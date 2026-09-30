@@ -1,0 +1,1053 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>10. 連立一次方程式の反復法 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_IterativeLinearSystems';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="11. 固有値問題と反復法" href="Chap_EigenvalueProblems.html" />
+    <link rel="prev" title="9. 常微分方程式の初期値問題" href="Chap_InitialValueProblems.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_IterativeLinearSystems.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>連立一次方程式の反復法</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">10.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">10.2. 波及を1段ずつ足す：産業連関の反復計算</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">10.3. 残差で修正する：反復法の共通の形</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">10.3.1. 2元の例を手で追う</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">10.4. いつ収束するか：対角優位</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">10.5. 大きな疎行列の例：格子上の方程式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">10.6. 残差で止めてよいか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">10.7. 直接法と反復法をどう選ぶか：フィルインとメモリ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-krylov">10.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 共役勾配法：Krylov部分空間で解く</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">10.9. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">10.10. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">10.11. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_IterativeLinearSystems.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">10. </span>連立一次方程式の反復法<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="Chap_LUFactorization.html"><span class="std std-doc">第5章</span></a>のGauss消去法・LU分解は、決まった回数の演算で解を構成する<strong>直接法</strong>である。途中の丸めを除けば、最後まで計算すれば答えが得られる。一方、未知数が数十万〜数百万になる問題では、次の二つが障害になる。</p>
+<ul class="simple">
+<li><p>密な行列として扱うと、分解に <span class="math notranslate nohighlight">\(O(n^3)\)</span> の演算、保存に <span class="math notranslate nohighlight">\(O(n^2)\)</span> のメモリが必要になる（第4・5章）。</p></li>
+<li><p>行列が疎でも、消去の途中でもともと0だった位置に非零が現れる<strong>フィルイン</strong>が起こり、メモリが足りなくなることがある（第4章）。</p></li>
+</ul>
+<p>そこで、近似解 <span class="math notranslate nohighlight">\(x_0,x_1,x_2,\ldots\)</span> を少しずつ改善していく<strong>反復法</strong>を使う。反復法は主に行列ベクトル積 <span class="math notranslate nohighlight">\(Ax\)</span> だけを使うので、疎行列の構造をそのまま活かせる。その代わり、第7章の非線形方程式と同じく、「いつ収束するか」「いつ止めるか」を自分で判断する必要がある。</p>
+<section id="id2">
+<h2><span class="section-number">10.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>直接法と反復法の違いを説明できる。</p></li>
+<li><p>産業連関の波及計算が、そのまま反復法になっていることを説明できる。</p></li>
+<li><p>Jacobi法とGauss-Seidel法を「残差を使った修正」として実装し、収束の条件（対角優位）を確かめられる。</p></li>
+<li><p>残差による停止条件と、解の前進誤差との関係を、条件数を使って説明できる。</p></li>
+<li><p>フィルインとメモリの観点から、直接法と反復法を選べる。</p></li>
+<li><p>♣ 共役勾配法が少ない反復で収束する理由の概略を説明できる。</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>本章は発展・応用編の第10章であり、講義では時間があれば扱う。第4章の残差・条件数・疎行列、第5章の前進代入と産業連関分析、第7章の反復と停止条件を使う。基本部分は標準ライブラリ <code class="docutils literal notranslate"><span class="pre">LinearAlgebra</span></code>、<code class="docutils literal notranslate"><span class="pre">SparseArrays</span></code>、<code class="docutils literal notranslate"><span class="pre">Random</span></code> だけで実行できる。</p>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">10.2. </span>波及を1段ずつ足す：産業連関の反復計算<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>第5章の産業連関分析では、投入係数行列 <span class="math notranslate nohighlight">\(A\)</span> と最終需要 <span class="math notranslate nohighlight">\(d\)</span> から、生産額 <span class="math notranslate nohighlight">\(x\)</span> を</p>
+<div class="math notranslate nohighlight">
+\[
+x=Ax+d
+\]</div>
+<p>の解として求めた。この式を「右辺の <span class="math notranslate nohighlight">\(x\)</span> に今の近似を入れ、左辺を次の近似にする」と読み替えると、</p>
+<div class="math notranslate nohighlight">
+\[
+x_{k+1}=d+Ax_k,\qquad x_0=0
+\]</div>
+<p>という反復になる。最初の数回を書き出すと</p>
+<div class="math notranslate nohighlight">
+\[
+x_1=d,\qquad
+x_2=d+Ad,\qquad
+x_3=d+Ad+A^2d,\qquad\ldots
+\]</div>
+<p>である。<span class="math notranslate nohighlight">\(d\)</span> は最終需要を満たすための直接の生産、<span class="math notranslate nohighlight">\(Ad\)</span> はそのために必要な原材料の生産（第1次の波及）、<span class="math notranslate nohighlight">\(A^2d\)</span> はその原材料のための生産（第2次の波及）を表す。経済学で「波及効果を段階的に足していく」と説明される計算そのものであり、同時に連立方程式 <span class="math notranslate nohighlight">\((I-A)x=d\)</span> の反復解法にもなっている。</p>
+<p>何回くらい足せば、第5章でLU分解から求めた解と3桁一致するだろうか。予想してから実行しよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="p">,</span><span class="w"> </span><span class="n">SparseArrays</span><span class="p">,</span><span class="w"> </span><span class="n">Random</span>
+
+<span class="n">Ain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.10</span><span class="w"> </span><span class="mf">0.05</span><span class="w"> </span><span class="mf">0.02</span><span class="p">;</span><span class="w">      </span><span class="c"># 第5章と同じ投入係数行列</span>
+<span class="w">       </span><span class="mf">0.20</span><span class="w"> </span><span class="mf">0.40</span><span class="w"> </span><span class="mf">0.15</span><span class="p">;</span>
+<span class="w">       </span><span class="mf">0.10</span><span class="w"> </span><span class="mf">0.20</span><span class="w"> </span><span class="mf">0.25</span><span class="p">]</span>
+<span class="n">d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">50.0</span><span class="p">,</span><span class="w"> </span><span class="mf">300.0</span><span class="p">,</span><span class="w"> </span><span class="mf">400.0</span><span class="p">]</span>
+<span class="n">x_direct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">I</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Ain</span><span class="p">)</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">d</span><span class="w">    </span><span class="c"># 直接法による解（比較の基準）</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">ripple_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">nrounds</span><span class="p">;</span><span class="w"> </span><span class="n">reference</span><span class="p">,</span><span class="w"> </span><span class="n">report</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">))</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">d</span><span class="p">))</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nrounds</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">x</span><span class="w">         </span><span class="c"># 波及をもう1段足す</span>
+<span class="w">        </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">report</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;k=</span><span class="si">$k</span><span class="s">: x = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;, 相対誤差 = &quot;</span><span class="p">,</span>
+<span class="w">                               </span><span class="n">round</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">reference</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">reference</span><span class="p">),</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span>
+<span class="k">end</span>
+
+<span class="n">ripple_iteration</span><span class="p">(</span><span class="n">Ain</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">;</span><span class="w"> </span><span class="n">reference</span><span class="o">=</span><span class="n">x_direct</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;投入係数の列和の最大値 opnorm(Ain, 1) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">opnorm</span><span class="p">(</span><span class="n">Ain</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k=1: x = [50.0, 300.0, 400.0], 相対誤差 = 0.525
+k=2: x = [78.0, 490.0, 565.0], 相対誤差 = 0.282
+k=3: x = [93.6, 596.35, 647.05], 相対誤差 = 0.152
+k=5: x = [106.74, 685.71, 713.67], 相対誤差 = 0.0444
+k=10: x = [111.92, 720.94, 739.73], 相対誤差 = 0.00205
+k=20: x = [112.17, 722.63, 740.99], 相対誤差 = 4.34e-6
+k=30: x = [112.17, 722.64, 740.99], 相対誤差 = 9.22e-9
+投入係数の列和の最大値 opnorm(Ain, 1) = 0.65
+</pre></div>
+</div>
+</div>
+</div>
+<p>10回で相対誤差は約 <span class="math notranslate nohighlight">\(2\times10^{-3}\)</span>、20回で約 <span class="math notranslate nohighlight">\(4\times10^{-6}\)</span> となり、直接法の解に近づいた。</p>
+<p>なぜ収束するのかを見よう。真の解は <span class="math notranslate nohighlight">\(x=d+Ax\)</span> を満たすので、誤差 <span class="math notranslate nohighlight">\(e_k=x_k-x\)</span> について</p>
+<div class="math notranslate nohighlight">
+\[
+e_{k+1}=x_{k+1}-x=(d+Ax_k)-(d+Ax)=Ae_k
+\]</div>
+<p>が成り立つ。<strong>誤差には毎回同じ行列 <span class="math notranslate nohighlight">\(A\)</span> がかかる。</strong> 第4章の♣節で見た1ノルムの作用素ノルム（列の絶対値和の最大値）を使うと</p>
+<div class="math notranslate nohighlight">
+\[
+\|e_{k+1}\|_1\le\|A\|_1\|e_k\|_1=0.65\,\|e_k\|_1
+\]</div>
+<p>である。どの産業も、1単位の生産に使う中間投入の合計が0.65以下なので、波及は1段ごとに65%以下に縮む。したがって誤差は <span class="math notranslate nohighlight">\(0.65^k\)</span> 倍以下になり、0に近づく。実際の縮み方はこの上界より速い。</p>
+<p>この「誤差に毎回かかる行列が、ベクトルを縮めるなら収束する」という見方が、以下のすべての反復法に共通する。</p>
+</section>
+<section id="id4">
+<h2><span class="section-number">10.3. </span>残差で修正する：反復法の共通の形<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>一般の <span class="math notranslate nohighlight">\(Ax=b\)</span> に戻ろう。第4章の後退誤差の考え方では、残差 <span class="math notranslate nohighlight">\(r_k=b-Ax_k\)</span> は「今の近似が方程式をどれだけ満たしていないか」を表した。もし <span class="math notranslate nohighlight">\(A\)</span> で簡単に割れるなら、<span class="math notranslate nohighlight">\(x_k+A^{-1}r_k\)</span> が厳密解になる。しかし、それは元の問題を解くことと同じである。</p>
+<p>そこで、<span class="math notranslate nohighlight">\(A\)</span> に近く、しかも<strong>簡単に解ける</strong>行列 <span class="math notranslate nohighlight">\(M\)</span> を選び、</p>
+<div class="math notranslate nohighlight">
+\[
+x_{k+1}=x_k+M^{-1}r_k,\qquad r_k=b-Ax_k
+\]</div>
+<p>と修正を繰り返す。実際に <span class="math notranslate nohighlight">\(M^{-1}\)</span> を作るのではなく、<span class="math notranslate nohighlight">\(Mz=r_k\)</span> を解いて <span class="math notranslate nohighlight">\(z\)</span> を足す。産業連関の反復は、<span class="math notranslate nohighlight">\(A\)</span> を <span class="math notranslate nohighlight">\(I-A_{\mathrm{in}}\)</span>、<span class="math notranslate nohighlight">\(M=I\)</span> とした場合にあたる（確かめてみよ）。</p>
+<p>誤差は <span class="math notranslate nohighlight">\(e_{k+1}=(I-M^{-1}A)e_k\)</span> と更新されるので、<span class="math notranslate nohighlight">\(G=I-M^{-1}A\)</span> がベクトルを縮めれば収束する。<span class="math notranslate nohighlight">\(M\)</span> が <span class="math notranslate nohighlight">\(A\)</span> に近いほど <span class="math notranslate nohighlight">\(G\)</span> は小さくなり、少ない反復で済む。一方、<span class="math notranslate nohighlight">\(Mz=r\)</span> を解く手間は増える。代表的な選び方は次のとおりである。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>方法</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(M\)</span> の選び方</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(Mz=r\)</span> の解き方</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>産業連関の波及計算</p></td>
+<td><p><span class="math notranslate nohighlight">\(I\)</span>（<span class="math notranslate nohighlight">\(A=I-A_{\mathrm{in}}\)</span> に対して）</p></td>
+<td><p>そのまま <span class="math notranslate nohighlight">\(z=r\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Jacobi法</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(A\)</span> の対角部分 <span class="math notranslate nohighlight">\(D\)</span></p></td>
+<td><p>各成分を対角成分で割る</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Gauss-Seidel法</strong></p></td>
+<td><p><span class="math notranslate nohighlight">\(A\)</span> の下三角部分（対角を含む）</p></td>
+<td><p>前進代入（第5章）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>成分で書くと、Jacobi法は「第 <span class="math notranslate nohighlight">\(i\)</span> 式を <span class="math notranslate nohighlight">\(x_i\)</span> について解き、他の未知数には前回の値を入れる」方法である。</p>
+<div class="math notranslate nohighlight">
+\[
+x_i^{(k+1)}=\frac{1}{a_{ii}}\Bigl(b_i-\sum_{j\ne i}a_{ij}x_j^{(k)}\Bigr)
+\]</div>
+<p>Gauss-Seidel法は、同じ反復の中ですでに更新した <span class="math notranslate nohighlight">\(x_1^{(k+1)},\ldots,x_{i-1}^{(k+1)}\)</span> をすぐに使う。この「新しい値をすぐ使う」操作が、下三角行列による前進代入に対応する。</p>
+<section id="id5">
+<h3><span class="section-number">10.3.1. </span>2元の例を手で追う<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+4x_1+x_2&amp;=9,\\
+2x_1+5x_2&amp;=9
+\end{aligned}
+\end{split}\]</div>
+<p>の解は <span class="math notranslate nohighlight">\((2,1)\)</span> である。<span class="math notranslate nohighlight">\(x^{(0)}=(0,0)\)</span> から始めると、</p>
+<p>**青は前回の値（上付き0）、橙は今回の更新値（上付き1）**として、最初の1回を並べる。色を外しても、上付きの番号で使う時点を区別できる。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>更新する成分</p></th>
+<th class="head"><p>Jacobi法：前回の値を使う</p></th>
+<th class="head"><p>Gauss-Seidel法：更新済みなら今回の値を使う</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(x_1^{(1)}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\((9-\textcolor{#0072B2}{x_2^{(0)}})/4=(9-0)/4=2.25\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\((9-\textcolor{#0072B2}{x_2^{(0)}})/4=2.25\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(x_2^{(1)}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\((9-2\textcolor{#0072B2}{x_1^{(0)}})/5=(9-0)/5=1.8\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\((9-2\textcolor{#B54A00}{x_1^{(1)}})/5=(9-2\times2.25)/5=0.9\)</span></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>違いが出るのは2行目である。Jacobi法は更新前の <span class="math notranslate nohighlight">\(x_1^{(0)}=0\)</span> を使い、Gauss-Seidel法は今求めた <span class="math notranslate nohighlight">\(x_1^{(1)}=2.25\)</span> をすぐに使う。</p>
+<p>次の反復では、Jacobi法は <span class="math notranslate nohighlight">\(x^{(2)}=(1.8,0.9)\)</span>、Gauss-Seidel法は <span class="math notranslate nohighlight">\(x^{(2)}=(2.025,0.99)\)</span> となる。</p>
+<p>次のコードは、上の共通の形をそのまま実装したものである。<code class="docutils literal notranslate"><span class="pre">stationary_iteration</span></code> は <span class="math notranslate nohighlight">\(Mz=r\)</span> を解く関数 <code class="docutils literal notranslate"><span class="pre">solve_M</span></code> を受け取り、毎回の相対残差を記録する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">solve_M</span><span class="p">;</span><span class="w"> </span><span class="n">x0</span><span class="o">=</span><span class="n">zeros</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">)),</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100_000</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">bnorm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">[]</span><span class="w">                  </span><span class="c"># 各反復の相対残差</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">x</span><span class="w">                      </span><span class="c"># 残差</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="n">bnorm</span><span class="p">)</span>
+<span class="w">        </span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">rtol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="n">isfinite</span><span class="p">(</span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">])</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">break</span><span class="w">  </span><span class="c"># 発散したら止める</span>
+<span class="w">        </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">maxiter</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">solve_M</span><span class="p">(</span><span class="n">r</span><span class="p">))</span><span class="w">   </span><span class="c"># Mz = r を解いて修正する</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">length</span><span class="p">(</span><span class="n">history</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">jacobi_solver</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">dA</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">diag</span><span class="p">(</span><span class="n">A</span><span class="p">);</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">dA</span><span class="p">)</span><span class="w">                       </span><span class="c"># M = 対角部分</span>
+<span class="n">gauss_seidel_solver</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">LowerTriangular</span><span class="p">(</span><span class="n">tril</span><span class="p">(</span><span class="n">A</span><span class="p">));</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">L</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">r</span><span class="p">)</span><span class="w">   </span><span class="c"># M = 下三角部分</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">show_iterates</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">make_solver</span><span class="p">,</span><span class="w"> </span><span class="n">nsteps</span><span class="p">)</span>
+<span class="w">    </span><span class="n">solve_M</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_solver</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">solve_M</span><span class="p">(</span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;  k=</span><span class="si">$k</span><span class="s">: x = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+
+<span class="n">A_small</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">4.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">2.0</span><span class="w"> </span><span class="mf">5.0</span><span class="p">]</span>
+<span class="n">b_small</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">9.0</span><span class="p">,</span><span class="w"> </span><span class="mf">9.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Jacobi法&quot;</span><span class="p">);</span><span class="w"> </span><span class="n">show_iterates</span><span class="p">(</span><span class="n">A_small</span><span class="p">,</span><span class="w"> </span><span class="n">b_small</span><span class="p">,</span><span class="w"> </span><span class="n">jacobi_solver</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Gauss-Seidel法&quot;</span><span class="p">);</span><span class="w"> </span><span class="n">show_iterates</span><span class="p">(</span><span class="n">A_small</span><span class="p">,</span><span class="w"> </span><span class="n">b_small</span><span class="p">,</span><span class="w"> </span><span class="n">gauss_seidel_solver</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Jacobi法
+  k=1: x = [2.25, 1.8]
+  k=2: x = [1.8, 0.9]
+  k=3: x = [2.025, 1.08]
+  k=4: x = [1.98, 0.99]
+Gauss-Seidel法
+  k=1: x = [2.25, 0.9]
+  k=2: x = [2.025, 0.99]
+  k=3: x = [2.0025, 0.999]
+  k=4: x = [2.0002, 0.9999]
+</pre></div>
+</div>
+</div>
+</div>
+<p>最初の2回は手計算と一致する。4回後の誤差は、Jacobi法で約0.02、Gauss-Seidel法で約0.0002である。この例では、新しい値をすぐ使うGauss-Seidel法の方がずっと速く収束する。</p>
+<p><code class="docutils literal notranslate"><span class="pre">gauss_seidel_solver</span></code> の中身は、第5章で実装した前進代入を、Juliaの <code class="docutils literal notranslate"><span class="pre">LowerTriangular</span></code> に任せたものである。反復法の1回の修正の中に、直接法で学んだ三角行列の解法が部品として使われている。</p>
+</section>
+</section>
+<section id="id6">
+<h2><span class="section-number">10.4. </span>いつ収束するか：対角優位<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>反復法はいつでも収束するわけではない。Jacobi法では、誤差にかかる行列は <span class="math notranslate nohighlight">\(G=I-D^{-1}A\)</span> であり、その <span class="math notranslate nohighlight">\((i,j)\)</span> 成分は <span class="math notranslate nohighlight">\(i\ne j\)</span> で <span class="math notranslate nohighlight">\(-a_{ij}/a_{ii}\)</span>、対角では0である。第4章の♣節の∞ノルム（行の絶対値和の最大値）を使うと</p>
+<div class="math notranslate nohighlight">
+\[
+\|G\|_\infty=\max_i\frac{\sum_{j\ne i}|a_{ij}|}{|a_{ii}|}
+\]</div>
+<p>となる。したがって、すべての行で</p>
+<div class="math notranslate nohighlight">
+\[
+|a_{ii}|&gt;\sum_{j\ne i}|a_{ij}|
+\]</div>
+<p>が成り立てば <span class="math notranslate nohighlight">\(\|G\|_\infty&lt;1\)</span> となり、どんな初期値からでも誤差は縮む。この性質を<strong>狭義対角優位</strong>という。「各式で、自分の未知数の係数がほかの係数の合計より大きい」という意味である。狭義対角優位ならGauss-Seidel法も収束することが知られている。</p>
+<p>上の例 <span class="math notranslate nohighlight">\(\begin{bmatrix}4&amp;1\\2&amp;5\end{bmatrix}\)</span> は <span class="math notranslate nohighlight">\(4&gt;1\)</span>、<span class="math notranslate nohighlight">\(5&gt;2\)</span> なので対角優位である。逆に対角優位でない行列では、発散することがある。次の例では、<span class="math notranslate nohighlight">\(|1|&lt;|2|\)</span>、<span class="math notranslate nohighlight">\(|1|&lt;|3|\)</span> である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A_bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span><span class="w"> </span><span class="mf">3.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">b_bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span><span class="w">                   </span><span class="c"># 解は (1, 1)</span>
+<span class="n">bad</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_bad</span><span class="p">,</span><span class="w"> </span><span class="n">b_bad</span><span class="p">,</span><span class="w"> </span><span class="n">jacobi_solver</span><span class="p">(</span><span class="n">A_bad</span><span class="p">);</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対残差の履歴 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">bad</span><span class="o">.</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="n">A_swapped</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span><span class="w">       </span><span class="c"># 2本の式の順番を入れ替えたもの</span>
+<span class="n">b_swapped</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">good</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_swapped</span><span class="p">,</span><span class="w"> </span><span class="n">b_swapped</span><span class="p">,</span><span class="w"> </span><span class="n">jacobi_solver</span><span class="p">(</span><span class="n">A_swapped</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;式を入れ替えた場合: 反復 &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">good</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; 回, 解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">good</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>相対残差の履歴 = [1.0, 2.41, 6.0, 14.4, 36.0, 86.7, 216.0, 520.0, 1300.0]
+式を入れ替えた場合: 反復 26 回, 解 = [0.9999999999234345, 0.9999999999234344]
+</pre></div>
+</div>
+</div>
+</div>
+<p>対角優位でない行列では、相対残差が反復ごとに約2.4倍ずつ増えて発散する。同じ2本の式の<strong>順番を入れ替える</strong>と対角優位になり、収束する。式の順番を変えても解は変わらないが、反復法の振る舞いは大きく変わる。第5章の行交換と同じく、「数学的に同じ問題」でも計算手順の選び方が結果を左右する。</p>
+<p>対角優位は十分条件であり、必要条件ではない。次の節の格子の問題は、対角成分4に対して非対角の絶対値和がちょうど4以下という「ぎりぎり」の場合だが、対称正定値でもあるので収束する。一般の収束条件は、<span class="math notranslate nohighlight">\(G\)</span> の固有値の絶対値の最大値（スペクトル半径）が1未満であることで、第11章の固有値の考え方を使って調べられる。</p>
+</section>
+<section id="id7">
+<h2><span class="section-number">10.5. </span>大きな疎行列の例：格子上の方程式<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>板の上の定常的な温度分布や、地図上で各地点の値が近隣の値となめらかにつながる状況を考える。正方形を <span class="math notranslate nohighlight">\(m\times m\)</span> の格子点に分け、各点の値 <span class="math notranslate nohighlight">\(u_{ij}\)</span> が</p>
+<div class="math notranslate nohighlight">
+\[
+4u_{ij}-u_{i-1,j}-u_{i+1,j}-u_{i,j-1}-u_{i,j+1}=f_{ij}
+\]</div>
+<p>を満たすとする（境界の外側の値は0とする）。これは偏微分方程式を第8章の2階差分で離散化したものであり、未知数は <span class="math notranslate nohighlight">\(N=m^2\)</span> 個、各式に現れる未知数は高々5個である。行列 <span class="math notranslate nohighlight">\(A\)</span> は <span class="math notranslate nohighlight">\(N\times N\)</span> だが、各行の非零成分は5個以下の疎行列になる。</p>
+<p>次の <code class="docutils literal notranslate"><span class="pre">laplacian2d</span></code> は、第4章の三重対角行列 <code class="docutils literal notranslate"><span class="pre">spdiagm</span></code> を<strong>Kronecker積</strong> <code class="docutils literal notranslate"><span class="pre">kron</span></code> で組み合わせてこの行列を作る。作り方の細部は追わなくてよい。<span class="math notranslate nohighlight">\(m=10,20,40\)</span> で、Jacobi法とGauss-Seidel法が相対残差 <span class="math notranslate nohighlight">\(10^{-6}\)</span> に達するまでの反復回数を調べる。格子を細かくすると反復回数はどう変わるか、予想してから実行しよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">laplacian2d</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spdiagm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">Im</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sparse</span><span class="p">(</span><span class="mf">1.0</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">kron</span><span class="p">(</span><span class="n">Im</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">kron</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">Im</span><span class="p">)</span><span class="w">     </span><span class="c"># 各行に 4 と -1 が並ぶ N×N 疎行列</span>
+<span class="k">end</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;m=4 の行列の第6行の非零成分: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nonzeros</span><span class="p">(</span><span class="n">laplacian2d</span><span class="p">(</span><span class="mi">4</span><span class="p">)[</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">]))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;m | N | 非零成分数 | 条件数 | Jacobi | Gauss-Seidel&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span>
+<span class="w">    </span><span class="n">A_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">laplacian2d</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">b_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ones</span><span class="p">(</span><span class="n">m</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="n">jac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">jacobi_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">gs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">gauss_seidel_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">^</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nnz</span><span class="p">(</span><span class="n">A_grid</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">cond</span><span class="p">(</span><span class="kt">Matrix</span><span class="p">(</span><span class="n">A_grid</span><span class="p">)),</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">            </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">jac</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">gs</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>m=4 の行列の第6行の非零成分: [-1.0, -1.0, 4.0, -1.0, -1.0]
+m | N | 非零成分数 | 条件数 | Jacobi | Gauss-Seidel
+10 | 100 | 460 | 48.4 | 332 | 167
+20 | 400 | 1920 | 178.0 | 1216 | 609
+40 | 1600 | 7840 | 681.0 | 4639 | 2321
+</pre></div>
+</div>
+</div>
+</div>
+<p>格子の一辺 <span class="math notranslate nohighlight">\(m\)</span> を2倍にすると、反復回数はJacobi法・Gauss-Seidel法とも約4倍になり、条件数も約4倍になる。Gauss-Seidel法の反復回数はJacobi法の約半分である。</p>
+<p>1回の反復は疎行列ベクトル積と、対角での割り算または疎な前進代入なので、仕事量は <span class="math notranslate nohighlight">\(O(\mathrm{nnz}(A))=O(N)\)</span> である。しかし反復回数が <span class="math notranslate nohighlight">\(m^2=N\)</span> に比例して増えるので、全体では <span class="math notranslate nohighlight">\(O(N^2)\)</span> の仕事になる。格子の値が隣の点としか直接やり取りしないため、端の情報が反対側へ伝わるのに何回もの反復が必要になる、と直感的に理解できる。この遅さを改善するのが、♣節の共役勾配法や、粗い格子と細かい格子を組み合わせるマルチグリッド法である。</p>
+</section>
+<section id="id8">
+<h2><span class="section-number">10.6. </span>残差で止めてよいか<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>反復法は、相対残差 <span class="math notranslate nohighlight">\(\|b-Ax_k\|/\|b\|\)</span> が指定した <code class="docutils literal notranslate"><span class="pre">rtol</span></code> 以下になったら止めるのが基本である。残差は真の解を知らなくても計算できるからである。では、<code class="docutils literal notranslate"><span class="pre">rtol=1e-6</span></code> で止めれば、解も6桁正しいのだろうか。</p>
+<p>第4章の不等式</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|x_k-x\|}{\|x\|}\le\kappa(A)\,\frac{\|b-Ax_k\|}{\|b\|}
+\]</div>
+<p>によれば、前進誤差は最大で条件数倍まで大きくなり得る。<span class="math notranslate nohighlight">\(m=40\)</span> の格子では <span class="math notranslate nohighlight">\(\kappa\approx681\)</span> なので、上界は約 <span class="math notranslate nohighlight">\(7\times10^{-4}\)</span> である。実際にどうなるかを、解が滑らかな場合（右辺がすべて1）と、解がばらつく場合（真の解を乱数で作る）で比べよう。どちらも同じ停止条件のGauss-Seidel法を使う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">compare_forward_errors</span><span class="p">(</span><span class="n">m</span><span class="p">;</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">A_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">laplacian2d</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="o">^</span><span class="mi">2</span>
+<span class="w">    </span><span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="n">x_true</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="s">&quot;滑らかな解&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_grid</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">ones</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;ばらつく解&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="n">N</span><span class="p">)))</span>
+<span class="w">        </span><span class="n">b_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_grid</span><span class="o">*</span><span class="n">x_true</span>
+<span class="w">        </span><span class="n">gs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">gauss_seidel_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="n">rtol</span><span class="p">)</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;: 反復 &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">gs</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; 回, 相対残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">                </span><span class="s">&quot;, 相対誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x_true</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">x_true</span><span class="p">),</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;条件数 × rtol = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">cond</span><span class="p">(</span><span class="kt">Matrix</span><span class="p">(</span><span class="n">A_grid</span><span class="p">))</span><span class="o">*</span><span class="n">rtol</span><span class="p">,</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="k">end</span>
+<span class="n">compare_forward_errors</span><span class="p">(</span><span class="mi">40</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>滑らかな解: 反復 2321 回, 相対残差 = 9.95e-7, 相対誤差 = 1.19e-6
+ばらつく解: 反復 522 回, 相対残差 = 9.99e-7, 相対誤差 = 0.000364
+条件数 × rtol = 0.000681
+</pre></div>
+</div>
+</div>
+</div>
+<p>同じ相対残差 <span class="math notranslate nohighlight">\(10^{-6}\)</span> で止めたのに、解が滑らかな場合の相対誤差は約 <span class="math notranslate nohighlight">\(10^{-6}\)</span>、ばらつく場合は約 <span class="math notranslate nohighlight">\(4\times10^{-4}\)</span> と、300倍以上違う。後者は第4章の上界にかなり近い。</p>
+<p>理由は次のとおりである。Gauss-Seidel法は、隣の点との細かい振動のような誤差をすぐに消すが、格子全体にわたるなだらかな誤差はなかなか消せない。ところが、なだらかな誤差ベクトル <span class="math notranslate nohighlight">\(e\)</span> に <span class="math notranslate nohighlight">\(A\)</span> をかけると、隣どうしの差をとる計算なので <span class="math notranslate nohighlight">\(Ae\)</span> はとても小さくなる。そのため、<strong>残差 <span class="math notranslate nohighlight">\(r=-Ae\)</span> には現れにくい誤差が、解の中に残っている</strong>。第4章で見た <span class="math notranslate nohighlight">\(\operatorname{diag}(1,\delta)\)</span> の例で、第2成分の誤差が残差では <span class="math notranslate nohighlight">\(\delta\)</span> 倍に縮んで見えたのと同じ仕組みである。</p>
+<p>ここから、次の教訓が得られる。</p>
+<ul class="simple">
+<li><p>停止条件の <code class="docutils literal notranslate"><span class="pre">rtol</span></code> は、解の誤差の許容値そのものではない。誤差を <span class="math notranslate nohighlight">\(\varepsilon\)</span> 以下にしたければ、目安として <span class="math notranslate nohighlight">\(\mathrm{rtol}\approx\varepsilon/\kappa\)</span> まで下げる必要がある。</p></li>
+<li><p>条件数が分からない場合は、<code class="docutils literal notranslate"><span class="pre">rtol</span></code> を1桁ずつ下げて解がどれだけ変わるかを見る、別の方法の解と比べる、など複数の手がかりを組み合わせる（第1章の検証の考え方）。</p></li>
+<li><p>どちらの右辺でも <span class="math notranslate nohighlight">\(\kappa\times\mathrm{rtol}\)</span> の上界は守られている。上界は「最悪でもこの程度」を教え、実際の誤差は問題（ここでは解の形）と解法の性質で決まる。</p></li>
+</ul>
+</section>
+<section id="id9">
+<h2><span class="section-number">10.7. </span>直接法と反復法をどう選ぶか：フィルインとメモリ<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<p>では、格子の問題には常に反復法を使うべきだろうか。Juliaの <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code> やLU分解は、疎行列に対しては、フィルインが少なくなるように行と列の順番を工夫する<strong>疎行列用の直接法</strong>を使う。<span class="math notranslate nohighlight">\(L,U\)</span> に現れる非零成分の数を、元の行列や、密な行列として保存した場合と比べよう。2次元の格子に加えて、3次元の格子（立方体を <span class="math notranslate nohighlight">\(m\times m\times m\)</span> に分け、各式に未知数が7個現れる）も調べる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">laplacian3d</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spdiagm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">),</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">Im</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sparse</span><span class="p">(</span><span class="mf">1.0</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">kron</span><span class="p">(</span><span class="n">Im</span><span class="p">,</span><span class="w"> </span><span class="n">Im</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">kron</span><span class="p">(</span><span class="n">Im</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">Im</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">kron</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">Im</span><span class="p">,</span><span class="w"> </span><span class="n">Im</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;次元 | m | 未知数N | nnz(A) | nnz(L)+nnz(U) | 倍率 | 密行列の成分数N^2&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span><span class="w"> </span><span class="n">builder</span><span class="p">,</span><span class="w"> </span><span class="n">sizes</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="s">&quot;2次元&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">laplacian2d</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">)),</span>
+<span class="w">                                    </span><span class="p">(</span><span class="s">&quot;3次元&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">laplacian3d</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">30</span><span class="p">)))</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">sizes</span>
+<span class="w">        </span><span class="n">A_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">builder</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">        </span><span class="n">F_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lu</span><span class="p">(</span><span class="n">A_grid</span><span class="p">)</span><span class="w">                     </span><span class="c"># 疎行列用のLU分解</span>
+<span class="w">        </span><span class="n">nnz_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nnz</span><span class="p">(</span><span class="n">F_grid</span><span class="o">.</span><span class="n">L</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">nnz</span><span class="p">(</span><span class="n">F_grid</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+<span class="w">        </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="n">dimension</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nnz</span><span class="p">(</span><span class="n">A_grid</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nnz_factor</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">round</span><span class="p">(</span><span class="n">nnz_factor</span><span class="o">/</span><span class="n">nnz</span><span class="p">(</span><span class="n">A_grid</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>次元 | m | 未知数N | nnz(A) | nnz(L)+nnz(U) | 倍率 | 密行列の成分数N^2
+2次元 | 50 | 2500 | 12300 | 71826 | 5.8 | 6250000
+2次元 | 100 | 10000 | 49600 | 412664 | 8.3 | 100000000
+2次元 | 200 | 40000 | 199200 | 2163822 | 10.9 | 1600000000
+3次元 | 10 | 1000 | 6400 | 64380 | 10.1 | 1000000
+3次元 | 20 | 8000 | 53600 | 1684564 | 31.4 | 64000000
+3次元 | 30 | 27000 | 183600 | 11211548 | 61.1 | 729000000
+</pre></div>
+</div>
+</div>
+</div>
+<p>2次元の格子では、<span class="math notranslate nohighlight">\(L,U\)</span> の非零成分は元の行列の6〜11倍に増えるが、密な行列として保存する <span class="math notranslate nohighlight">\(N^2\)</span> 個よりはるかに少ない。この規模の2次元問題なら、疎行列用の直接法（<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code>）は速く、何千回も反復するJacobi法やGauss-Seidel法より有利である。<strong>反復法が常に優れているわけではない。</strong></p>
+<p>一方、3次元の格子では、同じ程度の未知数でもフィルインの倍率が10倍から61倍へと急に増える。3次元では各点が遠くの点と消去の過程で結び付きやすいためである。一辺 <span class="math notranslate nohighlight">\(m=100\)</span>（未知数100万）の3次元問題になると、分解の保存に必要なメモリは一般的な計算機の容量を超えやすい。ここで、<span class="math notranslate nohighlight">\(A\)</span> そのものの <span class="math notranslate nohighlight">\(O(\mathrm{nnz}(A))\)</span> のメモリだけで動く反復法が必要になる。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>状況</p></th>
+<th class="head"><p>第一候補</p></th>
+<th class="head"><p>理由</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>小〜中規模の密行列</p></td>
+<td><p>LU分解（<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code>）</p></td>
+<td><p>反復法の利点がない。<span class="math notranslate nohighlight">\(O(n^3)\)</span> でも十分速い</p></td>
+</tr>
+<tr class="row-odd"><td><p>同じ行列で右辺が多い</p></td>
+<td><p>LU分解を再利用</p></td>
+<td><p>分解後は1本あたり <span class="math notranslate nohighlight">\(O(n^2)\)</span> または疎な代入</p></td>
+</tr>
+<tr class="row-even"><td><p>2次元格子など、フィルインが許容できる疎行列</p></td>
+<td><p>疎行列用の直接法</p></td>
+<td><p>反復回数や停止条件を気にしなくてよい</p></td>
+</tr>
+<tr class="row-odd"><td><p>3次元格子・巨大なネットワークなど、フィルインで分解が保存できない</p></td>
+<td><p>反復法（対称正定値なら共役勾配法）</p></td>
+<td><p>行列ベクトル積とベクトル数本分のメモリで済む</p></td>
+</tr>
+<tr class="row-even"><td><p>行列を明示的に作れず、<span class="math notranslate nohighlight">\(Av\)</span> を計算する関数だけがある</p></td>
+<td><p>反復法</p></td>
+<td><p>直接法は行列の成分を必要とする</p></td>
+</tr>
+<tr class="row-odd"><td><p>近い問題を少しずつ変えて何度も解く</p></td>
+<td><p>反復法（前回の解を初期値にする）</p></td>
+<td><p>良い初期値から始めると反復回数が減る</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="clubsuit-krylov">
+<h2><span class="section-number">10.8. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 共役勾配法：Krylov部分空間で解く<a class="headerlink" href="#clubsuit-krylov" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(A\)</span> が対称正定値（第6章）のとき、<span class="math notranslate nohighlight">\(Ax=b\)</span> を解くことは、関数</p>
+<div class="math notranslate nohighlight">
+\[
+\phi(x)=\frac12x^TAx-b^Tx
+\]</div>
+<p>を最小にすることと同じである。実際、<span class="math notranslate nohighlight">\(\phi\)</span> の勾配は <span class="math notranslate nohighlight">\(Ax-b=-r\)</span> であり、最小点で0になる。第7章の最適化とのつながりで述べたように、連立方程式が最小化問題として見えるのである。</p>
+<p>残差の方向（最も急に下る方向）に進むだけでは、前に進んだ向きを後の反復で打ち消してしまい、遅い。<strong>共役勾配法</strong>（conjugate gradient; CG）は、進む方向 <span class="math notranslate nohighlight">\(p_0,p_1,\ldots\)</span> を互いに <span class="math notranslate nohighlight">\(p_i^TAp_j=0\)</span>（<span class="math notranslate nohighlight">\(i\ne j\)</span>）となるように選び、一度最小化した方向を後で崩さない。その結果、<span class="math notranslate nohighlight">\(k\)</span> 回目の近似 <span class="math notranslate nohighlight">\(x_k\)</span> は、第11章のKrylov部分空間</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{K}_k(A,b)=\operatorname{span}\{b,Ab,\ldots,A^{k-1}b\}
+\]</div>
+<p>の中で、<span class="math notranslate nohighlight">\(A\)</span> で重み付けした誤差を最小にする点になる。1回の反復に必要なのは、行列ベクトル積1回と内積2回、ベクトル数本分のメモリだけである。</p>
+<p>厳密な演算なら <span class="math notranslate nohighlight">\(N\)</span> 回以内に厳密解に到達するが、実用上は反復法として使う。誤差はおおよそ <span class="math notranslate nohighlight">\(\left(\frac{\sqrt\kappa-1}{\sqrt\kappa+1}\right)^k\)</span> の速さで減るので、必要な反復回数は <span class="math notranslate nohighlight">\(\kappa\)</span> ではなく <span class="math notranslate nohighlight">\(\sqrt\kappa\)</span> に比例する。格子の問題では <span class="math notranslate nohighlight">\(\kappa\propto m^2\)</span> なので、反復回数は <span class="math notranslate nohighlight">\(m\)</span> に比例する程度で済む。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">conjugate_gradient</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">10</span><span class="o">*</span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="w">    </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">)</span><span class="w">                  </span><span class="c"># x = 0 のときの残差</span>
+<span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w">                  </span><span class="c"># 最初の探索方向</span>
+<span class="w">    </span><span class="n">rr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">)</span>
+<span class="w">    </span><span class="n">bnorm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">sqrt</span><span class="p">(</span><span class="n">rr</span><span class="p">)</span><span class="o">/</span><span class="n">bnorm</span><span class="p">]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">Ap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">p</span><span class="w">                 </span><span class="c"># 1反復で1回だけの行列ベクトル積</span>
+<span class="w">        </span><span class="n">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rr</span><span class="o">/</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="n">Ap</span><span class="p">)</span><span class="w">        </span><span class="c"># p方向に最小化する歩幅</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">.+=</span><span class="w"> </span><span class="n">α</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">p</span>
+<span class="w">        </span><span class="n">r</span><span class="w"> </span><span class="o">.-=</span><span class="w"> </span><span class="n">α</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">Ap</span>
+<span class="w">        </span><span class="n">rr_new</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">)</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="n">sqrt</span><span class="p">(</span><span class="n">rr_new</span><span class="p">)</span><span class="o">/</span><span class="n">bnorm</span><span class="p">)</span>
+<span class="w">        </span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">rtol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="p">(</span><span class="n">rr_new</span><span class="o">/</span><span class="n">rr</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">p</span><span class="w">   </span><span class="c"># 以前の方向とA-直交する新しい方向</span>
+<span class="w">        </span><span class="n">rr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rr_new</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;m | Jacobi | Gauss-Seidel | 共役勾配法&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span>
+<span class="w">    </span><span class="n">A_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">laplacian2d</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">b_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ones</span><span class="p">(</span><span class="n">m</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="n">jac</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">jacobi_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">gs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">gauss_seidel_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">cg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conjugate_gradient</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">;</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">jac</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">gs</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cg</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span>
+<span class="w">            </span><span class="s">&quot;（解の相対差 &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">cg</span><span class="o">.</span><span class="n">x</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A_grid</span><span class="o">\</span><span class="n">b_grid</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">A_grid</span><span class="o">\</span><span class="n">b_grid</span><span class="p">),</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;）&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>m | Jacobi | Gauss-Seidel | 共役勾配法
+10 | 332 | 167 | 14（解の相対差 3.0e-8）
+20 | 1216 | 609 | 32（解の相対差 1.0e-8）
+40 | 4639 | 2321 | 63（解の相対差 1.7e-8）
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 図を再作成する場合のみ実行する。</span>
+<span class="c"># 未導入なら一度だけ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="k">let</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">20</span>
+<span class="w">    </span><span class="n">A_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">laplacian2d</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">b_grid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ones</span><span class="p">(</span><span class="n">m</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">    </span><span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">((</span><span class="s">&quot;Jacobi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">jacobi_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">),</span><span class="w"> </span><span class="ss">:orange</span><span class="p">),</span>
+<span class="w">               </span><span class="p">(</span><span class="s">&quot;Gauss-Seidel&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stationary_iteration</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">,</span><span class="w"> </span><span class="n">gauss_seidel_solver</span><span class="p">(</span><span class="n">A_grid</span><span class="p">);</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">),</span><span class="w"> </span><span class="ss">:seagreen</span><span class="p">),</span>
+<span class="w">               </span><span class="p">(</span><span class="s">&quot;conjugate gradient&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">conjugate_gradient</span><span class="p">(</span><span class="n">A_grid</span><span class="p">,</span><span class="w"> </span><span class="n">b_grid</span><span class="p">;</span><span class="w"> </span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">),</span><span class="w"> </span><span class="ss">:dodgerblue</span><span class="p">))</span>
+<span class="w">    </span><span class="n">fig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1050</span><span class="p">,</span><span class="w"> </span><span class="mi">460</span><span class="p">))</span>
+<span class="w">    </span><span class="n">ax_all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;iteration k&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;relative residual&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">yscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;All iterations (20×20 grid, N = 400)&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">ax_zoom</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;iteration k&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;relative residual&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">yscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;First 60 iterations&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">results</span>
+<span class="w">        </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">length</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+<span class="w">        </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax_all</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+<span class="w">        </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="mi">61</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">))</span>
+<span class="w">        </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax_zoom</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="p">],</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">ax</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="n">ax_all</span><span class="p">,</span><span class="w"> </span><span class="n">ax_zoom</span><span class="p">)</span>
+<span class="w">        </span><span class="n">hlines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">1e-6</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray55</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">ylims!</span><span class="p">(</span><span class="n">ax_zoom</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-11</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">axislegend</span><span class="p">(</span><span class="n">ax_all</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="w">    </span><span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;iterative_convergence.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-iterative-convergence">
+<a class="reference internal image-reference" href="../_images/iterative_convergence.svg"><img alt="20×20格子の問題に対するJacobi法、Gauss-Seidel法、共役勾配法の相対残差の履歴。左は全反復、右は最初の60回の拡大。共役勾配法は約40回で10のマイナス10乗に達するが、Jacobi法とGauss-Seidel法は千回以上かかる。" src="../_images/iterative_convergence.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 10.1 </span><span class="caption-text">相対残差の履歴（縦軸は対数目盛）。左は全体、右は最初の60回の拡大。Jacobi法とGauss-Seidel法はほぼ一定の割合で残差が減るので直線に見える。共役勾配法は、反復が進むほど減り方が速くなり、約40回で <span class="math notranslate nohighlight">\(10^{-10}\)</span> に達する。破線は本文の停止条件 <span class="math notranslate nohighlight">\(10^{-6}\)</span>。</span><a class="headerlink" href="#fig-iterative-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p><span class="math notranslate nohighlight">\(m\)</span> を2倍にすると、共役勾配法の反復回数は約2倍（14→32→63）にとどまり、Jacobi法の約4倍と比べて増え方が小さい。<span class="math notranslate nohighlight">\(m=40\)</span> では、Jacobi法の約4600回に対して約60回である。1回の仕事量はどちらも <span class="math notranslate nohighlight">\(O(N)\)</span> なので、差はそのまま計算時間の差になる。</p>
+<p>実用では、共役勾配法の各反復で、Jacobi法やGauss-Seidel法の <span class="math notranslate nohighlight">\(M\)</span> のような「<span class="math notranslate nohighlight">\(A\)</span> に近く簡単に解ける行列」を使って問題を解きやすく変換する<strong>前処理</strong>（preconditioning）を組み合わせる。本章で学んだ単純な反復法は、それ自体よりも、前処理の部品として今も使われている。Juliaでは <code class="docutils literal notranslate"><span class="pre">Krylov.jl</span></code> や <code class="docutils literal notranslate"><span class="pre">IterativeSolvers.jl</span></code> などのパッケージに、前処理付きの共役勾配法や、非対称な行列用のGMRES法などが実装されている。</p>
+</section>
+<section id="id10">
+<h2><span class="section-number">10.9. </span>まとめ<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>反復法は、簡単に解ける行列 <span class="math notranslate nohighlight">\(M\)</span> を使って <span class="math notranslate nohighlight">\(x_{k+1}=x_k+M^{-1}(b-Ax_k)\)</span> と残差で修正を繰り返す。誤差には毎回同じ行列 <span class="math notranslate nohighlight">\(I-M^{-1}A\)</span> がかかり、それがベクトルを縮めれば収束する。産業連関の波及計算（<span class="math notranslate nohighlight">\(M=I\)</span>）、Jacobi法（<span class="math notranslate nohighlight">\(M=\)</span> 対角）、Gauss-Seidel法（<span class="math notranslate nohighlight">\(M=\)</span> 下三角）はすべてこの形である。狭義対角優位なら収束が保証されるが、式の並べ方で振る舞いは変わる。</p>
+<p>停止条件の相対残差は、解の相対誤差の許容値そのものではない。前進誤差は最大で条件数倍になり得る。疎行列でも、フィルインが許容できる規模なら直接法が有利なことが多く、反復法はメモリが足りない巨大な問題や、行列ベクトル積しか使えない場合に力を発揮する。</p>
+</div>
+</section>
+<section id="id11">
+<h2><span class="section-number">10.10. </span>演習<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>手で反復する</strong>：<span class="math notranslate nohighlight">\(5x_1+2x_2=7\)</span>、<span class="math notranslate nohighlight">\(x_1+4x_2=5\)</span>（解は <span class="math notranslate nohighlight">\((1,1)\)</span>）に、<span class="math notranslate nohighlight">\(x^{(0)}=(0,0)\)</span> からJacobi法とGauss-Seidel法をそれぞれ2回適用せよ。この係数行列が狭義対角優位であることも確かめよ。</p></li>
+<li><p><strong>式の順番と収束</strong>：<span class="math notranslate nohighlight">\(x_1+3x_2=4\)</span>、<span class="math notranslate nohighlight">\(4x_1+x_2=5\)</span> にJacobi法を使うと収束するか。対角優位かどうかで判断し、式の順番を入れ替えた場合と比べよ。コードでも確かめること。</p></li>
+<li><p><strong>波及と反復回数</strong>：産業連関の例で、投入係数の列和の最大値が0.65から0.9になったとする。本文の上界 <span class="math notranslate nohighlight">\(\|e_k\|_1\le0.9^k\|e_0\|_1\)</span> から、誤差を初期の <span class="math notranslate nohighlight">\(10^{-6}\)</span> 倍以下にするのに必要な反復回数を見積もり、0.65の場合と比べよ。列和が1に近い経済では、波及の計算に何が起こるか。</p></li>
+<li><p><strong>停止条件の意味</strong>：「相対残差 <span class="math notranslate nohighlight">\(10^{-6}\)</span> で止めたのだから、解は6桁正しい」という主張に対し、本文の格子の実験を使って反論せよ。解の誤差を <span class="math notranslate nohighlight">\(10^{-6}\)</span> 以下にしたいとき、停止条件をどう決めればよいか。</p></li>
+<li><p><strong>探究：シナリオ分析と初期値</strong>：格子の問題（<span class="math notranslate nohighlight">\(m=40\)</span>）で、右辺 <span class="math notranslate nohighlight">\(b\)</span> を少しだけ変えた問題（例えば <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">.+</span> <span class="pre">0.01</span> <span class="pre">.*</span> <span class="pre">randn(N)</span></code>）を解く。初期値を0にした場合と、元の問題の解を初期値にした場合で、Gauss-Seidel法と共役勾配法の反復回数を比べよ。まず結果を予想して書き、次に実験せよ。右辺の変え方（小さく変える／大きく変える／滑らかに変える）によって差がどう変わるかも調べ、第5章の「分解の再利用」と比べて、どちらの方法がどのような場面で有利かを考察せよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id12">
+<h2><span class="section-number">10.11. </span>参考文献と関連する節<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>T. A. Driscoll and R. J. Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/krylov/overview.html">Chapter 8: Krylov methods in linear algebra</a>、<a class="reference external" href="https://tobydriscoll.net/fnc-julia/krylov/minrescg.html">§8.6 MINRES and conjugate gradients</a>。疎行列と反復法、共役勾配法の収束。</p></li>
+<li><p><a class="reference external" href="https://jso.dev/Krylov.jl/stable/">Krylov.jl</a>：Juliaで前処理付きの共役勾配法やGMRES法などを使うためのパッケージ。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_InitialValueProblems.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">9. </span>常微分方程式の初期値問題</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_EigenvalueProblems.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">11. </span>固有値問題と反復法</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">10.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">10.2. 波及を1段ずつ足す：産業連関の反復計算</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">10.3. 残差で修正する：反復法の共通の形</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">10.3.1. 2元の例を手で追う</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">10.4. いつ収束するか：対角優位</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">10.5. 大きな疎行列の例：格子上の方程式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">10.6. 残差で止めてよいか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">10.7. 直接法と反復法をどう選ぶか：フィルインとメモリ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-krylov">10.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 共役勾配法：Krylov部分空間で解く</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">10.9. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">10.10. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">10.11. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,1269 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Juliaと線形代数 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_Julia_LinearAlgebra';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="4. 誤差・条件数・計算量" href="Chap_NumericalAccuracyAndCost.html" />
+    <link rel="prev" title="2. Linux環境とコマンド" href="Chap_linux_env.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_Julia_LinearAlgebra.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Juliaと線形代数</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.2. コードを試す準備</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3.3. 変数と計算式：まず1ステップを読む</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">3.3.1. 型は、どのような値かを表す</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3.4. 関数と繰り返し：入力を変えて同じ計算を使う</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#for">3.4.1. forで更新を繰り返す</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">3.5. 複数の数をまとめる：ベクトルと配列</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">3.6. 行列の成分と形を確認する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">3.6.1. 行列をベクトルにかける</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">3.7. 行列積と要素ごとの演算を区別する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">3.7.1. ドットを付けて各要素に適用する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">3.8. ベクトルの内積と長さを測る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">3.9. 連立一次方程式を解き、答えを確かめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">3.10. 後の章のコードを読むために</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-numpy">3.11. Python/NumPyとの対応を振り返る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">3.12. つまずいたときに確認すること</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">3.13. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 計算時間が気になったら</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">3.14. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">3.15. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">3.16. 関連資料</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_Julia_LinearAlgebra.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="julia">
+<h1><span class="section-number">3. </span>Juliaと線形代数<a class="headerlink" href="#julia" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="Chap_linux_env.html"><span class="std std-doc">第2章</span></a>では、用意された減衰計算のコードをファイルに保存し、実行結果をログに残した。本章では、そのコードを読み、自分で条件や計算内容を変えられるようになることを目指す。その後、複数の数をまとめたベクトル・行列を扱う方法へ進む。</p>
+<p>なぜ数値解析で線形代数が必要なのだろうか。例えば、複数の測定値を並べるとベクトルになり、複数の未知数の関係をまとめると行列が現れる。後の章では、連立方程式や回帰、微分方程式の近似などを、ベクトルと行列を使って計算する。本章で、小さな例の意味を手計算とコードの両方で確かめておこう。</p>
+<section id="id1">
+<h2><span class="section-number">3.1. </span>この章の目標<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>第1・2章の更新式と、Juliaの変数・関数・繰り返しを対応づけられる。</p></li>
+<li><p>ベクトルと行列を作り、成分と大きさを確認できる。</p></li>
+<li><p>行列積と要素ごとの演算の違いを、手計算の例で説明できる。</p></li>
+<li><p>ベクトルの長さや内積を計算し、連立方程式の答えを代入して確認できる。</p></li>
+<li><p>後の章のコードに現れるキーワード引数・無名関数・名前付きタプルなどの書き方を読める。</p></li>
+</ul>
+<p>線形代数の基礎を復習したい場合は、<a class="reference external" href="https://sotayoshida.github.io/AIML1/notebooks/Chapter_math_linearalgebra.html">AI・機械学習論1の線形代数の章</a>も参照してほしい。ここでは実数のベクトルと行列を中心に扱い、必要な式を具体例とともに確認する。</p>
+</section>
+<section id="id2">
+<h2><span class="section-number">3.2. </span>コードを試す準備<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>第2章で使ったJuliaを引き続き利用する。本章の基本部分は、Julia本体と、同梱されている標準ライブラリ <code class="docutils literal notranslate"><span class="pre">LinearAlgebra</span></code> で実行できる。追加パッケージは必要ない。未導入の場合は<a class="reference external" href="https://julialang.org/downloads/">Julia公式インストール案内</a>を参照する。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>実行方法</p></th>
+<th class="head"><p>本章のコードを試すには</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.jl</span></code> ファイル</p></td>
+<td><p>コードを上から順に一つのファイルへ保存し、第2章と同様に <code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">ファイル名.jl</span></code> で実行する</p></td>
+</tr>
+<tr class="row-odd"><td><p>Juliaの対話画面（REPL）</p></td>
+<td><p>ターミナルで <code class="docutils literal notranslate"><span class="pre">julia</span></code> を起動し、<code class="docutils literal notranslate"><span class="pre">julia&gt;</span></code> の後へJuliaのコードを入力する</p></td>
+</tr>
+<tr class="row-even"><td><p>Jupyter Notebookなど</p></td>
+<td><p>Juliaを実行するカーネル・実行環境を選び、セルを上から順に実行する</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>ターミナルのシェルに対するコマンドと、Juliaのコードは区別しよう。本章のコードセルはJulia用である。複数行の関数などは、途中の1行だけでなく、対応する <code class="docutils literal notranslate"><span class="pre">end</span></code> までまとめて入力する。</p>
+<p>Notebookでは、実行済みの変数や関数が残っている。上のセルを書き換えたら、そのセルと、それに依存する後のセルを実行し直す。結果がおかしい場合は、カーネルを再起動して先頭から実行すると、古い変数への依存に気づけることがある。Colabなどを利用する場合も、コードを実行する言語がJuliaであることを確認する。</p>
+<p>本章では <code class="docutils literal notranslate"><span class="pre">println</span></code> で結果を明示的に表示する。対話画面では式の値が自動表示される場合があるが、ファイルとして実行した場合も出力が分かるように、この書き方を使う。</p>
+</section>
+<section id="id3">
+<h2><span class="section-number">3.3. </span>変数と計算式：まず1ステップを読む<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>第1章のEuler法は、現在の量 <span class="math notranslate nohighlight">\(N\)</span> から短時間後の量を</p>
+<div class="math notranslate nohighlight">
+\[
+N_{\mathrm{next}}=N-h\lambda N
+\]</div>
+<p>で求めた。第2章と同じく、<span class="math notranslate nohighlight">\(\lambda\)</span> は入力しやすい名前 <code class="docutils literal notranslate"><span class="pre">lambda</span></code> を使って表す。<span class="math notranslate nohighlight">\(N=1\)</span>、<span class="math notranslate nohighlight">\(h=0.5\)</span>、<span class="math notranslate nohighlight">\(\lambda=0.4\)</span> なら、次の量は <span class="math notranslate nohighlight">\(1-0.5\times0.4\times1=0.8\)</span> になる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.4</span>
+<span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="n">Nnext</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">h</span><span class="o">*</span><span class="n">lambda</span><span class="o">*</span><span class="n">N</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;現在の量 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;次の量 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Nnext</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>現在の量 = 1.0
+次の量 = 0.8
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">=</span></code> は右辺の値を左辺の名前に<strong>代入する</strong>記号である。数学の等式とは役割が異なる。例えば <code class="docutils literal notranslate"><span class="pre">N</span> <span class="pre">=</span> <span class="pre">N</span> <span class="pre">-</span> <span class="pre">h*lambda*N</span></code> と書けば、右辺を更新前の値で計算してから、<code class="docutils literal notranslate"><span class="pre">N</span></code> が指す値を更新する。上の例では <code class="docutils literal notranslate"><span class="pre">Nnext</span></code> という別の名前に結果を入れたので、元の <code class="docutils literal notranslate"><span class="pre">N</span></code> は1のままである。等しいかを調べる比較には <code class="docutils literal notranslate"><span class="pre">==</span></code> を使う。</p>
+<p>掛け算には <code class="docutils literal notranslate"><span class="pre">*</span></code>、累乗には <code class="docutils literal notranslate"><span class="pre">^</span></code> を使う。割り算 <code class="docutils literal notranslate"><span class="pre">/</span></code> の結果は、整数同士でも通常は浮動小数点数になる。Pythonで累乗に使う <code class="docutils literal notranslate"><span class="pre">**</span></code> との違いに注意しよう。</p>
+<section id="id4">
+<h3><span class="section-number">3.3.1. </span>型は、どのような値かを表す<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<p>整数 <code class="docutils literal notranslate"><span class="pre">3</span></code> と小数 <code class="docutils literal notranslate"><span class="pre">3.0</span></code> は数学的には等しい値だが、Juliaでは異なる<strong>型</strong>を持つ。<code class="docutils literal notranslate"><span class="pre">typeof</span></code> で型を確認できる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0</span>
+<span class="n">label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;decay&quot;</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;3の型 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">typeof</span><span class="p">(</span><span class="n">count</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;3.0の型 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">typeof</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;文字列の型 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">typeof</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;3/2 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;3^2 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3の型 = Int64
+3.0の型 = Float64
+文字列の型 = String
+3/2 = 1.5
+3^2 = 9
+</pre></div>
+</div>
+</div>
+</div>
+<p>一般的な64ビット環境では、型はそれぞれ <code class="docutils literal notranslate"><span class="pre">Int64</span></code>（整数）、<code class="docutils literal notranslate"><span class="pre">Float64</span></code>（倍精度浮動小数点数）、<code class="docutils literal notranslate"><span class="pre">String</span></code>（文字列）となる。通常、変数を使うたびに型を宣言する必要はなく、代入する値から決まる。<code class="docutils literal notranslate"><span class="pre">Float64</span></code> も有限桁で数を表すため、第1章で見た丸めが起こることを思い出そう。</p>
+</section>
+</section>
+<section id="id5">
+<h2><span class="section-number">3.4. </span>関数と繰り返し：入力を変えて同じ計算を使う<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>同じ更新を何度も書く代わりに、入力を受け取って計算結果を返す<strong>関数</strong>にまとめる。例えば、1ステップ分の計算は次のように書ける。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">decay_step</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">h</span><span class="o">*</span><span class="n">lambda</span><span class="o">*</span><span class="n">N</span>
+<span class="k">end</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;1ステップ後 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">decay_step</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;もう1ステップ後 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">decay_step</span><span class="p">(</span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1ステップ後 = 0.8
+もう1ステップ後 = 0.64
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">function</span></code> の後ろに関数名と入力の名前（引数）を書き、<code class="docutils literal notranslate"><span class="pre">return</span></code> で結果を返す。<code class="docutils literal notranslate"><span class="pre">end</span></code> は関数の定義の終わりである。関数を<strong>定義すること</strong>と、<code class="docutils literal notranslate"><span class="pre">decay_step(1.0,</span> <span class="pre">0.4,</span> <span class="pre">0.5)</span></code> のように<strong>呼び出して計算すること</strong>は別の操作である。</p>
+<p>この場合、関数内の <code class="docutils literal notranslate"><span class="pre">N</span></code>、<code class="docutils literal notranslate"><span class="pre">lambda</span></code>、<code class="docutils literal notranslate"><span class="pre">h</span></code> は呼び出し時に渡した値を使う。外側に同じ名前の変数があっても、それを使っているわけではない。必要な値を引数として渡すと、計算条件が明確になり、同じ関数を別の条件でも使える。</p>
+<section id="for">
+<h3><span class="section-number">3.4.1. </span>forで更新を繰り返す<a class="headerlink" href="#for" title="Link to this heading">#</a></h3>
+<p>第2章の <code class="docutils literal notranslate"><span class="pre">main</span></code> は、関数の中で初期量やステップ数を固定していた。今度はそれらを引数として受け取り、条件を変えて使えるようにする。次は第1章と同じEuler法の関数を、条件分岐も明示して書いたものである。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">euler_decay</span><span class="p">(</span><span class="n">lambda</span><span class="p">,</span><span class="w"> </span><span class="n">N0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="o">::</span><span class="kt">Integer</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;ステップ数nは正の整数にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">0</span>
+<span class="w">        </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;最終時刻Tは正にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="o">/</span><span class="n">n</span>
+<span class="w">    </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N0</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">n</span>
+<span class="w">        </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">decay_step</span><span class="p">(</span><span class="n">N</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">N</span>
+<span class="k">end</span>
+
+<span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">euler_decay</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;n=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;: N(T)=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n=5: N(T)=0.07776
+n=10: N(T)=0.10737418240000003
+n=20: N(T)=0.12157665459056928
+</pre></div>
+</div>
+</div>
+</div>
+<p>結果は第1章と同じく、約0.077760、0.107374、0.121577となる。関数内の各部分を読み解こう。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>記述</p></th>
+<th class="head"><p>意味</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">n::Integer</span></code></p></td>
+<td><p>この引数として整数を受け取る指定</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">if</span> <span class="pre">n</span> <span class="pre">&lt;=</span> <span class="pre">0</span> <span class="pre">...</span> <span class="pre">end</span></code></p></td>
+<td><p>条件が成り立つときだけ中を実行する。ここでは <code class="docutils literal notranslate"><span class="pre">error</span></code> で理由を表示して処理を止める</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">h</span> <span class="pre">=</span> <span class="pre">T/n</span></code></p></td>
+<td><p>比較する最終時刻をそろえるため、ステップ数から刻み幅を決める</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">k</span> <span class="pre">in</span> <span class="pre">1:n</span> <span class="pre">...</span> <span class="pre">end</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">k</span></code> を1から <code class="docutils literal notranslate"><span class="pre">n</span></code> まで変えながら、中の更新を <code class="docutils literal notranslate"><span class="pre">n</span></code> 回行う</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">return</span> <span class="pre">N</span></code></p></td>
+<td><p>最後に得られた量を関数の結果として返す</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>外側の <code class="docutils literal notranslate"><span class="pre">for</span> <span class="pre">n</span> <span class="pre">in</span> <span class="pre">(5,</span> <span class="pre">10,</span> <span class="pre">20)</span></code> は、三つの条件を順に試すための繰り返しである。Juliaでは <code class="docutils literal notranslate"><span class="pre">function</span></code>、<code class="docutils literal notranslate"><span class="pre">for</span></code>、<code class="docutils literal notranslate"><span class="pre">if</span></code> などを <code class="docutils literal notranslate"><span class="pre">end</span></code> で閉じる。字下げだけで範囲が決まるPythonと異なるが、どこに何が含まれるか分かるように字下げして書く。</p>
+<p>この例のように、途中の値を書き換えながら進む計算を関数内にまとめると、変数の使われる範囲が明確になる。ファイルの最上位やNotebookに直接、外側の変数を書き換えるループを置くと、実行環境による変数の扱いの違いに戸惑うことがある。まずは関数の入力と出力を明らかにする書き方に慣れよう。</p>
+</section>
+</section>
+<section id="id6">
+<h2><span class="section-number">3.5. </span>複数の数をまとめる：ベクトルと配列<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>これまでは量 <span class="math notranslate nohighlight">\(N\)</span> を一つの数で表した。複数地点の温度や複数の未知数を扱うには、数を順に並べたベクトルが便利である。例えば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{x}=\begin{bmatrix}3\\4\end{bmatrix}
+\end{split}\]</div>
+<p>を、Juliaでは <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">[3.0,</span> <span class="pre">4.0]</span></code> と書く。この <code class="docutils literal notranslate"><span class="pre">x</span></code> は、順序を持つ数の入れ物である<strong>1次元配列</strong>で、線形代数の計算では列ベクトルとして扱える。</p>
+<p><code class="docutils literal notranslate"><span class="pre">x[1]</span></code> は第1成分、<code class="docutils literal notranslate"><span class="pre">x[2]</span></code> は第2成分である。Juliaの標準的な配列の添字は<strong>1から始まる</strong>。Pythonの配列のように最初を <code class="docutils literal notranslate"><span class="pre">x[0]</span></code> とすると、この配列では範囲外になる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;x = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;成分数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;第1成分 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;第2成分 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;成分の和 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x = [3.0, 4.0]
+成分数 = 2
+第1成分 = 3.0
+第2成分 = 4.0
+成分の和 = 7.0
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">length(x)</span></code> は成分数で、この場合は2である。「ベクトルの幾何学的な長さ」とは異なり、そちらは後で扱うノルムで測る。<code class="docutils literal notranslate"><span class="pre">sum(x)</span></code> は成分の和 <span class="math notranslate nohighlight">\(3+4=7\)</span> を求める。</p>
+<p>成分を書き換えるには、例えば <code class="docutils literal notranslate"><span class="pre">x[1]</span> <span class="pre">=</span> <span class="pre">10.0</span></code> と代入する。元の配列を残したまま試すには <code class="docutils literal notranslate"><span class="pre">copy</span></code> を使う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">x_copy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">x_copy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">10.0</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;元の配列 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;変更したコピー = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x_copy</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>元の配列 = [3.0, 4.0]
+変更したコピー = [10.0, 4.0]
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">x_copy</span> <span class="pre">=</span> <span class="pre">x</span></code> と代入するだけでは配列の中身はコピーされず、二つの名前で同じ配列を参照することになる。元データを残したい場合には、この違いに注意する。ここで扱った数値の配列なら <code class="docutils literal notranslate"><span class="pre">copy(x)</span></code> で独立した配列を作れる。</p>
+</section>
+<section id="id7">
+<h2><span class="section-number">3.6. </span>行列の成分と形を確認する<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>行列は、数を行と列に並べたものである。例えば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{A}=\begin{bmatrix}1&amp;2\\0&amp;1\end{bmatrix}
+\end{split}\]</div>
+<p>は2行2列の行列で、Juliaでは <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">=</span> <span class="pre">[1.0</span> <span class="pre">2.0;</span> <span class="pre">0.0</span> <span class="pre">1.0]</span></code> と書く。同じ行の成分は<strong>空白</strong>、行の区切りは<strong>セミコロン</strong>で表す。ベクトルの <code class="docutils literal notranslate"><span class="pre">[3.0,</span> <span class="pre">4.0]</span></code> に使ったカンマと役割が異なる。</p>
+<p><code class="docutils literal notranslate"><span class="pre">A[i,j]</span></code> は第 <span class="math notranslate nohighlight">\(i\)</span> 行、第 <span class="math notranslate nohighlight">\(j\)</span> 列の成分である。<code class="docutils literal notranslate"><span class="pre">size(A)</span></code> は「行数、列数」を返す。次の出力を先に予想してから実行しよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;A = &quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Aの形 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;A[1,2] = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Aの第1行 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">:</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Aの第2列 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;転置した行列 = &quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">transpose</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A = 
+2×2 Matrix{Float64}:
+ 1.0  2.0
+ 0.0  1.0
+Aの形 = (2, 2)
+A[1,2] = 2.0
+Aの第1行 = [1.0, 2.0]
+Aの第2列 = [2.0, 1.0]
+転置した行列 = 
+2×2 transpose(::Matrix{Float64}) with eltype Float64:
+ 1.0  0.0
+ 2.0  1.0
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">size(A)</span></code> は <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">2)</span></code>、<code class="docutils literal notranslate"><span class="pre">A[1,2]</span></code> は2となる。<code class="docutils literal notranslate"><span class="pre">:</span></code> はその方向の成分をすべて選ぶ指定なので、<code class="docutils literal notranslate"><span class="pre">A[1,:]</span></code> は第1行、<code class="docutils literal notranslate"><span class="pre">A[:,2]</span></code> は第2列である。<code class="docutils literal notranslate"><span class="pre">transpose(A)</span></code> は行と列を入れ替えた転置行列を返す。<code class="docutils literal notranslate"><span class="pre">display</span></code> は行列を見やすい形で表示するために使っている。</p>
+<p>Juliaのベクトル <code class="docutils literal notranslate"><span class="pre">x</span></code> の <code class="docutils literal notranslate"><span class="pre">size(x)</span></code> は <code class="docutils literal notranslate"><span class="pre">(2,)</span></code> であり、2行1列の2次元配列 <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">1)</span></code> とは区別される。ただし、次に見る <code class="docutils literal notranslate"><span class="pre">A*x</span></code> では数学の列ベクトルと同じように計算できる。</p>
+<section id="id8">
+<h3><span class="section-number">3.6.1. </span>行列をベクトルにかける<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<p>行列積は、各行とベクトルの対応する成分を掛けて足す計算である。上の <span class="math notranslate nohighlight">\(\mathbf{A}\)</span> と <span class="math notranslate nohighlight">\(\mathbf{x}=(3,4)^\mathsf{T}\)</span> では、</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{A}\mathbf{x}
+=\begin{bmatrix}\textcolor{#0072B2}{1}&amp;\textcolor{#0072B2}{2}\\0&amp;1\end{bmatrix}
+\begin{bmatrix}3\\4\end{bmatrix}
+=\begin{bmatrix}\textcolor{#0072B2}{1\times3+2\times4}\\0\times3+1\times4\end{bmatrix}
+=\begin{bmatrix}\textcolor{#0072B2}{11}\\4\end{bmatrix}
+\end{split}\]</div>
+<p>となる。青色は「行列の第1行 → 掛けて足す計算 → 第1出力」の対応を示す。第1出力は二つの入力を <span class="math notranslate nohighlight">\(1:2\)</span> の重みで足したもの、第2出力は第2入力をそのまま取り出したものである。行列は、このように複数の数を組み合わせて新しい数の組へ変換する働きを持つ。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">println</span><span class="p">(</span><span class="s">&quot;A*x = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;第1成分を手順通りに計算 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="n">A_rect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">2.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">x_three</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;長方形の行列の形 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">A_rect</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;A_rect*x_three = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_rect</span><span class="o">*</span><span class="n">x_three</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>A*x = [11.0, 4.0]
+第1成分を手順通りに計算 = 11.0
+長方形の行列の形 = (2, 3)
+A_rect*x_three = [11.0, 9.0]
+</pre></div>
+</div>
+</div>
+</div>
+<p>2行3列の行列と3成分のベクトルなら、結果は2成分となり、上の例では <span class="math notranslate nohighlight">\((11,9)^\mathsf{T}\)</span> である。一般に <span class="math notranslate nohighlight">\(m\)</span> 行 <span class="math notranslate nohighlight">\(n\)</span> 列の行列は、<span class="math notranslate nohighlight">\(n\)</span> 成分のベクトルにかけると <span class="math notranslate nohighlight">\(m\)</span> 成分のベクトルを返す。<strong>内側の大きさが一致するか、結果の大きさはいくつか</strong>を、計算前に確認しよう。</p>
+</section>
+</section>
+<section id="id9">
+<h2><span class="section-number">3.7. </span>行列積と要素ごとの演算を区別する<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<p>行列同士の積も、左の行列の各行と、右の行列の各列の成分を掛けて足す計算である。例えば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{B}=\begin{bmatrix}1&amp;2\\3&amp;4\end{bmatrix},\qquad
+\mathbf{C}=\begin{bmatrix}2&amp;0\\-1&amp;1\end{bmatrix}
+\end{split}\]</div>
+<p>なら、積の第1行第1列は <span class="math notranslate nohighlight">\(1\times2+2\times(-1)=0\)</span> になる。すべての成分を計算すると</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{B}\mathbf{C}=\begin{bmatrix}0&amp;2\\2&amp;4\end{bmatrix}
+\end{split}\]</div>
+<p>である。Juliaでは <code class="docutils literal notranslate"><span class="pre">B*C</span></code> と書く。一般に、<span class="math notranslate nohighlight">\(m\)</span> 行 <span class="math notranslate nohighlight">\(n\)</span> 列と <span class="math notranslate nohighlight">\(n\)</span> 行 <span class="math notranslate nohighlight">\(p\)</span> 列の行列の積は <span class="math notranslate nohighlight">\(m\)</span> 行 <span class="math notranslate nohighlight">\(p\)</span> 列になる。</p>
+<p>一方、同じ位置の成分だけを掛けたい場合は <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">.*</span> <span class="pre">C</span></code> と書く。上の例なら結果は</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{bmatrix}1\times2&amp;2\times0\\3\times(-1)&amp;4\times1\end{bmatrix}
+=\begin{bmatrix}2&amp;0\\-3&amp;4\end{bmatrix}
+\end{split}\]</div>
+<p>となり、行列積とは異なる。同じ形のデータ同士を成分ごとに処理する場合などに用いる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">B</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span><span class="w"> </span><span class="mf">3.0</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;行列積 B*C = &quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">B</span><span class="o">*</span><span class="n">C</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;要素ごとの積 B.*C = &quot;</span><span class="p">)</span>
+<span class="n">display</span><span class="p">(</span><span class="n">B</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">C</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>行列積 B*C = 
+2×2 Matrix{Float64}:
+ 0.0  2.0
+ 2.0  4.0
+要素ごとの積 B.*C = 
+2×2 Matrix{Float64}:
+  2.0  0.0
+ -3.0  4.0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id10">
+<h3><span class="section-number">3.7.1. </span>ドットを付けて各要素に適用する<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<p>配列の各要素に同じ操作を行う書き方を<strong>broadcast</strong>という。<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">.^</span> <span class="pre">2</span></code> は各成分を二乗し、<code class="docutils literal notranslate"><span class="pre">2</span> <span class="pre">.*</span> <span class="pre">x</span> <span class="pre">.+</span> <span class="pre">1</span></code> は各成分に「2倍して1を足す」を適用する。関数の場合は <code class="docutils literal notranslate"><span class="pre">exp.(配列)</span></code> のように関数名の後ろにドットを付ける。</p>
+<p>例えば、複数の時刻で減衰の解析解 <span class="math notranslate nohighlight">\(e^{-0.4t}\)</span> を計算してみよう。<code class="docutils literal notranslate"><span class="pre">times</span></code> に時刻を並べ、各時刻へ同じ式を適用する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">println</span><span class="p">(</span><span class="s">&quot;各成分の二乗 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;各成分を2倍して1を足す = &quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="n">times</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
+<span class="n">exact_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exp</span><span class="o">.</span><span class="p">(</span><span class="o">-</span><span class="mf">0.4</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">times</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;時刻 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">times</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解析解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exact_values</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>各成分の二乗 = [9.0, 16.0]
+各成分を2倍して1を足す = [7.0, 9.0]
+時刻 = [0.0, 1.0, 2.0]
+解析解 = [1.0, 0.6703200460356393, 0.44932896411722156]
+</pre></div>
+</div>
+</div>
+</div>
+<p>最初の二つの結果は <code class="docutils literal notranslate"><span class="pre">[9.0,</span> <span class="pre">16.0]</span></code> と <code class="docutils literal notranslate"><span class="pre">[7.0,</span> <span class="pre">9.0]</span></code> である。解析解はおよそ <code class="docutils literal notranslate"><span class="pre">[1.0,</span> <span class="pre">0.670320,</span> <span class="pre">0.449329]</span></code> となり、第1章の値とも対応する。複数時刻の値をまとめて処理する場面でも、配列が役立つことが分かる。</p>
+<p>なお、<code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">.*</span> <span class="pre">C</span></code> のような同じ形同士だけでなく、上の例の <code class="docutils literal notranslate"><span class="pre">0.4</span> <span class="pre">.*</span> <span class="pre">times</span></code> のように一つの数を全成分へ使うこともできる。まずは「行列積を行うのか、各成分に同じ操作を行うのか」を数式から判断しよう。</p>
+</section>
+</section>
+<section id="id11">
+<h2><span class="section-number">3.8. </span>ベクトルの内積と長さを測る<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<p>二つの実ベクトルの対応する成分を掛けて足したものを<strong>内積</strong>という。</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{x}^\mathsf{T}\mathbf{y}=\sum_{i=1}^n x_i y_i
+\]</div>
+<p>例えば <span class="math notranslate nohighlight">\(\mathbf{x}=(3,4)^\mathsf{T}\)</span>、<span class="math notranslate nohighlight">\(\mathbf{y}=(-4,3)^\mathsf{T}\)</span> なら、内積は <span class="math notranslate nohighlight">\(3\times(-4)+4\times3=0\)</span> である。平面の矢印と考えると、この二つは直交している。</p>
+<p>また、<span class="math notranslate nohighlight">\(\mathbf{x}\)</span> の長さは三平方の定理から <span class="math notranslate nohighlight">\(\sqrt{3^2+4^2}=5\)</span> である。これを一般の <span class="math notranslate nohighlight">\(n\)</span> 成分へ広げた</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{x}\|_2=\sqrt{\sum_{i=1}^n x_i^2}
+\]</div>
+<p>を**2ノルム（ユークリッドノルム）**という。複数の成分を持つベクトルの大きさを、一つの非負の数で表せる。</p>
+<p>これらを計算する関数は、標準ライブラリ <code class="docutils literal notranslate"><span class="pre">LinearAlgebra</span></code> に用意されている。<code class="docutils literal notranslate"><span class="pre">using</span> <span class="pre">LinearAlgebra</span></code> はその機能を読み込む命令で、追加インストールは不要である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span>
+<span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">4.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;内積 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;成分数 length(x) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;長さ norm(x) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;三平方の定理で計算 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>内積 = 0.0
+成分数 length(x) = 2
+長さ norm(x) = 5.0
+三平方の定理で計算 = 5.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>内積は0、成分数は2、ノルムは5となる。<code class="docutils literal notranslate"><span class="pre">dot(x,y)</span></code> はここで定義した内積、ベクトルに対する <code class="docutils literal notranslate"><span class="pre">norm(x)</span></code> は2ノルムを計算する。</p>
+<p>二つのベクトルの差にノルムを使えば、点の間の<strong>距離</strong>を測れる。真の値を <span class="math notranslate nohighlight">\(\mathbf{x}\)</span>、近似値を <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> とすると、<span class="math notranslate nohighlight">\(\|\hat{\mathbf{x}}-\mathbf{x}\|_2\)</span> は誤差ベクトルの大きさである。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">x_near</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.1</span><span class="p">,</span><span class="w"> </span><span class="mf">3.9</span><span class="p">]</span>
+<span class="n">error_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x_near</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;成分ごとの差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_vector</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;差の大きさ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">error_vector</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>成分ごとの差 = [0.10000000000000009, -0.10000000000000009]
+差の大きさ = 0.14142135623730964
+</pre></div>
+</div>
+</div>
+</div>
+<p>各成分の差はおよそ <span class="math notranslate nohighlight">\((0.1,-0.1)^\mathsf{T}\)</span> で、その大きさは <span class="math notranslate nohighlight">\(\sqrt{0.1^2+(-0.1)^2}\approx0.1414\)</span> となる。ここでも表示される小数の末尾には丸めの影響がある。</p>
+<p>ベクトルの大きさの測り方は2ノルム以外にもあり、行列を測るノルムもある。それらの定義や誤差評価での使い分けは<a class="reference internal" href="Chap_NumericalAccuracyAndCost.html"><span class="std std-doc">第4章</span></a>で扱う。特に、Juliaの <code class="docutils literal notranslate"><span class="pre">norm(A)</span></code> と <code class="docutils literal notranslate"><span class="pre">opnorm(A)</span></code> は行列に対して異なる量を測るので、ベクトルの <code class="docutils literal notranslate"><span class="pre">norm(x)</span></code> の説明をそのまま行列へ当てはめないようにしよう。本章ではベクトルの長さと距離を理解できればよい。</p>
+</section>
+<section id="id12">
+<h2><span class="section-number">3.9. </span>連立一次方程式を解き、答えを確かめる<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<p>次の連立方程式を考える。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+2x_1+x_2&amp;=5,\\
+x_1+3x_2&amp;=5.
+\end{aligned}
+\end{split}\]</div>
+<p>第1式から <span class="math notranslate nohighlight">\(x_2=5-2x_1\)</span> として第2式へ代入すれば、<span class="math notranslate nohighlight">\(x_1=2\)</span>、<span class="math notranslate nohighlight">\(x_2=1\)</span> と分かる。この問題は、係数、未知数、右辺をまとめて</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\underbrace{\begin{bmatrix}2&amp;1\\1&amp;3\end{bmatrix}}_{\mathbf{A}}
+\underbrace{\begin{bmatrix}x_1\\x_2\end{bmatrix}}_{\mathbf{x}}
+=\underbrace{\begin{bmatrix}5\\5\end{bmatrix}}_{\mathbf{b}}
+\end{split}\]</div>
+<p>と書ける。行列とベクトルの積を成分ごとに展開すると、元の二つの式に戻る。</p>
+<p>Juliaでは、係数行列 <code class="docutils literal notranslate"><span class="pre">A_system</span></code> と右辺 <code class="docutils literal notranslate"><span class="pre">b</span></code> を用意し、<code class="docutils literal notranslate"><span class="pre">A_system</span> <span class="pre">\</span> <span class="pre">b</span></code> で解を求められる。バックスラッシュ <code class="docutils literal notranslate"><span class="pre">\</span></code> は連立方程式を解く演算であり、成分ごとの割り算ではない。この例では係数行列が正則であり、解が一つに定まる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A_system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">]</span>
+<span class="n">xhat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_system</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">b</span>
+<span class="n">residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A_system</span><span class="o">*</span><span class="n">xhat</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xhat</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;左辺に代入した値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_system</span><span class="o">*</span><span class="n">xhat</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差ベクトル = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">residual</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差の大きさ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">residual</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>解 = [2.0, 1.0]
+左辺に代入した値 = [5.0, 5.0]
+残差ベクトル = [0.0, 0.0]
+残差の大きさ = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>手計算と同じく、解はおよそ <span class="math notranslate nohighlight">\((2,1)^\mathsf{T}\)</span> になる。求めた解を左辺へ代入した値が右辺 <span class="math notranslate nohighlight">\((5,5)^\mathsf{T}\)</span> に近いかを確認するため、</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{r}=\mathbf{b}-\mathbf{A}\hat{\mathbf{x}}
+\]</div>
+<p>を計算した。これが<strong>残差ベクトル</strong>である。各成分は、各方程式の右辺と左辺の差を表す。<code class="docutils literal notranslate"><span class="pre">norm(residual)</span></code> は、それらの差を一つの大きさにまとめている。</p>
+<p>比較のため、少し違う候補 <span class="math notranslate nohighlight">\(\mathbf{x}_{\mathrm{trial}}=(2.1,0.9)^\mathsf{T}\)</span> も代入してみよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">x_trial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">]</span>
+<span class="n">trial_residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A_system</span><span class="o">*</span><span class="n">x_trial</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;候補を左辺に代入 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_system</span><span class="o">*</span><span class="n">x_trial</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;候補の残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">trial_residual</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;候補の残差の大きさ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">trial_residual</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>候補を左辺に代入 = [5.1000000000000005, 4.8]
+候補の残差 = [-0.10000000000000053, 0.20000000000000018]
+候補の残差の大きさ = 0.22360679774997935
+</pre></div>
+</div>
+</div>
+</div>
+<p>左辺は約 <span class="math notranslate nohighlight">\((5.1,4.8)^\mathsf{T}\)</span>、残差は約 <span class="math notranslate nohighlight">\((-0.1,0.2)^\mathsf{T}\)</span> となる。その大きさは約0.224であり、この候補が方程式を満たしていないことが分かる。</p>
+<p>数学的には、正則な行列に対する解を <span class="math notranslate nohighlight">\(\mathbf{x}=\mathbf{A}^{-1}\mathbf{b}\)</span> と書ける。しかし、コードで逆行列を明示的に計算する必要はない。<code class="docutils literal notranslate"><span class="pre">A_system</span> <span class="pre">\</span> <span class="pre">b</span></code> は、行列に応じた方法を使って方程式を解く。計算の中で行われる消去法や分解は<a class="reference internal" href="Chap_LUFactorization.html"><span class="std std-doc">第5章</span></a>で学ぶ。</p>
+<p>本章では、手計算で分かる解と照合し、さらに代入して残差を確認した。真の解が分からない場合にも残差は計算できるが、<strong>残差が小さいことと解そのものの誤差が小さいことの関係は、問題によって変わる</strong>。この区別を第4章の条件数の学習につなげる。</p>
+</section>
+<section id="id13">
+<h2><span class="section-number">3.10. </span>後の章のコードを読むために<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<p>第5章以降のコードでは、本章までに紹介していない書き方もいくつか使う。すべてを今すぐ覚える必要はないが、「見たことがある」状態にしておくと、アルゴリズムの本体に集中しやすい。分からない記号が出てきたら、この表に戻ろう。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>書き方</p></th>
+<th class="head"><p>意味</p></th>
+<th class="head"><p>主に使う章</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">f(x)</span> <span class="pre">=</span> <span class="pre">cos(x)</span> <span class="pre">-</span> <span class="pre">x</span></code></p></td>
+<td><p>1行で関数を定義する。<code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">f(x)</span> <span class="pre">...</span> <span class="pre">end</span></code> と同じ</p></td>
+<td><p>第7章以降</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">-&gt;</span> <span class="pre">x^3</span></code></p></td>
+<td><p>名前を付けない関数（無名関数）。関数を引数として渡すときに使う</p></td>
+<td><p>第8章以降</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">function</span> <span class="pre">g(a,</span> <span class="pre">b;</span> <span class="pre">tol=1e-10)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">;</span></code> より後ろは<strong>キーワード引数</strong>で、既定値を持つ。呼び出すときは <code class="docutils literal notranslate"><span class="pre">g(1,</span> <span class="pre">2;</span> <span class="pre">tol=1e-6)</span></code> と名前で指定する</p></td>
+<td><p>第7章以降</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">while</span> <span class="pre">条件</span> <span class="pre">...</span> <span class="pre">end</span></code></p></td>
+<td><p>条件が成り立つ間、繰り返す。反復回数が事前に分からない計算で使う</p></td>
+<td><p>第7章以降</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">条件</span> <span class="pre">?</span> <span class="pre">A</span> <span class="pre">:</span> <span class="pre">B</span></code></p></td>
+<td><p>条件が真ならA、偽ならBを値とする</p></td>
+<td><p>第1章以降</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">条件</span> <span class="pre">||</span> <span class="pre">error(&quot;...&quot;)</span></code></p></td>
+<td><p>条件が<strong>偽のときだけ</strong>右側を実行する。入力の確認によく使う</p></td>
+<td><p>第1章以降</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">条件</span> <span class="pre">&amp;&amp;</span> <span class="pre">return</span> <span class="pre">x</span></code></p></td>
+<td><p>条件が<strong>真のときだけ</strong>右側を実行する</p></td>
+<td><p>第7章以降</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">(root=x,</span> <span class="pre">iterations=k)</span></code></p></td>
+<td><p><strong>名前付きタプル</strong>。複数の結果をまとめて返し、<code class="docutils literal notranslate"><span class="pre">result.root</span></code> のように取り出す</p></td>
+<td><p>第7章以降</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">v</span> <span class="pre">=</span> <span class="pre">Float64[]</span></code>、<code class="docutils literal notranslate"><span class="pre">push!(v,</span> <span class="pre">x)</span></code></p></td>
+<td><p>空の配列を作り、末尾へ値を追加する。反復の履歴を記録するときに使う</p></td>
+<td><p>第4章以降</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;x</span> <span class="pre">=</span> <span class="pre">$(x)&quot;</span></code></p></td>
+<td><p>文字列の中へ値を埋め込む。<code class="docutils literal notranslate"><span class="pre">*</span></code> で文字列同士をつなぐこともできる</p></td>
+<td><p>第1章以降</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">range(0,</span> <span class="pre">1,</span> <span class="pre">length=5)</span></code>、<code class="docutils literal notranslate"><span class="pre">collect(...)</span></code></p></td>
+<td><p>等間隔の点を作る。<code class="docutils literal notranslate"><span class="pre">collect</span></code> で通常の配列に変換する</p></td>
+<td><p>第8章以降</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">let</span> <span class="pre">...</span> <span class="pre">end</span></code></p></td>
+<td><p>中で使う変数の範囲を区切る</p></td>
+<td><p>第1章以降</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>コードには <code class="docutils literal notranslate"><span class="pre">λ</span></code>、<code class="docutils literal notranslate"><span class="pre">≤</span></code>、<code class="docutils literal notranslate"><span class="pre">≈</span></code>、<code class="docutils literal notranslate"><span class="pre">α</span></code> のような文字も現れる。Juliaの対話画面、Jupyter、VS Codeなどでは、<code class="docutils literal notranslate"><span class="pre">\lambda</span></code>、<code class="docutils literal notranslate"><span class="pre">\le</span></code>、<code class="docutils literal notranslate"><span class="pre">\approx</span></code>、<code class="docutils literal notranslate"><span class="pre">\alpha</span></code> と入力してTabキーを押すと変換できる。<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">≤</span> <span class="pre">b</span></code> は <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&lt;=</span> <span class="pre">b</span></code>、<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">≈</span> <span class="pre">b</span></code> は <code class="docutils literal notranslate"><span class="pre">isapprox(a,</span> <span class="pre">b)</span></code> と同じ意味なので、入力しにくければこちらを使ってもよい。</p>
+<p>次のコードは、これらの書き方をまとめて使った小さな例である。値を半分にし続け、<code class="docutils literal notranslate"><span class="pre">tol</span></code> 以下になるまでの回数と履歴を返す。実行前に、<code class="docutils literal notranslate"><span class="pre">halve_until(1.0)</span></code> が何回で止まるか予想してみよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">halve_until</span><span class="p">(</span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;正の値を入力してください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">[]</span><span class="w">          </span><span class="c"># 空の配列を用意する</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">tol</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w">        </span><span class="c"># 更新前の値を記録する</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="o">/</span><span class="mi">2</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">steps</span><span class="o">=</span><span class="n">length</span><span class="p">(</span><span class="n">history</span><span class="p">),</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">halve_until</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;最終値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 回数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;途中の値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;tol=0.01 の回数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">halve_until</span><span class="p">(</span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span><span class="o">.</span><span class="n">steps</span><span class="p">)</span>
+
+<span class="n">square</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="o">^</span><span class="mi">2</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;無名関数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">square</span><span class="p">(</span><span class="mf">3.0</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;, 各成分へ適用 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">square</span><span class="o">.</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;条件演算子 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">steps</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;4回以上&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;3回以下&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;0.1 + 0.2 ≈ 0.3 ? &quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.2</span><span class="w"> </span><span class="o">≈</span><span class="w"> </span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最終値 = 0.0625, 回数 = 4
+途中の値 = [1.0, 0.5, 0.25, 0.125]
+tol=0.01 の回数 = 7
+無名関数 = 9.0, 各成分へ適用 = [1.0, 4.0, 9.0]
+条件演算子 = 4回以上
+0.1 + 0.2 ≈ 0.3 ? true
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\(1\to0.5\to0.25\to0.125\to0.0625\)</span> と進み、4回目の更新後に初めて0.1以下となるので、回数は4である。キーワード引数 <code class="docutils literal notranslate"><span class="pre">tol</span></code> を変えると、関数の中身を書き換えずに停止条件だけを変えられる。第7章の二分法やNewton法の関数も、同じ形で「許容誤差」「最大反復回数」を受け取り、結果と履歴を名前付きタプルで返す。</p>
+</section>
+<section id="python-numpy">
+<h2><span class="section-number">3.11. </span>Python/NumPyとの対応を振り返る<a class="headerlink" href="#python-numpy" title="Link to this heading">#</a></h2>
+<p>ここまでに使った操作を、Pythonを使ったことがある人向けに整理する。Python側では <code class="docutils literal notranslate"><span class="pre">import</span> <span class="pre">numpy</span> <span class="pre">as</span> <span class="pre">np</span></code> を実行しているものとする。Pythonの通常のリストとNumPy配列では演算の意味が異なるため、この表は<strong>数値計算用のNumPy配列</strong>との比較である。Pythonを使ったことがない場合は、Juliaの欄を復習に使えばよい。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>操作</p></th>
+<th class="head"><p>Python/NumPy</p></th>
+<th class="head"><p>Julia</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ベクトルを作る</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">np.array([3.0,</span> <span class="pre">4.0])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[3.0,</span> <span class="pre">4.0]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>最初の成分</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x[0]</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x[1]</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>2行2列の行列</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">np.array([[1.,</span> <span class="pre">2.],</span> <span class="pre">[0.,</span> <span class="pre">1.]])</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">[1.0</span> <span class="pre">2.0;</span> <span class="pre">0.0</span> <span class="pre">1.0]</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>行列の形</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A.shape</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">size(A)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>行列積</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">&#64;</span> <span class="pre">B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">B</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>要素ごとの積</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">*</span> <span class="pre">B</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">.*</span> <span class="pre">B</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>各成分の二乗</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">**</span> <span class="pre">2</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">.^</span> <span class="pre">2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>各成分に指数関数を適用</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">np.exp(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">exp.(x)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>転置</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A.T</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">transpose(A)</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>ベクトルの2ノルム</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">np.linalg.norm(x)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">norm(x)</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>連立方程式を解く</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">np.linalg.solve(A,</span> <span class="pre">b)</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>独立した数値配列を作る</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">x.copy()</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">copy(x)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Juliaの <code class="docutils literal notranslate"><span class="pre">norm</span></code> や <code class="docutils literal notranslate"><span class="pre">dot</span></code> には <code class="docutils literal notranslate"><span class="pre">using</span> <span class="pre">LinearAlgebra</span></code> が必要である。実数行列では <code class="docutils literal notranslate"><span class="pre">A'</span></code> も転置になるが、複素行列では共役転置を表す。複素数を扱う章ではこの違いも確認する。</p>
+</section>
+<section id="id14">
+<h2><span class="section-number">3.12. </span>つまずいたときに確認すること<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<p>コードで思った結果が出ないときは、まず小さな入力で途中の値を表示し、手計算と比べよう。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>状況</p></th>
+<th class="head"><p>確認すること</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">UndefVarError</span></code>：名前が定義されていない</p></td>
+<td><p>変数・関数を定義するセルを実行したか。名前の綴りが一致するか。<code class="docutils literal notranslate"><span class="pre">norm</span></code> なら <code class="docutils literal notranslate"><span class="pre">using</span> <span class="pre">LinearAlgebra</span></code> を実行したか</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">BoundsError</span></code>：配列の範囲外</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">length(x)</span></code> や <code class="docutils literal notranslate"><span class="pre">size(A)</span></code> を確認する。この章の配列は添字1から始まる</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">DimensionMismatch</span></code>：大きさが合わない</p></td>
+<td><p>行列積の内側の大きさが一致しているか。行列積と要素ごとの演算を取り違えていないか</p></td>
+</tr>
+<tr class="row-odd"><td><p>コードを変更したのに出力が同じ</p></td>
+<td><p>ファイルなら保存してから再実行したか。Notebookなら変更箇所以降を実行し直したか</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>ライブラリを呼び出せたことと、意図した計算ができたことは別に確認する。特に、計算する前に結果の大きさやおおよその値を予想しておくと、取り違えに気づきやすい。</p>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">3.13. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 計算時間が気になったら<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>計算が大きくなったときには、同じ結果をより少ない時間やメモリで得るための工夫が必要になる。本章では、まず式とコードの対応、入力と出力、結果の検証を優先する。以下は、その先で計算時間を調べたくなったときの補足である。</p>
+<p>Juliaでは、関数を新しい引数の型で初めて呼び出す際などに、実行用コードを生成するコンパイルの時間がかかることがある。そのため、初回の時間を毎回の計算時間とみなさず、同じ条件で複数回調べる。例えば、Julia本体の <code class="docutils literal notranslate"><span class="pre">&#64;time</span></code> で時間やメモリ確保の情報を表示できる。</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="nd">@time</span><span class="w"> </span><span class="n">euler_decay</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mi">10_000</span><span class="p">)</span>
+<span class="nd">@time</span><span class="w"> </span><span class="n">euler_decay</span><span class="p">(</span><span class="mf">0.4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mi">10_000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">10_000</span></code> は読みやすく区切った整数10000である。この章を順に実行していれば、同じ引数の型でこの関数をすでに使っているため、ここで必ず初回だけ遅くなるわけではない。また、短い計算の時間は揺らぎやすく、一度の測定で速さを断定しない。</p>
+<p>処理を関数にまとめて必要な値を引数で渡すことや、数値配列の要素の型をそろえることは、コンパイラが計算内容を判断する助けにもなる。ただし、型の注釈を付けるだけで自動的に高速になるわけではない。測定で時間のかかる箇所を確かめ、変更後も同じ計算結果が得られることを確認しよう。</p>
+<p>より詳しい測定に用いる <code class="docutils literal notranslate"><span class="pre">BenchmarkTools</span></code> は追加パッケージであり、本章の実行には不要である。詳しい考え方は<a class="reference external" href="https://docs.julialang.org/en/v1/manual/performance-tips/">Julia公式のPerformance Tips</a>を参照できる。高速化の細かな技法は、本章の演習では要求しない。</p>
+</section>
+<section id="id15">
+<h2><span class="section-number">3.14. </span>まとめ<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<ul class="simple">
+<li><p>変数への代入、関数、繰り返しを使うと、数式の計算手順をコードで表せる。</p></li>
+<li><p>ベクトルと行列では、成分と大きさを確かめる。行列積と要素ごとの演算は意味が異なる。</p></li>
+<li><p>ベクトルの2ノルムは長さを、差の2ノルムは距離を測る。</p></li>
+<li><p>連立方程式は <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code> で解き、手計算や残差との照合によって結果を確かめる。</p></li>
+</ul>
+</div>
+<p>次の<a class="reference internal" href="Chap_NumericalAccuracyAndCost.html"><span class="std std-doc">第4章「誤差・条件数・計算量」</span></a>では、ここで用いた誤差や残差の大きさを、問題の尺度や入力への敏感さと結びつけて考える。ノルムの使い分けや、必要な演算回数・メモリ量の見積もりも学ぶ。</p>
+</section>
+<section id="id16">
+<h2><span class="section-number">3.15. </span>演習<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<p>本文のコードを見ながら取り組んでよい。実行前の予想と、実行結果から分かったことを短く書こう。新しい構文を調べたり、計算時間を競ったりする必要はない。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>入力を変えると何が変わるか</strong>：<code class="docutils literal notranslate"><span class="pre">euler_decay(0.4,</span> <span class="pre">1.0,</span> <span class="pre">5.0,</span> <span class="pre">10)</span></code> の初期量だけを2.0に変えると、最終値はどうなると予想できるか。更新式を見て理由を考え、実行して確認せよ。</p></li>
+<li><p><strong>積の意味を確かめる</strong>：本文の <span class="math notranslate nohighlight">\(\mathbf{B},\mathbf{C}\)</span> について、<code class="docutils literal notranslate"><span class="pre">B*C</span></code> と <code class="docutils literal notranslate"><span class="pre">B</span> <span class="pre">.*</span> <span class="pre">C</span></code> の第1行第1列を手計算せよ。両者の値が違う理由を説明し、コードの出力と照合せよ。</p></li>
+<li><p><strong>答えを代入してみる</strong>：本文の連立方程式について、候補 <span class="math notranslate nohighlight">\((1,2)^\mathsf{T}\)</span> は解だろうか。まず二つの式に代入して考え、次にコードで残差を確認せよ。どの方程式をどの程度満たさないか、残差の成分を使って説明せよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id17">
+<h2><span class="section-number">3.16. </span>関連資料<a class="headerlink" href="#id17" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://sotayoshida.github.io/AIML1/notebooks/Chapter_math_linearalgebra.html">AI・機械学習論1：線形代数</a>：ベクトル・行列・線形写像などの数学的な背景。</p></li>
+<li><p><a class="reference external" href="https://docs.julialang.org/en/v1/manual/getting-started/">Julia公式：Getting Started</a>と<a class="reference external" href="https://docs.julialang.org/en/v1/manual/arrays/">配列のマニュアル</a>：コードの実行方法、配列の作り方と演算。</p></li>
+<li><p><a class="reference external" href="https://tobydriscoll.net/fnc-julia/linsys/matrices.html">Fundamentals of Numerical Computation：§2.2 Computing with matrices</a>：数値計算での行列の扱い。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_linux_env.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">2. </span>Linux環境とコマンド</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_NumericalAccuracyAndCost.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>誤差・条件数・計算量</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">3.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">3.2. コードを試す準備</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">3.3. 変数と計算式：まず1ステップを読む</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">3.3.1. 型は、どのような値かを表す</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">3.4. 関数と繰り返し：入力を変えて同じ計算を使う</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#for">3.4.1. forで更新を繰り返す</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">3.5. 複数の数をまとめる：ベクトルと配列</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">3.6. 行列の成分と形を確認する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">3.6.1. 行列をベクトルにかける</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">3.7. 行列積と要素ごとの演算を区別する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">3.7.1. ドットを付けて各要素に適用する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">3.8. ベクトルの内積と長さを測る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">3.9. 連立一次方程式を解き、答えを確かめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">3.10. 後の章のコードを読むために</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#python-numpy">3.11. Python/NumPyとの対応を振り返る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">3.12. つまずいたときに確認すること</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">3.13. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 計算時間が気になったら</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">3.14. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">3.15. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">3.16. 関連資料</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

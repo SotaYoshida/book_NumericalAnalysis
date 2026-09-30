@@ -1,0 +1,1225 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>5. 連立一次方程式： Gauss消去法とLU分解 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_LUFactorization';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="6. 最小二乗法とQR分解" href="Chap_QRLeastSquares.html" />
+    <link rel="prev" title="4. 誤差・条件数・計算量" href="Chap_NumericalAccuracyAndCost.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_LUFactorization.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>連立一次方程式： Gauss消去法とLU分解</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">5.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">5.2. まずは消去法を思い出す</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">5.3. 三角行列なら順番に解ける</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lu">5.4. LU分解は消去操作の記録</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">5.5. ピボットと行交換</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">5.5.1. 0でなくても、小さなピボットには注意する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#n">5.6. n元の消去をコードにする</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">5.6.1. 演算回数を数える</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">5.7. 応用例：産業連関分析</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">5.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 基本行列で消去を表す</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">5.9. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">5.10. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">5.11. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_LUFactorization.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="gausslu">
+<h1><span class="section-number">5. </span>連立一次方程式： Gauss消去法とLU分解<a class="headerlink" href="#gausslu" title="Link to this heading">#</a></h1>
+<p>第3章では <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code> で解を求め、第4章ではその誤差を評価した。この章では、その中で使われる基本的な考え方を学ぶ。出発点は、高校数学でも行う「一方の式を何倍かして、もう一方の式から引く」操作である。</p>
+<section id="id1">
+<h2><span class="section-number">5.1. </span>この章の目標<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Gauss消去法で連立一次方程式を三角形の形に変形できる。</p></li>
+<li><p>上三角行列を後退代入で解ける。</p></li>
+<li><p>LU分解がGauss消去の記録であることを説明できる。</p></li>
+<li><p>行の入れ替え（ピボット選択）が必要な理由を説明できる。</p></li>
+<li><p>n元のGauss消去を実装し、演算回数が約 <span class="math notranslate nohighlight">\(\frac23n^3\)</span> となる理由を説明できる。</p></li>
+<li><p>JuliaでLU分解を使い、残差を確認できる。</p></li>
+<li><p>産業連関分析のように、同じ行列で右辺だけを変える問題で分解を再利用できる。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2><span class="section-number">5.2. </span>まずは消去法を思い出す<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>次の連立方程式を考える。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\begin{aligned}
+2x_1+x_2&amp;=5,\\
+4x_1+3x_2&amp;=11.
+\end{aligned}
+\end{align}
+\end{split}\]</div>
+<p>第2式から第1式の2倍を引くと</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+x_2=1
+\end{align}
+\]</div>
+<p>が得られる。これを第1式へ戻すと <span class="math notranslate nohighlight">\(x_1=2\)</span> である。行列では</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\left[\begin{array}{cc|c}
+\textcolor{#0072B2}{\boxed{2}}&amp;1&amp;5\\
+\textcolor{#B54A00}{4}&amp;3&amp;11
+\end{array}\right]
+\xrightarrow{R_2\leftarrow R_2-2R_1}
+\left[\begin{array}{cc|c}
+2&amp;1&amp;5\\
+\boxed{0}&amp;1&amp;1
+\end{array}\right]
+\end{align}
+\end{split}\]</div>
+<p>のように、係数と右辺をまとめて書ける。縦線の右が右辺であり、同じ行操作を両方に施す。係数行列の対角線より下を0にしたことになる。この操作を大きな行列へ順番に行うのが<strong>Gauss消去法</strong>である。</p>
+<p><strong>色と枠の読み方：</strong> 青い枠の <span class="math notranslate nohighlight">\(2\)</span> は割るときの基準（ピボット）、橙色の <span class="math notranslate nohighlight">\(4\)</span> は今回0にしたい成分、右の枠の <span class="math notranslate nohighlight">\(0\)</span> は消去した結果である。倍率は <span class="math notranslate nohighlight">\(m=4/2=2\)</span> となる。</p>
+<div class="math notranslate nohighlight">
+\[
+\underbrace{\textcolor{#B54A00}{4}-2\times\textcolor{#0072B2}{2}=0}_{\text{消去対象}},\qquad
+\underbrace{3-2\times1=1}_{\text{同じ行の係数}},\qquad
+\underbrace{11-2\times5=1}_{\text{右辺も更新}}
+\]</div>
+<p>0にしたいのは一つの成分だが、引き算は<strong>右辺を含む行全体</strong>に行う。次のコードでは、この三つの引き算がどの行に対応するか確認しよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">4.0</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">11.0</span><span class="p">]</span>
+
+<span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">A</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w">  </span><span class="c"># 第1行を何倍するか</span>
+<span class="n">A2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">b2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">A2</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="o">:</span><span class="p">]</span><span class="w"> </span><span class="o">.-=</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">A2</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="o">:</span><span class="p">]</span>
+<span class="n">b2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w">   </span><span class="o">-=</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">b2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;消去後のA = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;消去後のb = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>消去後のA = 
+[2.0 1.0; 0.0 1.0]
+消去後のb = [5.0, 1.0]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">5.3. </span>三角行列なら順番に解ける<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>消去後の行列は<strong>上三角行列</strong>である。下の式から上へ順番に未知数を求める操作を<strong>後退代入</strong>という。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\begin{bmatrix}
+u_{11}&amp;u_{12}\\0&amp;u_{22}
+\end{bmatrix}
+\begin{bmatrix}x_1\\x_2\end{bmatrix}
+=
+\begin{bmatrix}c_1\\c_2\end{bmatrix}
+\end{align}
+\end{split}\]</div>
+<p>なら、まず <span class="math notranslate nohighlight">\(x_2=c_2/u_{22}\)</span>、次に <span class="math notranslate nohighlight">\(x_1=(c_1-u_{12}x_2)/u_{11}\)</span> と求める。下三角行列では、上から下へ進む<strong>前進代入</strong>を使う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">backward_substitution</span><span class="p">(</span><span class="n">U</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="kt">Float64</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">n</span><span class="o">:-</span><span class="mi">1</span><span class="o">:</span><span class="mi">1</span>
+<span class="w">        </span><span class="n">known</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">((</span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">x</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="p">);</span><span class="w"> </span><span class="n">init</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="w">        </span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">known</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span>
+<span class="k">end</span>
+
+<span class="n">U</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">UpperTriangular</span><span class="p">(</span><span class="n">A2</span><span class="p">)</span>
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">backward_substitution</span><span class="p">(</span><span class="n">U</span><span class="p">,</span><span class="w"> </span><span class="n">b2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;後退代入で得た解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;元の方程式の残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">A</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>後退代入で得た解 = [2.0, 1.0]
+元の方程式の残差 = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="lu">
+<h2><span class="section-number">5.4. </span>LU分解は消去操作の記録<a class="headerlink" href="#lu" title="Link to this heading">#</a></h2>
+<p>今の消去では「第2行から第1行の2倍を引く」と、上三角行列 <span class="math notranslate nohighlight">\(U\)</span> が得られた。逆に第2行へ第1行の2倍を足せば元の行列に戻る。この関係は</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\underbrace{\begin{bmatrix}2&amp;1\\4&amp;3\end{bmatrix}}_A
+=\underbrace{\begin{bmatrix}1&amp;0\\\textcolor{#0072B2}{\boxed{2}}&amp;1\end{bmatrix}}_L
+\underbrace{\begin{bmatrix}2&amp;1\\0&amp;1\end{bmatrix}}_U
+\end{split}\]</div>
+<p>と書ける。 <span class="math notranslate nohighlight">\(L\)</span> の下側の青い枠の2は、消去で使った倍率 <span class="math notranslate nohighlight">\(m=4/2\)</span> の記録である。行列の積を1行だけ計算すると、元の第2行が <span class="math notranslate nohighlight">\(2(2,1)+(0,1)=(4,3)\)</span> と復元される。</p>
+<p>これが<strong>LU分解</strong>の出発点である。大きな行列でも、消去で使った倍率を下三角行列 <span class="math notranslate nohighlight">\(L\)</span> に、消去後の係数を上三角行列 <span class="math notranslate nohighlight">\(U\)</span> に保存する。<span class="math notranslate nohighlight">\(L\)</span> の対角成分は1とする。正則な行列について、行交換なしに各段階を0で割らずに進められれば、この形の分解は存在し一意になる。正則でも途中に0のピボットが現れることがあり、その場合は後述の行交換が必要である。</p>
+<p><span class="math notranslate nohighlight">\(Ax=b\)</span> を解くとき、<span class="math notranslate nohighlight">\(y=Ux\)</span> と置けば、</p>
+<div class="math notranslate nohighlight">
+\[
+Ly=b\quad\longrightarrow\quad Ux=y
+\]</div>
+<p>の順で解ける。今の例では <span class="math notranslate nohighlight">\(y_1=5\)</span>、<span class="math notranslate nohighlight">\(2y_1+y_2=11\)</span> から <span class="math notranslate nohighlight">\(y=(5,1)^T\)</span> となる。これは先ほど消去で作った右辺と同じである。続く後退代入で <span class="math notranslate nohighlight">\(x=(2,1)^T\)</span> が得られる。</p>
+<p><strong>分解は係数行列の準備、代入は各右辺を解く作業</strong>である。この区別により、同じ行列で右辺だけが変わる計算を再利用できる。3次行列での消去係数と基本行列の関係は、後の補足で一度だけ詳しく確認する。</p>
+</section>
+<section id="id4">
+<h2><span class="section-number">5.5. </span>ピボットと行交換<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>ここでも用いるのは<strong>行基本変形</strong>であり、列基本変形ではない。「第 <span class="math notranslate nohighlight">\(k\)</span> 列の消去」とは、各 <span class="math notranslate nohighlight">\(i&gt;k\)</span> に対して</p>
+<div class="math notranslate nohighlight">
+\[
+R_i\leftarrow R_i-m_{ik}R_k
+\]</div>
+<p>という<strong>行操作</strong>を行い、結果として第 <span class="math notranslate nohighlight">\(k\)</span> 列の対角成分より下を0にする、という意味である。第 <span class="math notranslate nohighlight">\(k\)</span> 段階の消去係数を</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+m_{ik}=\frac{a_{ik}^{(k-1)}}{a_{kk}^{(k-1)}}
+\end{align}
+\]</div>
+<p>と計算する。ここで <span class="math notranslate nohighlight">\(a_{ij}^{(k-1)}\)</span> は、<span class="math notranslate nohighlight">\(k-1\)</span> 段階までの行操作を終えた行列の <span class="math notranslate nohighlight">\((i,j)\)</span> 成分を表す。実際、第 <span class="math notranslate nohighlight">\(k\)</span> 列の <span class="math notranslate nohighlight">\((i,k)\)</span> 成分は</p>
+<div class="math notranslate nohighlight">
+\[
+a_{ik}^{(k-1)}-m_{ik}a_{kk}^{(k-1)}=0
+\]</div>
+<p>となる。</p>
+<p>この分母 <span class="math notranslate nohighlight">\(a_{kk}^{(k-1)}\)</span> が第 <span class="math notranslate nohighlight">\(k\)</span> 段階の <strong>ピボット</strong> であり、その位置 <span class="math notranslate nohighlight">\((k,k)\)</span> を <strong>ピボット位置</strong> という。ピボットを使って、同じ列のピボットより下にある成分を0にしていく。</p>
+<p>例えば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+A=\begin{bmatrix}0&amp;1\\2&amp;3\end{bmatrix}
+\end{align}
+\end{split}\]</div>
+<p>では、最初のピボット位置にある <span class="math notranslate nohighlight">\(a_{11}=0\)</span> で割れないため、そのままでは第1列を消去できない。第1行と第2行を交換すれば、左上の成分は2になり、これをピボットとして消去を進められる。</p>
+<p>行交換を右辺も含めて描くと、次のようになる（<span class="math notranslate nohighlight">\(b=(1,5)^T\)</span> の例）。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\left[\begin{array}{cc|c}0&amp;1&amp;1\\\textcolor{#0072B2}{2}&amp;3&amp;5\end{array}\right]
+\xrightarrow{R_1\leftrightarrow R_2}
+\left[\begin{array}{cc|c}\textcolor{#0072B2}{\boxed{2}}&amp;3&amp;5\\0&amp;1&amp;1\end{array}\right].
+\end{split}\]</div>
+<p>青い2が左上のピボット位置へ移る。右辺の1と5も同じ行と一緒に移る。</p>
+<p>ピボットが0でなくても、絶対値が非常に小さいと、消去係数 <span class="math notranslate nohighlight">\(m_{ik}\)</span> が大きくなり、途中の値や丸め誤差が増幅されることがある。そこで第 <span class="math notranslate nohighlight">\(k\)</span> 段階では、まだ消去していない第 <span class="math notranslate nohighlight">\(k\)</span> 行から第 <span class="math notranslate nohighlight">\(n\)</span> 行の中から</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+p=\mathop{\mathrm{arg\,max}}_{k\leq i\leq n}|a_{ik}^{(k-1)}|
+\end{align}
+\]</div>
+<p>を選び、第 <span class="math notranslate nohighlight">\(k\)</span> 行と第 <span class="math notranslate nohighlight">\(p\)</span> 行を交換してから、<span class="math notranslate nohighlight">\(a_{kk}^{(k-1)}\)</span> をピボットとして使う。この方法を<strong>部分ピボット選択（partial pivoting）</strong> という。「部分」は、未処理の部分行列全体ではなく、消去中の第 <span class="math notranslate nohighlight">\(k\)</span> 列から候補を選ぶことを表す。<strong>候補を列の中から選ぶことと、列そのものを入れ替えることは別である。</strong> 実際に入れ替えるのは行である。</p>
+<p>行交換をまとめて置換行列 <span class="math notranslate nohighlight">\(P\)</span> で表すと、行交換後の行列 <span class="math notranslate nohighlight">\(PA\)</span> にGauss消去を行うため、分解は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+PA=LU
+\end{align}
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(P\)</span> を<strong>左から</strong>かける <span class="math notranslate nohighlight">\(PA\)</span> は行交換を表す。列交換を表すのは <span class="math notranslate nohighlight">\(AP\)</span> のような右からの乗算であり、ここでは行っていない。連立方程式の右辺にも同じ行交換を適用すれば、</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+Ax=b
+\quad\Longleftrightarrow\quad
+PAx=Pb
+\quad\Longleftrightarrow\quad
+LUx=Pb
+\end{align}
+\]</div>
+<p>であり、方程式の解は変わらない。まず <span class="math notranslate nohighlight">\(Ly=Pb\)</span> を前進代入で解き、次に <span class="math notranslate nohighlight">\(Ux=y\)</span> を後退代入で解けばよい。</p>
+<p>Juliaの <code class="docutils literal notranslate"><span class="pre">lu(A)</span></code> は通常、部分ピボット選択を用いる。返り値 <code class="docutils literal notranslate"><span class="pre">F</span></code> の <code class="docutils literal notranslate"><span class="pre">F.p</span></code> は行の並べ替えを表し、</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="p">[</span><span class="n">F</span><span class="o">.</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">]</span><span class="w"> </span><span class="o">≈</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">L</span><span class="o">*</span><span class="n">F</span><span class="o">.</span><span class="n">U</span>
+</pre></div>
+</div>
+<p>が成り立つ。次の例では、最初のピボットが0の行列で実際に行が交換されることを確認する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A_zero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">2.0</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">b_zero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">]</span>
+<span class="n">F_zero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lu</span><span class="p">(</span><span class="n">A_zero</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;選ばれた行の順番 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">F_zero</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;行交換後の行列 = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_zero</span><span class="p">[</span><span class="n">F_zero</span><span class="o">.</span><span class="n">p</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;L*U = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">F_zero</span><span class="o">.</span><span class="n">L</span><span class="o">*</span><span class="n">F_zero</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+<span class="n">x_zero</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F_zero</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">b_zero</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x_zero</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b_zero</span><span class="o">-</span><span class="n">A_zero</span><span class="o">*</span><span class="n">x_zero</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>選ばれた行の順番 = [2, 1]
+行交換後の行列 = 
+[2.0 3.0; 0.0 1.0]
+L*U = 
+[2.0 3.0; 0.0 1.0]
+解 = [1.0, 1.0]
+残差 = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>次に、3元の連立方程式の係数行列を <code class="docutils literal notranslate"><span class="pre">lu</span></code> で分解する。ここではJuliaの部分ピボット付き分解と <span class="math notranslate nohighlight">\(PA=LU\)</span> の確認に焦点を絞る。したがって、<code class="docutils literal notranslate"><span class="pre">A</span></code> ではなく行を <code class="docutils literal notranslate"><span class="pre">F.p</span></code> の順に並べた <code class="docutils literal notranslate"><span class="pre">A[F.p,</span> <span class="pre">:]</span></code> と <code class="docutils literal notranslate"><span class="pre">F.L*F.U</span></code> を比較する。同じ行列を行交換なしで消去し、基本行列から <span class="math notranslate nohighlight">\(A=LU\)</span> を導く計算は後の補足にまとめる。行交換の有無によって <span class="math notranslate nohighlight">\(L,U\)</span> は異なるが、それぞれ <span class="math notranslate nohighlight">\(PA=LU\)</span> と <span class="math notranslate nohighlight">\(A=LU\)</span> を満たす。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">4.0</span><span class="w"> </span><span class="o">-</span><span class="mf">6.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">7.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
+<span class="n">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lu</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;L = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">L</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;U = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">U</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;行の並べ替え = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;分解の確認 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">F</span><span class="o">.</span><span class="n">p</span><span class="p">,</span><span class="o">:</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">L</span><span class="o">*</span><span class="n">F</span><span class="o">.</span><span class="n">U</span><span class="p">))</span>
+
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">9.0</span><span class="p">]</span>
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">b</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">A</span><span class="o">*</span><span class="n">x</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L = 
+[1.0 0.0 0.0; 0.5 1.0 0.0; -0.5 1.0 1.0]
+U = 
+[4.0 -6.0 0.0; 0.0 4.0 1.0; 0.0 0.0 1.0]
+行の並べ替え = [2, 1, 3]
+分解の確認 = 0.0
+解 = [1.0, 1.0, 2.0]
+残差 = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id5">
+<h3><span class="section-number">5.5.1. </span>0でなくても、小さなピボットには注意する<a class="headerlink" href="#id5" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(A=\begin{bmatrix}\varepsilon&amp;1\\1&amp;1\end{bmatrix}\)</span>、<span class="math notranslate nohighlight">\(b=(1,2)^T\)</span>、<span class="math notranslate nohighlight">\(\varepsilon=10^{-20}\)</span> とする。連立方程式は</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\varepsilon x_1+x_2&amp;=1,\\
+x_1+x_2&amp;=2
+\end{aligned}
+\end{split}\]</div>
+<p>である。行交換をしないと、最初のピボットは <span class="math notranslate nohighlight">\(\varepsilon\)</span> であり、第2行の <span class="math notranslate nohighlight">\(x_1\)</span> を消すための消去係数は</p>
+<div class="math notranslate nohighlight">
+\[
+m=\frac{1}{\varepsilon}=10^{20}
+\]</div>
+<p>となる。行操作 <span class="math notranslate nohighlight">\(R_2\leftarrow R_2-mR_1\)</span> を行うと、第2式は</p>
+<div class="math notranslate nohighlight">
+\[
+(1-m\varepsilon)x_1+(1-m)x_2=2-m
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(m\varepsilon=1\)</span> なので <span class="math notranslate nohighlight">\(x_1\)</span> の項が消え、後退代入により</p>
+<div class="math notranslate nohighlight">
+\[
+x_2=\frac{2-m}{1-m}
+\]</div>
+<p>を得る。その後、第1式 <span class="math notranslate nohighlight">\(\varepsilon x_1+x_2=1\)</span> に戻って</p>
+<div class="math notranslate nohighlight">
+\[
+x_1=\frac{1-x_2}{\varepsilon}
+\]</div>
+<p>と求める。下の <code class="docutils literal notranslate"><span class="pre">x2_no_pivot</span></code> と <code class="docutils literal notranslate"><span class="pre">x_no_pivot</span></code> は、この2式をそのままコードにしたものである。</p>
+<p>ただし、倍精度浮動小数点数では <span class="math notranslate nohighlight">\(2-10^{20}\)</span> と <span class="math notranslate nohighlight">\(1-10^{20}\)</span> の小さな差を保持できず、どちらも実質的に <span class="math notranslate nohighlight">\(-10^{20}\)</span> となる。そのため計算上は <span class="math notranslate nohighlight">\(x_2=1\)</span>、続いて <span class="math notranslate nohighlight">\(x_1=(1-1)/\varepsilon=0\)</span> となり、<code class="docutils literal notranslate"><span class="pre">x_no_pivot</span> <span class="pre">=</span> <span class="pre">[0.0,</span> <span class="pre">1.0]</span></code> が得られる。一方、厳密解は</p>
+<div class="math notranslate nohighlight">
+\[
+x_1=\frac{1}{1-\varepsilon},\qquad
+x_2=\frac{1-2\varepsilon}{1-\varepsilon}
+\]</div>
+<p>であり、<span class="math notranslate nohighlight">\(\varepsilon=10^{-20}\)</span> ではほぼ <span class="math notranslate nohighlight">\((1,1)^T\)</span> である。</p>
+<p>この行列の条件数は約2.6である。第4章の言葉では、ここでの難しさは問題の悪条件性ではなく、計算手順にある。部分ピボット選択はこの例を改善し、通常の問題で丸めの増幅を抑える。ただし、あらゆる行列で小さな前進誤差を保証するわけではない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">eps_pivot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-20</span>
+<span class="n">A_small</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">eps_pivot</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">b_small</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
+<span class="n">multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="n">eps_pivot</span><span class="w">  </span><span class="c"># 行交換なしの消去係数 m</span>
+<span class="c"># R2 ← R2 - m*R1 により (1-m)x₂ = 2-m</span>
+<span class="n">x2_no_pivot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="o">-</span><span class="n">multiplier</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">multiplier</span><span class="p">)</span>
+<span class="c"># 第1式 εx₁+x₂=1 に戻って x₁ を求める</span>
+<span class="n">x_no_pivot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[(</span><span class="mi">1</span><span class="o">-</span><span class="n">x2_no_pivot</span><span class="p">)</span><span class="o">/</span><span class="n">eps_pivot</span><span class="p">,</span><span class="w"> </span><span class="n">x2_no_pivot</span><span class="p">]</span>
+<span class="n">x_pivot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_small</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">b_small</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;条件数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cond</span><span class="p">(</span><span class="n">A_small</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;行交換なし = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x_no_pivot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b_small</span><span class="o">-</span><span class="n">A_small</span><span class="o">*</span><span class="n">x_no_pivot</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;部分ピボット選択 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x_pivot</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b_small</span><span class="o">-</span><span class="n">A_small</span><span class="o">*</span><span class="n">x_pivot</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>条件数 = 2.6180339887498953
+行交換なし = [0.0, 1.0], 残差 = 1.0
+部分ピボット選択 = [1.0, 1.0], 残差 = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="n">
+<h2><span class="section-number">5.6. </span>n元の消去をコードにする<a class="headerlink" href="#n" title="Link to this heading">#</a></h2>
+<p>ここまでは2元・3元の例を手で追った。同じ手順を <span class="math notranslate nohighlight">\(n\)</span> 元へ広げると、次の二重の繰り返しになる。</p>
+<ol class="arabic simple">
+<li><p>第 <span class="math notranslate nohighlight">\(k\)</span> 列（<span class="math notranslate nohighlight">\(k=1,\ldots,n-1\)</span>）について、ピボット <span class="math notranslate nohighlight">\(u_{kk}\)</span> を確認する。</p></li>
+<li><p>その下の各行 <span class="math notranslate nohighlight">\(i=k+1,\ldots,n\)</span> で消去係数 <span class="math notranslate nohighlight">\(m_{ik}=u_{ik}/u_{kk}\)</span> を計算し、<span class="math notranslate nohighlight">\(L\)</span> の <span class="math notranslate nohighlight">\((i,k)\)</span> 成分に記録する。</p></li>
+<li><p>第 <span class="math notranslate nohighlight">\(i\)</span> 行から第 <span class="math notranslate nohighlight">\(k\)</span> 行の <span class="math notranslate nohighlight">\(m_{ik}\)</span> 倍を引く。</p></li>
+</ol>
+<p>本文の3元の行列を、行交換せずに消去する流れを先に見よう。各段階で、青い枠がピボット、橙色がその列で消す成分を示す。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{bmatrix}
+\textcolor{#0072B2}{\boxed{2}}&amp;1&amp;1\\
+\textcolor{#B54A00}{4}&amp;-6&amp;0\\
+\textcolor{#B54A00}{-2}&amp;7&amp;2
+\end{bmatrix}
+\xrightarrow{\substack{R_2\leftarrow R_2-2R_1\\R_3\leftarrow R_3+R_1}}
+\begin{bmatrix}
+2&amp;1&amp;1\\
+0&amp;\textcolor{#0072B2}{\boxed{-8}}&amp;-2\\
+0&amp;\textcolor{#B54A00}{8}&amp;3
+\end{bmatrix}
+\xrightarrow{R_3\leftarrow R_3+R_2}
+\underbrace{\begin{bmatrix}2&amp;1&amp;1\\0&amp;-8&amp;-2\\0&amp;0&amp;1\end{bmatrix}}_U.
+\end{split}\]</div>
+<p>第1列を消してから第2列へ進む。最後の行操作では第2行の第1成分が0なので、すでに作った第1列の0を保てる。記録する倍率は <span class="math notranslate nohighlight">\(m_{21}=2\)</span>、<span class="math notranslate nohighlight">\(m_{31}=-1\)</span>、<span class="math notranslate nohighlight">\(m_{32}=-1\)</span> である。</p>
+<p>次の <code class="docutils literal notranslate"><span class="pre">lu_nopivot</span></code> は、理解のために<strong>行交換を行わない</strong>Gauss消去をそのまま書いたものである。実際の計算では、部分ピボット選択を行う <code class="docutils literal notranslate"><span class="pre">lu</span></code> を使う。前進代入 <code class="docutils literal notranslate"><span class="pre">forward_substitution</span></code> は、後退代入を上から下へ進める形に書き換えたものである。</p>
+<p>実行前に、本文の3元の例で <span class="math notranslate nohighlight">\(L\)</span> の対角線より下に何が並ぶか予想してみよう（後の補足で手計算した <span class="math notranslate nohighlight">\(m_{21},m_{31},m_{32}\)</span> である）。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">lu_nopivot</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;正方行列を入力してください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">U</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">L</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="w">                      </span><span class="c"># 第k列を消去する</span>
+<span class="w">        </span><span class="n">iszero</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">])</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;ピボットが0です（第</span><span class="si">$</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="s">段階）。行交換が必要です&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="w">                  </span><span class="c"># ピボットより下の各行</span>
+<span class="w">            </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="o">/</span><span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="w">           </span><span class="c"># 消去係数</span>
+<span class="w">            </span><span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="w">                  </span><span class="c"># 倍率をLに記録する</span>
+<span class="w">            </span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">k</span><span class="o">:</span><span class="n">n</span><span class="p">]</span><span class="w"> </span><span class="o">.-=</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="n">k</span><span class="o">:</span><span class="n">n</span><span class="p">]</span><span class="w">  </span><span class="c"># R_i ← R_i - m R_k</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">U</span>
+<span class="k">end</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">forward_substitution</span><span class="p">(</span><span class="n">L</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="kt">Float64</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">n</span>
+<span class="w">        </span><span class="n">known</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">((</span><span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">y</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="n">init</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+<span class="w">        </span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">known</span><span class="p">)</span><span class="o">/</span><span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">]</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">y</span>
+<span class="k">end</span>
+
+<span class="n">A3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">4.0</span><span class="w"> </span><span class="o">-</span><span class="mf">6.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">7.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
+<span class="n">b3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">9.0</span><span class="p">]</span>
+<span class="n">L3</span><span class="p">,</span><span class="w"> </span><span class="n">U3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lu_nopivot</span><span class="p">(</span><span class="n">A3</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;L = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">L3</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;U = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">U3</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;||A-LU|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A3</span><span class="o">-</span><span class="n">L3</span><span class="o">*</span><span class="n">U3</span><span class="p">))</span>
+<span class="n">y3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">forward_substitution</span><span class="p">(</span><span class="n">L3</span><span class="p">,</span><span class="w"> </span><span class="n">b3</span><span class="p">)</span><span class="w">    </span><span class="c"># Ly = b</span>
+<span class="n">x3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">backward_substitution</span><span class="p">(</span><span class="n">U3</span><span class="p">,</span><span class="w"> </span><span class="n">y3</span><span class="p">)</span><span class="w">   </span><span class="c"># Ux = y</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;y = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">y3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, x = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x3</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b3</span><span class="o">-</span><span class="n">A3</span><span class="o">*</span><span class="n">x3</span><span class="p">))</span>
+
+<span class="k">try</span>
+<span class="w">    </span><span class="n">lu_nopivot</span><span class="p">([</span><span class="mf">0.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">2.0</span><span class="w"> </span><span class="mf">3.0</span><span class="p">])</span>
+<span class="k">catch</span><span class="w"> </span><span class="n">err</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;行交換なしの失敗: &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">err</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>L = [1.0 0.0 0.0; 2.0 1.0 0.0; -1.0 -1.0 1.0]
+U = [2.0 1.0 1.0; 0.0 -8.0 -2.0; 0.0 0.0 1.0]
+||A-LU|| = 0.0
+y = [5.0, -12.0, 2.0], x = [1.0, 1.0, 2.0], 残差 = 0.0
+行交換なしの失敗: ピボットが0です（第1段階）。行交換が必要です
+</pre></div>
+</div>
+</div>
+</div>
+<p>3元の例では、<span class="math notranslate nohighlight">\(L\)</span> の対角線より下に消去係数 <span class="math notranslate nohighlight">\(2,-1,-1\)</span> が並び、解 <span class="math notranslate nohighlight">\((1,1,2)^T\)</span> が得られた。これはJuliaの <code class="docutils literal notranslate"><span class="pre">lu</span></code> の結果と <span class="math notranslate nohighlight">\(L,U\)</span> は異なるが（あちらは行交換をしている）、解は同じである。最初のピボットが0の行列では、この実装は止まる。<code class="docutils literal notranslate"><span class="pre">lu</span></code> が行交換を行う理由がここにある。</p>
+<section id="id6">
+<h3><span class="section-number">5.6.1. </span>演算回数を数える<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<p>第4章と同じように、何回の四則演算が必要かを数えよう。第 <span class="math notranslate nohighlight">\(k\)</span> 段階では、ピボットより下の <span class="math notranslate nohighlight">\(n-k\)</span> 行それぞれについて、消去係数の除算が1回、第 <span class="math notranslate nohighlight">\(k\)</span> 列以降の約 <span class="math notranslate nohighlight">\(n-k\)</span> 個の成分に乗算と減算が1回ずつ必要である。したがって、おおよそ</p>
+<div class="math notranslate nohighlight">
+\[
+\sum_{k=1}^{n-1}\left\{2(n-k)^2+(n-k)\right\}
+\approx 2\sum_{j=1}^{n-1}j^2
+\approx \frac{2}{3}n^3
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(\sum_{j=1}^{n-1}j^2=(n-1)n(2n-1)/6\approx n^3/3\)</span> を使った。一方、前進代入・後退代入は各行で約 <span class="math notranslate nohighlight">\(2i\)</span> 回の演算を行うので、合わせて約 <span class="math notranslate nohighlight">\(2n^2\)</span> 回である。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>作業</p></th>
+<th class="head"><p>演算回数の目安</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(n\)</span> を倍にすると</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>LU分解</p></td>
+<td><p><span class="math notranslate nohighlight">\(\frac{2}{3}n^3\)</span></p></td>
+<td><p>約8倍</p></td>
+</tr>
+<tr class="row-odd"><td><p>前進代入＋後退代入（右辺1本）</p></td>
+<td><p><span class="math notranslate nohighlight">\(2n^2\)</span></p></td>
+<td><p>約4倍</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>次のコードは、上の和を実際に計算して <span class="math notranslate nohighlight">\(\frac23n^3\)</span> と比べ、さらにJuliaの <code class="docutils literal notranslate"><span class="pre">lu</span></code> と代入の実行時間を測る。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">400</span><span class="p">)</span>
+<span class="w">    </span><span class="n">elimination</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;n=</span><span class="si">$n</span><span class="s">: 消去の演算回数=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">elimination</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 2n^3/3=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="n">n</span><span class="o">^</span><span class="mi">3</span><span class="o">/</span><span class="mi">3</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">using</span><span class="w"> </span><span class="n">Random</span>
+<span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">function</span><span class="w"> </span><span class="n">best_time</span><span class="p">(</span><span class="n">f</span><span class="p">;</span><span class="w"> </span><span class="n">samples</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">f</span><span class="p">()</span><span class="w">                                  </span><span class="c"># 初回のコンパイルを先に済ませる</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">minimum</span><span class="p">([</span><span class="nd">@elapsed</span><span class="w"> </span><span class="n">f</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">samples</span><span class="p">])</span>
+<span class="k">end</span>
+<span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">500</span><span class="p">,</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="mi">2000</span><span class="p">)</span>
+<span class="w">    </span><span class="n">A_rand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="n">b_rand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="n">F_rand</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lu</span><span class="p">(</span><span class="n">A_rand</span><span class="p">)</span>
+<span class="w">    </span><span class="n">t_factor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">best_time</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">lu</span><span class="p">(</span><span class="n">A_rand</span><span class="p">))</span>
+<span class="w">    </span><span class="n">t_solve</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">best_time</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">F_rand</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">b_rand</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;n=</span><span class="si">$n</span><span class="s">: 分解 &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">t_factor</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; ms, 代入 &quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">round</span><span class="p">(</span><span class="n">t_solve</span><span class="o">*</span><span class="mf">1e3</span><span class="p">,</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; ms&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n=100: 消去の演算回数=661650, 2n^3/3=666667
+n=200: 消去の演算回数=5313300, 2n^3/3=5333333
+n=400: 消去の演算回数=42586600, 2n^3/3=42666667
+n=500: 分解 1.39 ms, 代入 0.0412 ms
+n=1000: 分解 6.15 ms, 代入 0.149 ms
+n=2000: 分解 30.9 ms, 代入 0.732 ms
+</pre></div>
+</div>
+</div>
+</div>
+<p>数えた演算回数は <span class="math notranslate nohighlight">\(\frac23n^3\)</span> とよく一致し、<span class="math notranslate nohighlight">\(n\)</span> を倍にすると約8倍になる。一方、実行時間は計算機によって異なり、8倍ちょうどにはならないことが多い。<code class="docutils literal notranslate"><span class="pre">lu</span></code> の内部では、行列計算ライブラリ（BLAS/LAPACK）が複数のコアやキャッシュを活用するためである（第16章）。<strong>演算回数は規模の見通しを与え、実測はその計算機での実際を与える</strong>。両者を区別して読もう。</p>
+<p>それでも「分解は代入の数十倍以上かかる」という関係は変わらない。同じ行列で右辺だけを変えて何度も解くなら、分解を1回だけ行って再利用する利益は大きい。</p>
+<div class="tip admonition">
+<p class="admonition-title">逆行列を計算しないのはなぜか</p>
+<p><span class="math notranslate nohighlight">\(x=A^{-1}b\)</span> を <code class="docutils literal notranslate"><span class="pre">inv(A)*b</span></code> と計算すると、逆行列を作るのに約 <span class="math notranslate nohighlight">\(2n^3\)</span> 回の演算が必要で、LU分解の約3倍である。丸め誤差の面でも、一般に <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code> の方が有利である。「逆行列を掛ける」は式の上の表現であり、計算では「分解して代入する」と読み替える。ただし、次の応用例のように、逆行列の各成分そのものに意味があり、それを知りたい場合は別である。</p>
+</div>
+</section>
+</section>
+<section id="id7">
+<h2><span class="section-number">5.7. </span>応用例：産業連関分析<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>経済の各産業は、自分の生産のために他の産業の製品を使う。例えば製造業が1単位生産するには、農林水産業から0.05単位、製造業自身から0.40単位、サービス業から0.20単位を投入する、というように考える。この比率を並べた行列 <span class="math notranslate nohighlight">\(A\)</span> を<strong>投入係数行列</strong>という。第 <span class="math notranslate nohighlight">\(j\)</span> 列は「産業 <span class="math notranslate nohighlight">\(j\)</span> が1単位生産するのに必要な各産業からの投入」である。</p>
+<p>各産業の生産額を <span class="math notranslate nohighlight">\(x\)</span>、消費者や輸出などの<strong>最終需要</strong>を <span class="math notranslate nohighlight">\(d\)</span> とすると、生産額は「他産業への中間投入」と「最終需要」の和に等しいので、</p>
+<div class="math notranslate nohighlight">
+\[
+x=Ax+d
+\quad\Longleftrightarrow\quad
+(I-A)x=d
+\]</div>
+<p>となる。これは連立一次方程式であり、Leontief（レオンチェフ）モデルと呼ばれる。実際の産業連関表は数百部門に及び、政府や自治体が経済波及効果を見積もる際に使われている。</p>
+<p>ここでは3部門の架空の例を使う。最終需要をいくつも変えて比較する（シナリオ分析）ことが多いので、<span class="math notranslate nohighlight">\(I-A\)</span> を一度だけ分解し、各シナリオで代入だけを行う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">Ain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.10</span><span class="w"> </span><span class="mf">0.05</span><span class="w"> </span><span class="mf">0.02</span><span class="p">;</span><span class="w">     </span><span class="c"># 行: 投入する側（農林水産, 製造, サービス）</span>
+<span class="w">       </span><span class="mf">0.20</span><span class="w"> </span><span class="mf">0.40</span><span class="w"> </span><span class="mf">0.15</span><span class="p">;</span><span class="w">     </span><span class="c"># 列: 生産する側</span>
+<span class="w">       </span><span class="mf">0.10</span><span class="w"> </span><span class="mf">0.20</span><span class="w"> </span><span class="mf">0.25</span><span class="p">]</span>
+<span class="n">d_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">50.0</span><span class="p">,</span><span class="w"> </span><span class="mf">300.0</span><span class="p">,</span><span class="w"> </span><span class="mf">400.0</span><span class="p">]</span><span class="w">   </span><span class="c"># 最終需要</span>
+<span class="n">M_leontief</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">Ain</span>
+<span class="n">F_leontief</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lu</span><span class="p">(</span><span class="n">M_leontief</span><span class="p">)</span><span class="w">     </span><span class="c"># 一度だけ分解する</span>
+
+<span class="n">x_base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F_leontief</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">d_base</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;投入係数の列和 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">Ain</span><span class="p">,</span><span class="w"> </span><span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;必要な生産額 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">x_base</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">M_leontief</span><span class="o">*</span><span class="n">x_base</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">d_base</span><span class="p">))</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="n">Δd</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="s">&quot;製造業への最終需要 +30&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">30.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]),</span>
+<span class="w">                    </span><span class="p">(</span><span class="s">&quot;サービス業への最終需要 +30&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">30.0</span><span class="p">]))</span>
+<span class="w">    </span><span class="n">Δx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F_leontief</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">Δd</span><span class="w">          </span><span class="c"># 分解を再利用して代入だけを行う</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;: 生産額の増加 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">Δx</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+<span class="w">            </span><span class="s">&quot;, 合計 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">Δx</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>投入係数の列和 = [0.4 0.65 0.42]
+必要な生産額 = [112.2, 722.6, 741.0]
+残差 = 1.6077746776921858e-13
+製造業への最終需要 +30: 生産額の増加 = [3.39, 54.9, 15.09], 合計 = 73.38
+サービス業への最終需要 +30: 生産額の増加 = [1.59, 11.34, 43.24], 合計 = 56.17
+</pre></div>
+</div>
+</div>
+</div>
+<p>製造業への最終需要を30増やすと、製造業自身の生産は30より多い約54.9増え、農林水産業・サービス業の生産も増える。製造業が原材料を他産業から買い、その産業がさらに別の産業から買う、という連鎖が方程式に含まれているためである。生産額の増加の合計（約73.4）を最初の需要増30で割った値は、経済波及効果の大きさの目安になる。</p>
+<p><span class="math notranslate nohighlight">\((I-A)^{-1}\)</span> は<strong>レオンチェフ逆行列</strong>と呼ばれ、その第 <span class="math notranslate nohighlight">\(j\)</span> 列は「産業 <span class="math notranslate nohighlight">\(j\)</span> の最終需要が1増えたときの各産業の生産増」を表す。このように逆行列の成分そのものに意味がある場合には、単位行列の各列を右辺として <code class="docutils literal notranslate"><span class="pre">F_leontief</span> <span class="pre">\</span> <span class="pre">Matrix(I,</span> <span class="pre">3,</span> <span class="pre">3)</span></code> のように計算する。これも <span class="math notranslate nohighlight">\(n\)</span> 本の右辺に対する代入であり、分解は1回で済む。</p>
+<p>モデルとしての注意もある。投入係数が一定、価格が変わらない、生産能力に上限がない、という仮定を置いている（第1章のモデル誤差）。また、投入係数の列和が1未満でなければ <span class="math notranslate nohighlight">\(x\ge0\)</span> となる解が得られるとは限らない。数値計算で解が求まったことと、その解が経済的に意味を持つことは、別に確かめる必要がある。</p>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">5.8. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 基本行列で消去を表す<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>ここでは、本文のJulia例と同じ行列に対し、<strong>行交換を行わない</strong>消去を基本行列の積として確認する。このため、Juliaが部分ピボット選択で返した <span class="math notranslate nohighlight">\(L,U\)</span> と、ここで得る <span class="math notranslate nohighlight">\(L,U\)</span> は異なる。一般の分解を導くための補足であり、基本の解法と行交換は前の節だけで追える。</p>
+<p>行基本変形は、行列を<strong>左からかける操作</strong>として表せる。第 <span class="math notranslate nohighlight">\(i\)</span> 行から第 <span class="math notranslate nohighlight">\(k\)</span> 行の <span class="math notranslate nohighlight">\(m\)</span> 倍を引く操作</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+R_i\leftarrow R_i-mR_k
+\end{align}
+\]</div>
+<p>に対応する基本行列を</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+E_{ik}(m)=I-me_ie_k^T
+\end{align}
+\]</div>
+<p>と書く。ここで <span class="math notranslate nohighlight">\(e_i\)</span> は第 <span class="math notranslate nohighlight">\(i\)</span> 成分だけが1の単位ベクトルである。<span class="math notranslate nohighlight">\(E_{ik}(m)A\)</span> を計算すると、<span class="math notranslate nohighlight">\(A\)</span> の第 <span class="math notranslate nohighlight">\(i\)</span> 行だけが <span class="math notranslate nohighlight">\(R_i-mR_k\)</span> に置き換わる。</p>
+<p>具体例として</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+A=
+\begin{bmatrix}
+2&amp;1&amp;1\\
+4&amp;-6&amp;0\\
+-2&amp;7&amp;2
+\end{bmatrix}
+\end{align}
+\end{split}\]</div>
+<p>を上三角行列へ変形する。第1列の消去係数は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+m_{21}=\frac{4}{2}=2,\qquad
+m_{31}=\frac{-2}{2}=-1
+\end{align}
+\]</div>
+<p>なので、対応する基本行列は</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+E_{21}=
+\begin{bmatrix}1&amp;0&amp;0\\ \textcolor{#0072B2}{-2}&amp;1&amp;0\\0&amp;0&amp;1\end{bmatrix},\qquad
+E_{31}=
+\begin{bmatrix}1&amp;0&amp;0\\0&amp;1&amp;0\\ \textcolor{#0072B2}{1}&amp;0&amp;1\end{bmatrix}.
+\end{align}
+\end{split}\]</div>
+<p>これらを順に左からかけると</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+A^{(1)}=E_{31}E_{21}A
+=
+\begin{bmatrix}
+2&amp;1&amp;1\\
+\textcolor{#B54A00}{0}&amp;-8&amp;-2\\
+\textcolor{#B54A00}{0}&amp;8&amp;3
+\end{bmatrix}.
+\end{align}
+\end{split}\]</div>
+<p>次に <span class="math notranslate nohighlight">\(m_{32}=8/(-8)=-1\)</span> として</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+E_{32}=
+\begin{bmatrix}1&amp;0&amp;0\\0&amp;1&amp;0\\0&amp;\textcolor{#0072B2}{1}&amp;1\end{bmatrix}
+\end{align}
+\end{split}\]</div>
+<p>を左からかければ</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+E_{32}E_{31}E_{21}A
+=
+\begin{bmatrix}
+2&amp;1&amp;1\\
+0&amp;-8&amp;-2\\
+0&amp;\textcolor{#B54A00}{0}&amp;1
+\end{bmatrix}
+=U
+\end{align}
+\end{split}\]</div>
+<p>となる。ここで重要なのは、<span class="math notranslate nohighlight">\(U\)</span> が突然現れたのではなく、<strong>消去を表す基本行列を順番に左からかけた結果</strong>だという点である。</p>
+<p>上式の消去操作を逆向きに戻すと</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+A=E_{21}^{-1}E_{31}^{-1}E_{32}^{-1}U=LU,
+\end{align}
+\]</div>
+<p>したがって</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+L=E_{21}^{-1}E_{31}^{-1}E_{32}^{-1}
+=
+\begin{bmatrix}
+1&amp;0&amp;0\\
+2&amp;1&amp;0\\
+-1&amp;-1&amp;1
+\end{bmatrix}.
+\end{align}
+\end{split}\]</div>
+<p>※ここでは、基本行列の逆操作が、上の基本行列の係数を反転させた操作であることを使った。基本行列の逆行列では、引いた操作を足して戻すため符号が反転する。</p>
+<p>結果として、Gauss消去で使った係数 <span class="math notranslate nohighlight">\(m_{21},m_{31},m_{32}\)</span> が <span class="math notranslate nohighlight">\(L\)</span> の対角線より下に並ぶ。</p>
+<p>この計算で消去係数の分母に使った <span class="math notranslate nohighlight">\(a_{11}=2\)</span> と <span class="math notranslate nohighlight">\(a_{22}^{(1)}=-8\)</span> が、前節で定義したピボットである。どちらも0でないため、この補足では行を入れ替えずに消去できた。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A_basic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">4.0</span><span class="w"> </span><span class="o">-</span><span class="mf">6.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="o">-</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">7.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
+<span class="n">I3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">I</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">m21</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_basic</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">A_basic</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">m31</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_basic</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">A_basic</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">E21</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">I3</span><span class="p">);</span><span class="w"> </span><span class="n">E21</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">m21</span>
+<span class="n">E31</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">I3</span><span class="p">);</span><span class="w"> </span><span class="n">E31</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">m31</span>
+<span class="n">A_step1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E31</span><span class="o">*</span><span class="n">E21</span><span class="o">*</span><span class="n">A_basic</span>
+
+<span class="n">m32</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_step1</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="n">A_step1</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">E32</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">I3</span><span class="p">);</span><span class="w"> </span><span class="n">E32</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">m32</span>
+<span class="n">U_basic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E32</span><span class="o">*</span><span class="n">A_step1</span>
+
+<span class="c"># 各消去操作を逆向きに戻す基本行列</span>
+<span class="n">E21_inv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">I3</span><span class="p">);</span><span class="w"> </span><span class="n">E21_inv</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m21</span>
+<span class="n">E31_inv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">I3</span><span class="p">);</span><span class="w"> </span><span class="n">E31_inv</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m31</span>
+<span class="n">E32_inv</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">I3</span><span class="p">);</span><span class="w"> </span><span class="n">E32_inv</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m32</span>
+<span class="n">L_basic</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">E21_inv</span><span class="o">*</span><span class="n">E31_inv</span><span class="o">*</span><span class="n">E32_inv</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;消去係数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">m21</span><span class="p">,</span><span class="n">m31</span><span class="p">,</span><span class="n">m32</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;U = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">U_basic</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;L = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">L_basic</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;||A-LU|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_basic</span><span class="o">-</span><span class="n">L_basic</span><span class="o">*</span><span class="n">U_basic</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>消去係数 = (2.0, -1.0, -1.0)
+U = 
+[2.0 1.0 1.0; 0.0 -8.0 -2.0; 0.0 0.0 1.0]
+L = 
+[1.0 0.0 0.0; 2.0 1.0 0.0; -1.0 -1.0 1.0]
+||A-LU|| = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id8">
+<h2><span class="section-number">5.9. </span>まとめ<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>Gauss消去法は、係数と右辺へ同じ行操作を施して三角形の方程式を作る。LU分解はその操作を再利用するための記録で、行交換がある場合は <span class="math notranslate nohighlight">\(PA=LU\)</span> と書く。行交換は丸めの増幅を抑える工夫であり、元の問題の悪条件性を解消するものではない。</p>
+<p>密な <span class="math notranslate nohighlight">\(n\times n\)</span> 行列では、分解が <span class="math notranslate nohighlight">\(O(n^3)\)</span>、1本の右辺に対する前進・後退代入が <span class="math notranslate nohighlight">\(O(n^2)\)</span> である。右辺が3本なら、分解を3回行う代わりに、1回の分解と3回の代入で済む。</p>
+<ul class="simple">
+<li><p>1回の求解：<code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">=</span> <span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code></p></li>
+<li><p>同じ行列で繰り返す：<code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">=</span> <span class="pre">lu(A)</span></code> の後に <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">\</span> <span class="pre">b1</span></code>, <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">\</span> <span class="pre">b2</span></code></p></li>
+<li><p>検証：元の式の相対残差 <code class="docutils literal notranslate"><span class="pre">norm(b-A*x)/norm(b)</span></code> と、必要に応じて条件数（ここでは <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">!=</span> <span class="pre">0</span></code>）。</p></li>
+</ul>
+<p>逆行列は、その成分自体に意味がある場合（レオンチェフ逆行列など）を除き、明示的に作らない。</p>
+</div>
+<p>未知数が数十万を超える疎行列では、分解のメモリが足りなくなることがある。そのような場合に使う反復法は、<a class="reference internal" href="Chap_IterativeLinearSystems.html"><span class="std std-doc">第10章「連立一次方程式の反復法」</span></a>で扱う。産業連関の「波及を1段ずつ足す」計算が、その入口になる。</p>
+<p>次の<a class="reference internal" href="Chap_QRLeastSquares.html"><span class="std std-doc">第6章</span></a>では、方程式が未知数より多く、すべてを同時には満たせない場合を考える。</p>
+</section>
+<section id="id9">
+<h2><span class="section-number">5.10. </span>演習<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>消去と右辺</strong>：本文の2元連立方程式で、第2式から第1式の2倍を引き、消去後の右辺が1になることを確かめよ。その後、下の式から順に解け。</p></li>
+<li><p><strong>行交換の意味</strong>：<span class="math notranslate nohighlight">\(A=\begin{bmatrix}0&amp;1\\2&amp;3\end{bmatrix}\)</span>、<span class="math notranslate nohighlight">\(b=(1,5)^T\)</span> で、最初に行交換する理由を説明せよ。右辺にも同じ交換をした式を書き、<span class="math notranslate nohighlight">\(x=(1,1)^T\)</span> を代入して確かめよ。</p></li>
+<li><p><strong>分解を使い回す</strong>：同じ係数行列で右辺だけが3回変わる場合、LU分解のどの部分を再利用できるか。問題サイズを倍にすると、分解と1回の代入の仕事量はそれぞれ約何倍になるか。</p></li>
+<li><p><strong>実装を確かめる</strong>：<code class="docutils literal notranslate"><span class="pre">lu_nopivot</span></code> を本文の2元の例 <span class="math notranslate nohighlight">\(A=\begin{bmatrix}2&amp;1\\4&amp;3\end{bmatrix}\)</span> に使い、手計算の <span class="math notranslate nohighlight">\(L,U\)</span> と一致するか確かめよ。次に、小さなピボットの例（<span class="math notranslate nohighlight">\(\varepsilon=10^{-20}\)</span>）に使うと何が起こるかを<strong>実行前に予想して書き</strong>、実行結果と比べよ。予想と違った点があれば、第4章の「条件数」と「安定性」のどちらの問題かを説明せよ。</p></li>
+<li><p><strong>探究：波及効果を比べる</strong>：産業連関の例で、どの産業の最終需要を1増やすと生産額の合計が最も増えるか。まずレオンチェフ逆行列の列和から予想し、計算で確かめよ。次に、製造業の自部門投入係数（本文の0.40）を0.60、0.80と大きくしたとき、生産額と <code class="docutils literal notranslate"><span class="pre">cond(I</span> <span class="pre">-</span> <span class="pre">Ain)</span></code> がどう変わるかを調べ、列和が1に近づくと何が起こるかを考察せよ。結論だけでなく、どの値を変えて何を比べたかを記録すること。</p></li>
+</ol>
+</div>
+</section>
+<section id="id10">
+<h2><span class="section-number">5.11. </span>参考文献と関連する節<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Driscoll and Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/linsys/lu.html">LU factorization</a>.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_NumericalAccuracyAndCost.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">4. </span>誤差・条件数・計算量</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_QRLeastSquares.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>最小二乗法とQR分解</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">5.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">5.2. まずは消去法を思い出す</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">5.3. 三角行列なら順番に解ける</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#lu">5.4. LU分解は消去操作の記録</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">5.5. ピボットと行交換</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">5.5.1. 0でなくても、小さなピボットには注意する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#n">5.6. n元の消去をコードにする</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">5.6.1. 演算回数を数える</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">5.7. 応用例：産業連関分析</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">5.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 基本行列で消去を表す</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">5.9. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">5.10. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">5.11. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

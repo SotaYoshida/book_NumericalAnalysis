@@ -1,0 +1,623 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>数値解析 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="_static/copybutton.js?v=f281be69"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'home';</script>
+    <link rel="index" title="索引" href="genindex.html" />
+    <link rel="search" title="検索" href="search.html" />
+    <link rel="next" title="1. 数値解析とは" href="notebooks/Chap_WhyItMatters.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="#">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="_sources/home.md" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.md</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>数値解析</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">到達目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">このブックの使い方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">参考文献</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notation">数学的記法(notation)について</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1>数値解析<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>この講義では、数学的な問題を計算可能な形へ変換し、得られた数値を誤差・安定性・計算量の観点から評価するための基礎を学ぶ。公式の適用だけでなく、仮定を確認し、実装し、結果を検証するところまでを数値解析の一部として扱う。</p>
+<p>実装にはJuliaを用いる。Juliaの事前知識は仮定しないが、微積分と線形代数の基礎、およびPythonなど何らかの言語による初歩的なプログラミング経験を前提とする。Juliaは、ベクトル・行列の記法が数式に近く、標準ライブラリだけでも主要な数値線形代数を扱えるため採用した。学習の中心は言語固有の文法ではなく、他の言語でも再利用できる数値計算の考え方に置く。</p>
+<section id="id2">
+<h2>到達目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>講義終了時には、次のことができるようになることを目標とする。</p>
+<ol class="arabic simple">
+<li><p>問題の規模から、必要な演算回数・メモリ量のオーダーを見積もる。</p></li>
+<li><p>浮動小数点数、条件数、安定性の違いを説明し、計算結果を検証する。</p></li>
+<li><p>連立一次方程式、最小二乗問題、固有値問題を、問題の構造に応じて解く。</p></li>
+<li><p>非線形方程式、補間、数値微分、数値積分に対する基本的な数値解法を実装する。</p></li>
+<li><p>常微分方程式を離散化し、刻み幅と安定性を意識して数値的に解く。</p></li>
+<li><p>数値計算の結果を、既知解との比較・刻み幅の変更・問題固有の性質などを組み合わせて検証し、その信頼性を自分の言葉で説明する。</p></li>
+<li><p>（時間が許せば）連立一次方程式と固有値問題の反復法、並列計算の考え方を説明する。発展編のSVD・テンソル分解、Fourier解析、DMD、MCMCは自習用の資料とする。</p></li>
+</ol>
+<p>一見、上の目標は込み入った内容に見えるが、各章は「問題を有限個の数で表し、構造を利用して解き、誤差を確かめる」という共通の流れを持つ。個々の公式を孤立して覚えるのではなく、この流れを異なる問題へ適用することを目指す。</p>
+</section>
+<section id="id3">
+<h2>このブックの使い方<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>各章は「目標 → 数学的な考え方 → 最小限の実装 → 検証 → 演習」を基本として構成する。まず本文の小さな例で手順を追い、結果を予想してから出力と比較してほしい。章末の基本演習は、短い計算と、結果の意味を説明する問題を中心としている。作図や補足の実装をすべて再現することは、基本演習の前提にしていない。</p>
+<p>ファイルの操作とプログラム実行の基本は<a class="reference internal" href="notebooks/Chap_linux_env.html"><span class="std std-doc">第2章「Linux環境とコマンド」</span></a>、必要なJuliaの書き方は<a class="reference internal" href="notebooks/Chap_Julia_LinearAlgebra.html"><span class="std std-doc">第3章「Juliaと線形代数」</span></a>で補う。第1章では、まず数式・手計算・表・図を追って数値解析の考え方をつかみ、コードの実行は環境を準備してから試してもよい。</p>
+<p>基本的な数値計算のコードでは、Julia本体と標準ライブラリ <code class="docutils literal notranslate"><span class="pre">LinearAlgebra</span></code>、<code class="docutils literal notranslate"><span class="pre">SparseArrays</span></code>、<code class="docutils literal notranslate"><span class="pre">Statistics</span></code>、<code class="docutils literal notranslate"><span class="pre">Random</span></code> などを用いる。図の再作成には <code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> など、話題によっては別の追加パッケージも必要になるため、使用するコード付近の案内を確認してほしい。第1章の数値実験はJulia本体だけで実行でき、作図コードには <code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> が必要である。ブックに掲載された図を見るだけなら、作図コードの実行やパッケージの追加は不要である。</p>
+<p>本資料は全16章からなり、次の四つの部を順に学ぶ。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>部</p></th>
+<th class="head"><p>章</p></th>
+<th class="head"><p>内容</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>準備</p></td>
+<td><p>第1〜4章</p></td>
+<td><p>数値解析の考え方、Linux環境、Juliaと線形代数、誤差・条件数・計算量</p></td>
+</tr>
+<tr class="row-odd"><td><p>基本アルゴリズム</p></td>
+<td><p>第5〜7章</p></td>
+<td><p>連立一次方程式の直接法、最小二乗法、非線形方程式</p></td>
+</tr>
+<tr class="row-even"><td><p>近似と微分方程式</p></td>
+<td><p>第8〜9章</p></td>
+<td><p>補間・数値微分・数値積分、常微分方程式の初期値問題</p></td>
+</tr>
+<tr class="row-odd"><td><p>発展・応用</p></td>
+<td><p>第10〜16章</p></td>
+<td><p>連立一次方程式の反復法、固有値問題、SVD・テンソル分解、Fourier解析、DMD、MCMC、並列計算（講義では第10・11・16章を選択的に扱う）</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>各章の <span class="math notranslate nohighlight">\(\clubsuit\)</span> を付した節は補足・発展事項であり、初読時には飛ばしても、その後の章の基本部分を読み進められる。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>本資料はJupyter Bookを用いて作成しており、ブラウザでの閲覧を想定している。
+コードを実行する際は、Julia 1.12以降のローカル環境を推奨する。</p>
+</div>
+</section>
+<section id="id4">
+<h2>参考文献<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>本資料の構成と例題を検討する際、以下の文献を参照した。</p>
+<ol class="arabic simple">
+<li><p>Tobin A. Driscoll and Richard J. Braun, <em><a class="reference external" href="https://tobydriscoll.net/fnc-julia/home.html">Fundamentals of Numerical Computation</a></em>. Julia、MATLAB、Pythonによる実装例を含むオンライン教科書。</p></li>
+<li><p>Giray Ökten, <em><a class="reference external" href="https://open.umn.edu/opentextbooks/textbooks/first-semester-in-numerical-analysis-with-julia">First Semester in Numerical Analysis with Julia</a></em>, Florida State University.</p></li>
+</ol>
+</section>
+<section id="notation">
+<h2>数学的記法(notation)について<a class="headerlink" href="#notation" title="Link to this heading">#</a></h2>
+<p>基本の記法は以下のとおりである。各章で別の意味に使う記号は、その箇所で定義する。第5章以降では、式を簡潔にするため、行列とベクトルの太字を省略して <span class="math notranslate nohighlight">\(A\)</span>、<span class="math notranslate nohighlight">\(x\)</span> のように書くことが多い。実数の例を中心とし、複素数を使う章では転置と共役転置を区別する。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>記号</p></th>
+<th class="head"><p>意味等</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(a, b, c, ..., x\)</span></p></td>
+<td><p>スカラー値</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathbb{R}\)</span></p></td>
+<td><p>実数全体の集合</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(a \in \mathbb{R}\)</span></p></td>
+<td><p>aは集合<span class="math notranslate nohighlight">\(\mathbb{R}\)</span>の要素である</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\{ \ldots \}\)</span></p></td>
+<td><p>波括弧, 集合を表す</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([ \ldots ] \)</span></p></td>
+<td><p>角括弧, 列ベクトルを並べて行列を表現する際などに用いる</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathbb{R}^n\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(n\)</span>次元実数ベクトル空間</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\mathbf{a}, \mathbf{x}\)</span></p></td>
+<td><p>ベクトル, 太字のイタリック体を用いる</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathbf{A}, \mathbf{X}\)</span></p></td>
+<td><p>行列, 太字の大文字を用いる(例外あり)</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(x^T, \mathbf{A}^T\)</span></p></td>
+<td><p>ベクトル・行列の転置</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathbf{A}^*\)</span></p></td>
+<td><p>共役転置。Juliaの <code class="docutils literal notranslate"><span class="pre">A'</span></code> はこれに対応する</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\mathbf{A}^{-1}\)</span></p></td>
+<td><p>逆行列</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathbf{x} \cdot \mathbf{y}\)</span></p></td>
+<td><p>ベクトルの内積</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\mathbf{x}^T  \mathbf{y}\)</span></p></td>
+<td><p>ベクトルの内積(行列の一種であることをより意識した書き方)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathbf{I}_m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(m\)</span>次元単位行列</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\mathbf{0}_m\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(m\)</span>次元ゼロ行列</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathrm{dim}(V)\)</span></p></td>
+<td><p>ベクトル空間<span class="math notranslate nohighlight">\(V\)</span>の次元</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\mathrm{rank}(\mathbf{A})\)</span></p></td>
+<td><p>行列<span class="math notranslate nohighlight">\(\mathbf{A}\)</span>の階数(rank)</p></td>
+</tr>
+<tr class="row-odd"><td><p>tr <span class="math notranslate nohighlight">\((\mathbf{A})\)</span></p></td>
+<td><p>行列<span class="math notranslate nohighlight">\(\mathbf{A}\)</span>のトレース(trace)</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\det (\mathbf{A})\)</span></p></td>
+<td><p>行列<span class="math notranslate nohighlight">\(\mathbf{A}\)</span>の行列式(determinant)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\lvert x\rvert\)</span>, <span class="math notranslate nohighlight">\(\det(A)\)</span></p></td>
+<td><p>スカラーの絶対値、行列式（区別して記す）</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\lVert x\rVert_2\)</span>, <span class="math notranslate nohighlight">\(\lVert A\rVert_2\)</span></p></td>
+<td><p>ベクトルの2ノルム、それに対応する行列の作用素ノルム</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\lVert A\rVert_F\)</span></p></td>
+<td><p>Frobeniusノルム。Juliaで行列に <code class="docutils literal notranslate"><span class="pre">norm(A)</span></code> を使うとこの量になる</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(X \sim P\)</span></p></td>
+<td><p>確率変数<span class="math notranslate nohighlight">\(X\)</span>が分布<span class="math notranslate nohighlight">\(P\)</span>に従うことを表す</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\mathcal{N}(\mu, \sigma^2)\)</span></p></td>
+<td><p>平均<span class="math notranslate nohighlight">\(\mu\)</span>、分散<span class="math notranslate nohighlight">\(\sigma^2\)</span>の正規分布</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\mathcal{N}(\boldsymbol{\mu}, \mathbf{\Sigma})\)</span></p></td>
+<td><p>平均<span class="math notranslate nohighlight">\(\boldsymbol{\mu}\)</span>、共分散行列<span class="math notranslate nohighlight">\(\mathbf{\Sigma}\)</span>の多変量正規分布</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            name: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="right-next"
+       href="notebooks/Chap_WhyItMatters.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>数値解析とは</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">到達目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">このブックの使い方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">参考文献</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#notation">数学的記法(notation)について</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

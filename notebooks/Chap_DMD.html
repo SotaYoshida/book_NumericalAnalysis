@@ -1,0 +1,891 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>14. 動的モード分解 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_DMD';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="15. マルコフ連鎖モンテカルロ法" href="Chap_MCMC.html" />
+    <link rel="prev" title="13. Fourier解析とFourier回帰" href="Chap_FourierAnalysis.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_DMD.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>動的モード分解</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">14.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">14.2. データについて</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">14.3. 時間変化の規則を、観測から求める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#snapshot">14.4. snapshotから時間発展を推定する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#svd">14.5. SVDによる低次元化</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">14.6. 2次元の減衰振動</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">14.7. 成長率、周波数、再構成</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fourier">14.8. Fourier解析との違い</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-dmd">14.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> カルマン渦：空間パターンとしてDMDを見る</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julia">14.9.1. Juliaで再計算する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mode">14.9.2. 150枚の画像を15個のmodeで再構成する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">14.10. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">14.11. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">14.12. 参考文献</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_DMD.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">14. </span>動的モード分解<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>動的モード分解（dynamic mode decomposition; DMD）は、時系列のsnapshotから、1 stepの時間発展を近似する線形作用と、その固有モードを推定する方法である。SVDによる低次元化、最小二乗、固有値分解を組み合わせる。</p>
+<section id="id2">
+<h2><span class="section-number">14.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>snapshot行列 <span class="math notranslate nohighlight">\(X,Y\)</span> を構成できる。</p></li>
+<li><p>DMDが解く最小二乗問題を説明できる。</p></li>
+<li><p>最小二乗・SVD・固有値問題が、DMDでそれぞれ何を担当するか説明できる。</p></li>
+<li><p>空間場をベクトル化し、DMD modeを元の形へ戻して解釈できる。</p></li>
+<li><p>離散時間固有値から成長率と周波数を求められる。</p></li>
+<li><p>Fourier解析との違いとDMDの限界を説明できる。</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2><span class="section-number">14.2. </span>データについて<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>この章で使用するデータは、円柱周りの2次元非圧縮流れの数値シミュレーション結果である。
+DMDの教科書<a class="reference external" href="http://dmdbook.com">http://dmdbook.com</a>の付録にある <code class="docutils literal notranslate"><span class="pre">CYLINDER_ALL.mat</span></code> を使用する。</p>
+<p>コードの実行が必要な場合は各自でダウンロードして、<code class="docutils literal notranslate"><span class="pre">DATA/FLUIDS/CYLINDER_ALL.mat</span></code> に配置すること。</p>
+</section>
+<section id="id4">
+<h2><span class="section-number">14.3. </span>時間変化の規則を、観測から求める<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p><a class="reference internal" href="Chap_InitialValueProblems.html"><span class="std std-doc">第9章「常微分方程式の初期値問題」</span></a>では、微分方程式から次の状態を計算した。今度は、状態の記録はあるが、更新の式が分からない場合を考える。例えば等間隔で測った値が1、0.8、0.64、0.512なら、毎回0.8倍になる規則 <span class="math notranslate nohighlight">\(x_{k+1}=0.8x_k\)</span> が見える。</p>
+<p>雑音がある場合には、隣同士の比を一つずつ読むより、全組に対して <span class="math notranslate nohighlight">\(x_{k+1}\approx ax_k\)</span> を当てはめる方が自然である。最小二乗法なら <span class="math notranslate nohighlight">\(a=\sum_k x_kx_{k+1}/\sum_k x_k^2\)</span> となる（分母が0でない場合）。DMDはこの考え方を、各時刻の状態がベクトルの場合へ広げる。</p>
+<p>例えば棒の温度分布を1列に並べたものが、一つの<strong>スナップショット</strong>である。そこから、どの空間パターンがどの速さで減衰・振動するかを推定する。第6章の最小二乗、第12章のSVD、第11章の固有値問題を組み合わせる。</p>
+</section>
+<section id="snapshot">
+<h2><span class="section-number">14.4. </span>snapshotから時間発展を推定する<a class="headerlink" href="#snapshot" title="Link to this heading">#</a></h2>
+<p>等時間間隔 <span class="math notranslate nohighlight">\(\Delta t\)</span> で得た状態 <span class="math notranslate nohighlight">\(x_1,\ldots,x_{m+1}\in\mathbb{R}^n\)</span> から</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+X=[x_1\ x_2\ \cdots\ x_m],\qquad
+Y=[x_2\ x_3\ \cdots\ x_{m+1}]
+\end{align}
+\]</div>
+<p>を作る。例えば4時刻なら、<span class="math notranslate nohighlight">\(X\)</span> の列は第1・2・3時刻、<span class="math notranslate nohighlight">\(Y\)</span> の列は第2・3・4時刻であり、同じ列番号が「現在と次」を組にする。</p>
+<figure class="align-default" id="fig-learning-dmd-pairs">
+<a class="reference internal image-reference" href="../_images/learning_dmd_pairs.svg"><img alt="4時刻のデータから、Xの列をx1,x2,x3、Yの列をx2,x3,x4とし、同じ列を現在と次の状態の組にする。" src="../_images/learning_dmd_pairs.svg" style="width: 95%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 14.1 </span><span class="caption-text">同じ列の上下が、入力と出力の一つの組である。<span class="math notranslate nohighlight">\(x_2\)</span> は第1列では「次」、第2列では「現在」として現れる。共通の <span class="math notranslate nohighlight">\(A\)</span> で <span class="math notranslate nohighlight">\(Ax_1\approx x_2\)</span>、<span class="math notranslate nohighlight">\(Ax_2\approx x_3\)</span>、<span class="math notranslate nohighlight">\(Ax_3\approx x_4\)</span> を同時に満たすように当てはめる。</span><a class="headerlink" href="#fig-learning-dmd-pairs" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>両方とも <span class="math notranslate nohighlight">\(n\times m\)</span> 行列である。DMDは</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+Y\approx AX
+\end{align}
+\]</div>
+<p>となる線形作用 <span class="math notranslate nohighlight">\(A\)</span> をFrobeniusノルムの意味で当てはめる。この残差を最小にする行列のうちFrobeniusノルムが最小の解は <span class="math notranslate nohighlight">\(A=YX^+\)</span> である。<span class="math notranslate nohighlight">\(X^+\)</span> は第12章の擬似逆で、正の特異値を逆数にして作る。ただし、<span class="math notranslate nohighlight">\(A\in\mathbb{R}^{n\times n}\)</span> を明示すると大規模になる。</p>
+</section>
+<section id="svd">
+<h2><span class="section-number">14.5. </span>SVDによる低次元化<a class="headerlink" href="#svd" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(X\)</span> のrank-<span class="math notranslate nohighlight">\(r\)</span> SVDを</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+X\approx U_r\Sigma_rV_r^*
+\end{align}
+\]</div>
+<p>とする。保持した特異値はすべて正とし、打ち切った近似作用素を <span class="math notranslate nohighlight">\(A_r=YV_r\Sigma_r^{-1}U_r^*\)</span> と作る。<span class="math notranslate nohighlight">\(U_r\)</span> が張る部分空間へ射影すれば <span class="math notranslate nohighlight">\(U_r^*A_rU_r\)</span> となり、<span class="math notranslate nohighlight">\(U_r^*U_r=I\)</span> を使うと次の式を得る。</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\widetilde A=U_r^*YV_r\Sigma_r^{-1}
+\end{align}
+\]</div>
+<p>元の <span class="math notranslate nohighlight">\(n\times n\)</span> 行列を作らず、<span class="math notranslate nohighlight">\(r\times r\)</span> の <span class="math notranslate nohighlight">\(\widetilde A\)</span> だけを扱える。小さな固有値問題</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\widetilde AW=W\Lambda
+\end{align}
+\]</div>
+<p>を解き、exact DMD modesを</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\Phi=YV_r\Sigma_r^{-1}W
+\end{align}
+\]</div>
+<p>とする。<code class="docutils literal notranslate"><span class="pre">exact</span> <span class="pre">DMD</span></code> はこのモードの構成法の名称であり、観測値や未来を誤差なく再現するという保証ではない。<span class="math notranslate nohighlight">\(\lambda_j\ne0\)</span> で対応する列 <span class="math notranslate nohighlight">\(\phi_j\)</span> が0でなければ、<span class="math notranslate nohighlight">\(A_r\phi_j=\lambda_j\phi_j\)</span> が成り立つ。小さい特異値の逆数はノイズを増幅するため、<span class="math notranslate nohighlight">\(r\)</span> の選択は正則化の役割も持つ。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">exact_dmd</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="n">r</span><span class="p">)</span>
+<span class="w">    </span><span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">==</span><span class="n">size</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;XとYの形をそろえてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">svd</span><span class="p">(</span><span class="n">X</span><span class="p">;</span><span class="n">full</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span>
+<span class="w">    </span><span class="mi">1</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">S</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;rは1以上、特異値の個数以下にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Ur</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">U</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">r</span><span class="p">]</span>
+<span class="w">    </span><span class="n">sr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">r</span><span class="p">]</span>
+<span class="w">    </span><span class="n">sr</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">maximum</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">))</span><span class="o">*</span><span class="n">eps</span><span class="p">(</span><span class="n">eltype</span><span class="p">(</span><span class="n">sr</span><span class="p">))</span><span class="o">*</span><span class="n">sr</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;保持した特異値に数値的な0が含まれます&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Vr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">V</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">r</span><span class="p">]</span>
+<span class="w">    </span><span class="n">Atilde</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Ur</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Vr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Diagonal</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">sr</span><span class="p">)</span>
+<span class="w">    </span><span class="n">E</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigen</span><span class="p">(</span><span class="n">Atilde</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Φ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Y</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Vr</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Diagonal</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">sr</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">E</span><span class="o">.</span><span class="n">vectors</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">E</span><span class="o">.</span><span class="n">values</span><span class="p">,</span><span class="n">Φ</span><span class="p">,</span><span class="n">F</span><span class="o">.</span><span class="n">S</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2><span class="section-number">14.6. </span>2次元の減衰振動<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>回転と減衰を組み合わせた線形系</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+x_{k+1}=\rho R(\theta)x_k
+\end{align}
+\]</div>
+<p>を使う。<span class="math notranslate nohighlight">\(R(\theta)=\begin{bmatrix}\cos\theta&amp;-\sin\theta\\\sin\theta&amp;\cos\theta\end{bmatrix}\)</span> は回転で、1ステップごとに角度 <span class="math notranslate nohighlight">\(\theta\)</span> だけ回り、長さが <span class="math notranslate nohighlight">\(\rho\)</span> 倍になる。固有値は <span class="math notranslate nohighlight">\(\rho e^{\pm i\theta}\)</span> である。ここでは <span class="math notranslate nohighlight">\(\Delta t=0.1\)</span>、<span class="math notranslate nohighlight">\(\rho=0.98\)</span>、<span class="math notranslate nohighlight">\(\theta=0.25\)</span> とし、60ステップのうち最初の40組でDMDを学習する。後半は規則の予測を確認するために残す。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">Δt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span>
+<span class="n">ρ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.98</span>
+<span class="n">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.25</span>
+<span class="n">Atrue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ρ</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">[</span><span class="n">cos</span><span class="p">(</span><span class="n">θ</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">θ</span><span class="p">);</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">θ</span><span class="p">)</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">θ</span><span class="p">)]</span>
+<span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span>
+<span class="n">snapshots</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">0.2</span><span class="p">]</span>
+<span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">m</span>
+<span class="w">    </span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Atrue</span><span class="o">*</span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">k</span><span class="p">]</span>
+<span class="k">end</span>
+<span class="n">train_pairs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">40</span>
+<span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">train_pairs</span><span class="p">]</span>
+<span class="n">Y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">2</span><span class="o">:</span><span class="n">train_pairs</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">λ</span><span class="p">,</span><span class="n">Φ</span><span class="p">,</span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exact_dmd</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">Y</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">Admd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Φ</span><span class="o">*</span><span class="n">Diagonal</span><span class="p">(</span><span class="n">λ</span><span class="p">)</span><span class="o">*</span><span class="n">pinv</span><span class="p">(</span><span class="n">Φ</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;真の固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">eigvals</span><span class="p">(</span><span class="n">Atrue</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;DMD固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">λ</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;DMD modelの1-step相対残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">Y</span><span class="o">-</span><span class="n">Admd</span><span class="o">*</span><span class="n">X</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">Y</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>真の固有値 = ComplexF64[0.9495341732764319 - 0.2424558800694325im, 0.9495341732764319 + 0.2424558800694325im]
+DMD固有値 = ComplexF64[0.9495341732764312 - 0.24245588006943228im, 0.9495341732764312 + 0.24245588006943228im]
+DMD modelの1-step相対残差 = 1.2268530519639235e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="n">ρ_plot</span><span class="p">,</span><span class="w"> </span><span class="n">θ_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.98</span><span class="p">,</span><span class="w"> </span><span class="mf">0.25</span>
+<span class="n">A_dmd_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ρ_plot</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">[</span><span class="n">cos</span><span class="p">(</span><span class="n">θ_plot</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">θ_plot</span><span class="p">);</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">θ_plot</span><span class="p">)</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">θ_plot</span><span class="p">)]</span>
+<span class="n">snapshots_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">61</span><span class="p">)</span>
+<span class="n">snapshots_plot</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">]</span>
+<span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="mi">60</span>
+<span class="w">    </span><span class="n">snapshots_plot</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_dmd_plot</span><span class="o">*</span><span class="n">snapshots_plot</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">]</span>
+<span class="k">end</span>
+<span class="n">eigenvalues_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">λ</span><span class="w">  </span><span class="c"># データから求めたDMD固有値</span>
+<span class="n">unit_angle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="nb">π</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">fig_dmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">950</span><span class="p">,</span><span class="w"> </span><span class="mi">430</span><span class="p">))</span>
+<span class="n">ax_state</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_dmd</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;state component 1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;state component 2&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Snapshots of a damped oscillation&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">aspect</span><span class="o">=</span><span class="n">DataAspect</span><span class="p">())</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_state</span><span class="p">,</span><span class="w"> </span><span class="n">snapshots_plot</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">],</span><span class="w"> </span><span class="n">snapshots_plot</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray45</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_state</span><span class="p">,</span><span class="w"> </span><span class="n">snapshots_plot</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">],</span><span class="w"> </span><span class="n">snapshots_plot</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">];</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="mi">0</span><span class="o">:</span><span class="mi">60</span><span class="p">,</span><span class="w"> </span><span class="n">colormap</span><span class="o">=</span><span class="ss">:viridis</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_state</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">snapshots_plot</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]],</span><span class="w"> </span><span class="p">[</span><span class="n">snapshots_plot</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]];</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+<span class="n">ax_spectrum_dmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_dmd</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;real part&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;imaginary part&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;DMD eigenvalues&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">aspect</span><span class="o">=</span><span class="n">DataAspect</span><span class="p">())</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_spectrum_dmd</span><span class="p">,</span><span class="w"> </span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="n">unit_angle</span><span class="p">),</span><span class="w"> </span><span class="n">sin</span><span class="o">.</span><span class="p">(</span><span class="n">unit_angle</span><span class="p">);</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray55</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_spectrum_dmd</span><span class="p">,</span><span class="w"> </span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">eigenvalues_plot</span><span class="p">),</span><span class="w"> </span><span class="n">imag</span><span class="o">.</span><span class="p">(</span><span class="n">eigenvalues_plot</span><span class="p">);</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">xlims!</span><span class="p">(</span><span class="n">ax_spectrum_dmd</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.15</span><span class="p">,</span><span class="w"> </span><span class="mf">1.15</span><span class="p">)</span>
+<span class="n">ylims!</span><span class="p">(</span><span class="n">ax_spectrum_dmd</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.15</span><span class="p">,</span><span class="w"> </span><span class="mf">1.15</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dmd_trajectory_spectrum.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_dmd</span><span class="p">)</span>
+<span class="n">fig_dmd</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-dmd-trajectory-spectrum">
+<a class="reference internal image-reference" href="../_images/dmd_trajectory_spectrum.svg"><img alt="減衰振動のsnapshot軌道と対応するDMD固有値" src="../_images/dmd_trajectory_spectrum.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 14.2 </span><span class="caption-text">状態空間の回転は複素共役な固有値の偏角に、1ステップごとの縮小は固有値の絶対値に対応する。単位円の内側にあるため、このモードは時間とともに減衰する。</span><a class="headerlink" href="#fig-dmd-trajectory-spectrum" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id6">
+<h2><span class="section-number">14.7. </span>成長率、周波数、再構成<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>離散時間固有値 <span class="math notranslate nohighlight">\(\lambda_j\)</span> に対し</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\omega_j=\frac{\log\lambda_j}{\Delta t}
+\end{align}
+\]</div>
+<p>と置く（<span class="math notranslate nohighlight">\(\lambda_j\ne0\)</span>）。<span class="math notranslate nohighlight">\(\lambda_j=\rho_j e^{i\theta_j}\)</span> と書けば、<span class="math notranslate nohighlight">\(\omega_j=(\log\rho_j+i\theta_j)/\Delta t\)</span> である。<span class="math notranslate nohighlight">\(\operatorname{Re}\omega_j\)</span> は連続時間の成長・減衰率、<span class="math notranslate nohighlight">\(\operatorname{Im}\omega_j/(2\pi)\)</span> は周波数である。偏角には <span class="math notranslate nohighlight">\(2\pi\)</span> の整数倍の不定性があるため、周波数にも <span class="math notranslate nohighlight">\(1/\Delta t\)</span> の整数倍の不定性がある。主値は一つの範囲を選ぶ規約であり、第13章のエイリアシングを解消するものではない。</p>
+<p>初期振幅 <span class="math notranslate nohighlight">\(b=\Phi^+x_1\)</span> を求めれば</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+x_k\approx\Phi\Lambda^{k-1}b
+\end{align}
+\]</div>
+<p>で再構成できる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">Δt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1</span>
+<span class="n">ω</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="o">.</span><span class="p">(</span><span class="n">complex</span><span class="o">.</span><span class="p">(</span><span class="n">λ</span><span class="p">))</span><span class="o">./</span><span class="n">Δt</span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Φ</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">complex</span><span class="o">.</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">reconstruction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hcat</span><span class="p">([</span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">Φ</span><span class="o">*</span><span class="p">(</span><span class="n">λ</span><span class="o">.^</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.*</span><span class="n">b</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">...</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;成長率 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">ω</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;周波数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">imag</span><span class="o">.</span><span class="p">(</span><span class="n">ω</span><span class="p">)</span><span class="o">./</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;学習区間の再構成相対誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="mi">41</span><span class="p">]</span><span class="o">-</span><span class="n">reconstruction</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="mi">41</span><span class="p">])</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="mi">41</span><span class="p">]))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;未使用の後半の予測相対誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">42</span><span class="o">:</span><span class="k">end</span><span class="p">]</span><span class="o">-</span><span class="n">reconstruction</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">42</span><span class="o">:</span><span class="k">end</span><span class="p">])</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">snapshots</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">42</span><span class="o">:</span><span class="k">end</span><span class="p">]))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>成長率 = [-0.20202707317520185, -0.20202707317520185]
+周波数 = [-0.3978873577297384, 0.3978873577297384]
+学習区間の再構成相対誤差 = 1.2717807757320093e-14
+未使用の後半の予測相対誤差 = 3.3852915604244035e-14
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="fourier">
+<h2><span class="section-number">14.8. </span>Fourier解析との違い<a class="headerlink" href="#fourier" title="Link to this heading">#</a></h2>
+<p>Fourier解析は、あらかじめ決めた互いに直交する時間周波数へ信号を分解する。DMDは、snapshotから空間modeと複素指数時間発展を同時に推定する。DMD固有値は単位円上に限られず、成長・減衰も表せる。</p>
+<p>ただし、DMDが非線形系を線形系へ厳密に変換するとは限らない。打切りなしの標準的な当てはめは、観測した組に対する1ステップ残差を最小化する。特異値を打ち切れば、選んだ入力部分空間に制限した近似となる。いずれも長時間の予測誤差を直接最小化しているわけではない。結果は観測量、sampling、rank、ノイズに依存する。</p>
+</section>
+<section id="clubsuit-dmd">
+<h2><span class="section-number">14.9. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> カルマン渦：空間パターンとしてDMDを見る<a class="headerlink" href="#clubsuit-dmd" title="Link to this heading">#</a></h2>
+<p>2次元の減衰振動では固有値の意味を確認できたが、DMD modeがどのような<strong>空間パターン</strong>を表すかは見えにくい。そこで、円柱後流に生じるKármán（カルマン）渦列を考える。円柱の上下から渦が交互に放出され、後流に周期的な構造が現れる。</p>
+<p>以下はReynolds数100の数値simulationから得た渦度場である。赤と青は逆向きの回転を表し、時間とともに渦が下流へ運ばれる様子が分かる。</p>
+<figure class="align-default" id="fig-dmd-karman-vorticity">
+<a class="reference internal image-reference" href="../_images/dmd_data_vorticity.gif"><img alt="円柱後流に生じるカルマン渦列の渦度場" src="../_images/dmd_data_vorticity.gif" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 14.3 </span><span class="caption-text">円柱後流の渦度場。赤と青の渦が交互に放出される。</span><a class="headerlink" href="#fig-dmd-karman-vorticity" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>各時刻の場は <span class="math notranslate nohighlight">\(199\times449\)</span> の格子値を持つ。これを縦に並べれば</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+q_k=\operatorname{vec}(q(\cdot,\cdot,t_k))\in\mathbb{R}^{89351}
+\end{align}
+\]</div>
+<p>という1本のsnapshotになる。151枚の場から <span class="math notranslate nohighlight">\(X,Y\in\mathbb{R}^{89351\times150}\)</span> を作れば、本文と同じDMDを適用できる。DMD mode <span class="math notranslate nohighlight">\(\phi_j\)</span> も89351次元のベクトルだが、<span class="math notranslate nohighlight">\(199\times449\)</span> に戻すと、流れの中で一緒に振動・移流する空間構造として見られる。</p>
+<div class="note admonition">
+<p class="admonition-title">アニメーションの見方</p>
+<p>DMDは各pixelを別々に近似するのではない。空間全体に広がる少数のmodeと、各modeに対応する成長率・周波数を組み合わせて、流れ場の時間発展を表す。</p>
+</div>
+<section id="julia">
+<h3><span class="section-number">14.9.1. </span>Juliaで再計算する<a class="headerlink" href="#julia" title="Link to this heading">#</a></h3>
+<p>次のコードは、付属dataの流れ方向速度 <code class="docutils literal notranslate"><span class="pre">UALL</span></code> を読み、対話的に実行しやすいよう格子点を1点おきに取り出してrank-15 DMDを計算する。最後に、元のsnapshot、DMD再構成、両者の差、代表的な振動modeを並べる。</p>
+<div class="warning admonition">
+<p class="admonition-title">実行環境と計算量</p>
+<p>初回だけ <code class="docutils literal notranslate"><span class="pre">MAT.jl</span></code> と <code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> のinstallが必要である。元の <code class="docutils literal notranslate"><span class="pre">CYLINDER_ALL.mat</span></code> は約301 MB（約287 MiB）あり、全格子点でSVDと再構成を行うと相応のmemoryと時間を使う。再計算コードは空間格子を1点おきに間引き、掲載アニメーションは全格子点を使用している。ローカルの <code class="docutils literal notranslate"><span class="pre">DATA/FLUIDS/CYLINDER_ALL.mat</span></code> を読む。Colabでノートブックだけを開いた場合、データファイルも別途配置する必要がある。この節の再実行は基本演習には必要ない。</p>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot tag_requires-mat-data docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ実行する</span>
+<span class="c"># import Pkg; Pkg.add([&quot;MAT&quot;, &quot;CairoMakie&quot;])</span>
+<span class="k">using</span><span class="w"> </span><span class="n">MAT</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+
+<span class="n">data_candidates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;DATA&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;FLUIDS&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CYLINDER_ALL.mat&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;DATA&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;FLUIDS&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CYLINDER_ALL.mat&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">data_index</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">findfirst</span><span class="p">(</span><span class="n">isfile</span><span class="p">,</span><span class="w"> </span><span class="n">data_candidates</span><span class="p">)</span>
+<span class="n">isnothing</span><span class="p">(</span><span class="n">data_index</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;CYLINDER_ALL.matが見つかりません&quot;</span><span class="p">)</span>
+<span class="n">data_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">data_candidates</span><span class="p">[</span><span class="n">data_index</span><span class="p">]</span>
+
+<span class="n">u_all</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">matopen</span><span class="p">(</span><span class="n">data_file</span><span class="p">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">file</span>
+<span class="w">    </span><span class="n">read</span><span class="p">(</span><span class="n">file</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;UALL&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">nrow</span><span class="p">,</span><span class="w"> </span><span class="n">ncol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">199</span><span class="p">,</span><span class="w"> </span><span class="mi">449</span>
+<span class="n">stride</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
+<span class="n">rows</span><span class="p">,</span><span class="w"> </span><span class="n">cols</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">stride</span><span class="o">:</span><span class="n">nrow</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">stride</span><span class="o">:</span><span class="n">ncol</span>
+<span class="n">sample_indices</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="p">(</span><span class="kt">LinearIndices</span><span class="p">((</span><span class="n">nrow</span><span class="p">,</span><span class="n">ncol</span><span class="p">))[</span><span class="n">rows</span><span class="p">,</span><span class="n">cols</span><span class="p">])</span>
+<span class="n">u_sampled</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u_all</span><span class="p">[</span><span class="n">sample_indices</span><span class="p">,</span><span class="o">:</span><span class="p">]</span>
+
+<span class="n">Xu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u_sampled</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="k">end</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">Yu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u_sampled</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">2</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+<span class="n">rank_vortex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">15</span>
+<span class="n">λu</span><span class="p">,</span><span class="w"> </span><span class="n">Φu</span><span class="p">,</span><span class="w"> </span><span class="n">su</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exact_dmd</span><span class="p">(</span><span class="n">Xu</span><span class="p">,</span><span class="n">Yu</span><span class="p">,</span><span class="n">rank_vortex</span><span class="p">)</span>
+
+<span class="n">bu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Φu</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">complex</span><span class="o">.</span><span class="p">(</span><span class="n">Xu</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">time_dynamics</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hcat</span><span class="p">([(</span><span class="n">λu</span><span class="o">.^</span><span class="n">k</span><span class="p">)</span><span class="o">.*</span><span class="n">bu</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">Yu</span><span class="p">,</span><span class="mi">2</span><span class="p">)]</span><span class="o">...</span><span class="p">)</span>
+<span class="n">Yu_dmd</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">Φu</span><span class="o">*</span><span class="n">time_dynamics</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;rank-15再構成の相対誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">Yu</span><span class="o">-</span><span class="n">Yu_dmd</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">Yu</span><span class="p">))</span>
+
+<span class="n">Δt_vortex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span>
+<span class="n">ωu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="o">.</span><span class="p">(</span><span class="n">complex</span><span class="o">.</span><span class="p">(</span><span class="n">λu</span><span class="p">))</span><span class="o">./</span><span class="n">Δt_vortex</span>
+<span class="n">positive_modes</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">findall</span><span class="p">(</span><span class="n">imag</span><span class="o">.</span><span class="p">(</span><span class="n">ωu</span><span class="p">)</span><span class="w"> </span><span class="o">.&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<span class="n">isempty</span><span class="p">(</span><span class="n">positive_modes</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;正の周波数を持つモードがありません&quot;</span><span class="p">)</span>
+<span class="n">contributions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">abs</span><span class="p">(</span><span class="n">bu</span><span class="p">[</span><span class="n">j</span><span class="p">])</span><span class="o">*</span><span class="n">norm</span><span class="p">(</span><span class="n">Φu</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">j</span><span class="p">])</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">positive_modes</span><span class="p">]</span>
+<span class="n">mode_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">positive_modes</span><span class="p">[</span><span class="n">argmax</span><span class="p">(</span><span class="n">contributions</span><span class="p">)]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;代表modeの周波数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">imag</span><span class="p">(</span><span class="n">ωu</span><span class="p">[</span><span class="n">mode_id</span><span class="p">])</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="p">))</span>
+
+<span class="n">snapshot_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">60</span>
+<span class="n">field_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">rows</span><span class="p">),</span><span class="n">length</span><span class="p">(</span><span class="n">cols</span><span class="p">))</span>
+<span class="n">fig_vortex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">720</span><span class="p">,</span><span class="w"> </span><span class="mi">1100</span><span class="p">))</span>
+<span class="n">vortex_panels</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span>
+<span class="w">    </span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">Yu</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">snapshot_id</span><span class="p">],</span><span class="n">field_size</span><span class="o">...</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Data&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)),</span>
+<span class="w">    </span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">Yu_dmd</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">snapshot_id</span><span class="p">],</span><span class="n">field_size</span><span class="o">...</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;DMD (r=15)&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)),</span>
+<span class="w">    </span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">Yu</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">snapshot_id</span><span class="p">]</span><span class="o">-</span><span class="n">Yu_dmd</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">snapshot_id</span><span class="p">],</span><span class="n">field_size</span><span class="o">...</span><span class="p">),</span>
+<span class="w">     </span><span class="s">&quot;Data - DMD&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">0.02</span><span class="p">,</span><span class="w"> </span><span class="mf">0.02</span><span class="p">)),</span>
+<span class="w">    </span><span class="p">(</span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">Φu</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">mode_id</span><span class="p">],</span><span class="n">field_size</span><span class="o">...</span><span class="p">)),</span><span class="w"> </span><span class="s">&quot;Oscillatory DMD mode&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">nothing</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">field</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">colorrange</span><span class="p">))</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">enumerate</span><span class="p">(</span><span class="n">vortex_panels</span><span class="p">)</span>
+<span class="w">    </span><span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_vortex</span><span class="p">[</span><span class="n">row</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">aspect</span><span class="o">=</span><span class="n">DataAspect</span><span class="p">(),</span><span class="w"> </span><span class="n">yreversed</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">isnothing</span><span class="p">(</span><span class="n">colorrange</span><span class="p">)</span>
+<span class="w">        </span><span class="n">heatmap!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">permutedims</span><span class="p">(</span><span class="n">field</span><span class="p">);</span><span class="w"> </span><span class="n">colormap</span><span class="o">=</span><span class="ss">:vik</span><span class="p">)</span>
+<span class="w">    </span><span class="k">else</span>
+<span class="w">        </span><span class="n">heatmap!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">permutedims</span><span class="p">(</span><span class="n">field</span><span class="p">);</span><span class="w"> </span><span class="n">colormap</span><span class="o">=</span><span class="ss">:vik</span><span class="p">,</span><span class="w"> </span><span class="n">colorrange</span><span class="o">=</span><span class="n">colorrange</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">hidedecorations!</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="s">&quot;dmd_vortex_diagnostics.svg&quot;</span><span class="p">),</span><span class="n">fig_vortex</span><span class="p">)</span>
+<span class="n">fig_vortex</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+</section>
+<section id="mode">
+<h3><span class="section-number">14.9.2. </span>150枚の画像を15個のmodeで再構成する<a class="headerlink" href="#mode" title="Link to this heading">#</a></h3>
+<p>次のanimationは、流れ方向速度について、上から元data、rank-15 DMDによる再構成、両者の差を示す。</p>
+<figure class="align-default" id="fig-dmd-karman-reconstruction">
+<a class="reference internal image-reference" href="../_images/dmd_data_compare.gif"><img alt="円柱後流の元データ、DMD再構成、差分の比較" src="../_images/dmd_data_compare.gif" style="width: 420px;" /></a>
+<figcaption>
+<p><span class="caption-number">図 14.4 </span><span class="caption-text">円柱後流の速度場とrank-15 DMD再構成。下段は <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">-</span> <span class="pre">DMD</span></code> である。</span><a class="headerlink" href="#fig-dmd-karman-reconstruction" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>元dataとDMD再構成のcolor scaleは <span class="math notranslate nohighlight">\([-1,1]\)</span>、差分は <span class="math notranslate nohighlight">\([-0.01,0.01]\)</span> である。差分は上2段より100倍細かい尺度で表示されている。色の濃さだけで元の値と誤差を比較せず、各段のカラーバーを確認する。</p>
+<p>再計算コードは、再構成誤差と代表的な振動モードの周波数を出力する。周波数への換算には、このデータの時間間隔として <span class="math notranslate nohighlight">\(\Delta t=0.2\)</span> を用いる。モードの係数だけの大小はベクトルの正規化で変わるため、ここでは係数の絶対値とモードのノルムの積で代表を選ぶ。</p>
+<p>この例では、150本のsnapshotで表される時間発展を15 modeへ圧縮しても、交互に放出される渦の主要な周期構造が保たれている。ただし、再構成が良いことと未知時刻の予測が良いことは同じではない。rankを変えたときの誤差と、学習区間外の予測を別々に確認する必要がある。</p>
+</section>
+</section>
+<section id="id7">
+<h2><span class="section-number">14.10. </span>まとめ<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>DMDでは、隣接時刻の組から時間更新を当てはめ、SVDで小さな空間へ移し、固有値から成長・減衰・振動を読む。学習した区間の再構成と未使用区間の予測を分け、保持する特異値・観測間隔・観測量への依存性を確かめる。</p>
+</div>
+<p>次の<a class="reference internal" href="Chap_MCMC.html"><span class="std std-doc">第15章</span></a>では、確率分布に関する平均を、確率的な反復で計算する。</p>
+</section>
+<section id="id8">
+<h2><span class="section-number">14.11. </span>演習<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>現在と次を組にする</strong>：等間隔の観測1、0.8、0.64、0.512から <span class="math notranslate nohighlight">\(X,Y\)</span> を1行の行列として書け。<span class="math notranslate nohighlight">\(Y=aX\)</span> を満たす <span class="math notranslate nohighlight">\(a\)</span> はいくらか。</p></li>
+<li><p><strong>固有値を読む</strong>：1ステップの固有値が <span class="math notranslate nohighlight">\(0.98e^{0.25i}\)</span> なら、長さは増えるか減るか。<span class="math notranslate nohighlight">\(\Delta t=0.1\)</span> のとき、角度の進みを時間当たりへ換算するには何で割ればよいか。</p></li>
+<li><p><strong>当てはめと予測</strong>：学習に使ったスナップショットをよく再構成できた。未知の未来にも使えるかを確かめるには、どのデータを残し、何を比較したいか。</p></li>
+</ol>
+</div>
+</section>
+<section id="id9">
+<h2><span class="section-number">14.12. </span>参考文献<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Kutz et al., <em>Dynamic Mode Decomposition: Data-Driven Modeling of Complex Systems</em>, SIAM, 2016.</p></li>
+<li><p>Kutz, <em>Data-Driven Modeling &amp; Scientific Computation: Methods for Complex Systems &amp; Big Data</em>, Cambridge University Press, 2013. Cylinder-wake data: <a class="reference external" href="http://dmdbook.com/">DMD Book</a>.</p></li>
+<li><p>Tu et al., <a class="reference external" href="https://arxiv.org/abs/1312.0041">On Dynamic Mode Decomposition: Theory and Applications</a>, <em>Journal of Computational Dynamics</em> 1(2), 2014.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_FourierAnalysis.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">13. </span>Fourier解析とFourier回帰</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_MCMC.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">15. </span>マルコフ連鎖モンテカルロ法</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">14.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">14.2. データについて</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">14.3. 時間変化の規則を、観測から求める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#snapshot">14.4. snapshotから時間発展を推定する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#svd">14.5. SVDによる低次元化</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">14.6. 2次元の減衰振動</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">14.7. 成長率、周波数、再構成</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fourier">14.8. Fourier解析との違い</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-dmd">14.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> カルマン渦：空間パターンとしてDMDを見る</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julia">14.9.1. Juliaで再計算する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#mode">14.9.2. 150枚の画像を15個のmodeで再構成する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">14.10. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">14.11. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">14.12. 参考文献</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

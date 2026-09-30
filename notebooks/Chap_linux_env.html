@@ -1,0 +1,1028 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>2. Linux環境とコマンド &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_linux_env';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="3. Juliaと線形代数" href="Chap_Julia_LinearAlgebra.html" />
+    <link rel="prev" title="1. 数値解析とは" href="Chap_WhyItMatters.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_linux_env.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Linux環境とコマンド</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">2.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2.2. Linux・ターミナル・シェルの違い</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">2.2.1. コマンドを入力する場所を用意する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">2.3. 最初の操作：現在地とファイルを見る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">2.4. ファイルの場所を表す：ディレクトリとパス</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">2.5. 計算用の作業場所を作る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">2.6. メモを作り、コピーと保存先を確かめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">2.7. 第1章の計算をファイルに保存して実行する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julia">2.7.1. Juliaの起動を確認する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">2.7.2. テキストエディタでコードを保存する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">2.7.3. 保存したファイルを指定して実行する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">2.8. 計算条件と結果をログに残す</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">2.8.1. 上書きと追記</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">2.8.2. エラーメッセージも記録する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">2.9. 必要な記録を探して読む</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">2.10. うまくいかないときは、何を確認するか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">2.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 同じ手順をまとめて実行する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">2.12. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 出力の組み合わせと実行環境の確認</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">2.12.1. パイプで出力を次のコマンドへ渡す</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#path">2.12.2. PATHはコマンドの探索先</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">2.12.3. 実行中のプログラムを確認する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">2.13. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 遠隔の計算機を使う場合</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">2.14. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">2.15. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">2.16. 関連資料</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section class="tex2jax_ignore mathjax_ignore" id="linux">
+<h1><span class="section-number">2. </span>Linux環境とコマンド<a class="headerlink" href="#linux" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="Chap_WhyItMatters.html"><span class="std std-doc">第1章</span></a>では、数値解だけでなく、計算条件や検証の結果も記録することが大切だと学んだ。実際に計算を進めるには、コードを保存し、それを実行し、得られた結果を後から読み返せるようにする必要がある。</p>
+<p>本章では、第1章の指数減衰の計算を題材に、<strong>作業場所を作る → コードを保存する → 実行する → 結果を記録して確認する</strong>という流れを一度体験する。この作業のために使うのが、ターミナルへ文字で入力する命令、すなわちコマンドである。</p>
+<p>ノートブックではコードと結果が同じ画面に並ぶ。一方、ファイルに保存したプログラムをターミナルから実行する方法では、コードと出力を自分で整理する。この方法に慣れると、条件を変えて同じ計算を繰り返したり、研究室の計算機で実行したりするときにも役立つ。</p>
+<section id="id1">
+<h2><span class="section-number">2.1. </span>この章の目標<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>ターミナルで、現在の作業場所とファイルの保存先を確認できる。</p></li>
+<li><p>用意されたJuliaのコードをファイルに保存し、実行できる。</p></li>
+<li><p>計算条件と結果をログに残し、後から読み返せる。</p></li>
+<li><p>ファイルが見つからないなどのエラーが出たとき、確認する場所を説明できる。</p></li>
+</ul>
+<p>コマンドやオプションを一度に暗記する必要はない。基本部分の作業を順に試し、必要な操作を資料から探せるようになろう。♣節は、作業の自動化や遠隔の計算機を使う際に参照する補足であり、章末の演習には必要ない。</p>
+</section>
+<section id="id2">
+<h2><span class="section-number">2.2. </span>Linux・ターミナル・シェルの違い<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>普段、ファイルをフォルダに移動したりアプリケーションを起動したりできるのは、OS（Operating System）がファイルの管理やプログラムの実行を担当しているためである。LinuxもOSとして広く使われている。厳密にはLinuxはOSの中核であるカーネルの名前だが、本章ではUbuntuなどのLinux環境全体を指して用いる。</p>
+<p>Linuxでは、計算の実行やファイル整理をコマンドで行う環境が整っている。この操作をまとめて記録・再実行できることが、数値計算で便利な点である。ただし、Linuxそのものと、文字で命令するための道具は区別しよう。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>名前</p></th>
+<th class="head"><p>役割</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>OS</p></td>
+<td><p>ファイル管理やプログラム実行などを支える。Linux、Windows、macOSなどがある</p></td>
+</tr>
+<tr class="row-odd"><td><p>ターミナル</p></td>
+<td><p>文字を入力し、実行結果を表示するための画面を提供する</p></td>
+</tr>
+<tr class="row-even"><td><p>シェル</p></td>
+<td><p>入力したコマンドを解釈するプログラム。<code class="docutils literal notranslate"><span class="pre">bash</span></code>、<code class="docutils literal notranslate"><span class="pre">zsh</span></code>などがある</p></td>
+</tr>
+<tr class="row-odd"><td><p>Julia</p></td>
+<td><p>数値計算のコードを実行するプログラミング言語・実行環境</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>例えば <code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">src/decay.jl</span></code> と入力すると、シェルがJuliaを起動し、Juliaが <code class="docutils literal notranslate"><span class="pre">src/decay.jl</span></code> の内容を実行する。シェルに対する命令と、Juliaの計算式は別のものである。</p>
+<section id="id3">
+<h3><span class="section-number">2.2.1. </span>コマンドを入力する場所を用意する<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<p>本章の基本操作は、Linuxの <code class="docutils literal notranslate"><span class="pre">bash</span></code> やmacOSの <code class="docutils literal notranslate"><span class="pre">zsh</span></code> などで使える範囲を扱う。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>手元の環境</p></th>
+<th class="head"><p>本章で使う入力場所</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Linux</p></td>
+<td><p>「端末」「Terminal」などのアプリケーション</p></td>
+</tr>
+<tr class="row-odd"><td><p>macOS</p></td>
+<td><p>「ターミナル」アプリケーション。macOSはLinuxではないが、ここで使う基本操作の多くは共通している</p></td>
+</tr>
+<tr class="row-even"><td><p>Windows</p></td>
+<td><p>WSLで用意したUbuntuなどのシェル。Windows Terminalを使う場合はUbuntuのタブを選ぶ</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Windows Terminalというアプリを開いただけでは、WSLのシェルを使っているとは限らない。PowerShellやコマンドプロンプトでは、本章と同じ名前のコマンドでも働きが異なる場合がある。WSLはWindows上でLinux環境を利用する仕組みで、導入手順は<a class="reference external" href="https://learn.microsoft.com/ja-jp/windows/wsl/install">Microsoftの公式案内</a>を参照してほしい。<a class="reference external" href="https://sotayoshida.github.io/Lecture_DataScience/notebooks/Python_misc_python_env_forWin11.html">プログラミング演習1の「WSLとPython環境」</a>も背景の説明として利用できる。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>本章のシェルコマンドは、上の表のターミナルへ入力する。JuliaやPythonのノートブックのコードセルに、そのまま貼り付けるものではない。ブラウザ上の資料を読みながら、別にターミナルを開いて作業しよう。Juliaの準備がまだでも、ファイルを作成・整理するところまでは試せる。</p>
+</div>
+</section>
+</section>
+<section id="id4">
+<h2><span class="section-number">2.3. </span>最初の操作：現在地とファイルを見る<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>ターミナルには、例えば次のような表示が出る。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>student@linux:~$
+</pre></div>
+</div>
+<p>これは<strong>プロンプト</strong>といい、ユーザーの入力を待っている状態、つまり「次のコマンドを入力できる」状態である。ユーザ名や現在地などを含むことが多いが、表示は環境により異なり、末尾が <code class="docutils literal notranslate"><span class="pre">%</span></code> や<code class="docutils literal notranslate"><span class="pre">&gt;</span></code>のこともある。
+以下のコマンド欄では、環境名やユーザ名の表示は省略し、ユーザーが入力する部分だけを示すこととする。1行ずつ入力し、Enterで実行しよう。</p>
+<p>まず次の2行を試す。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">pwd</span>
+ls
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">pwd</span></code> は現在いるディレクトリ（フォルダ）の場所を表示し、<code class="docutils literal notranslate"><span class="pre">ls</span></code> はその中のファイルやディレクトリの名前を表示する。例えば <code class="docutils literal notranslate"><span class="pre">pwd</span></code> が <code class="docutils literal notranslate"><span class="pre">/home/student</span></code> と返せば、そこが現在の作業場所である。macOSなら <code class="docutils literal notranslate"><span class="pre">/Users/ユーザ名</span></code> など、実際の表示は異なる。</p>
+<p>コマンドの基本形は「コマンド名、必要ならオプション、対象となる引数」である。例えば <code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-l</span></code> の <code class="docutils literal notranslate"><span class="pre">-l</span></code> は詳細表示のオプションである。半角スペースで区切り、ファイル名の大文字・小文字も資料と合わせよう。</p>
+<p>何も表示されずプロンプトへ戻ることもある。例えば空のディレクトリでの <code class="docutils literal notranslate"><span class="pre">ls</span></code> は、表示する名前がないので何も出さない。表示の有無だけで成功・失敗を判断せず、現在地や作成したファイルを確かめるのが基本である。</p>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p><code class="docutils literal notranslate"><span class="pre">julia&gt;</span></code> と表示されている場合は、シェルではなくJuliaの対話画面にいる。<code class="docutils literal notranslate"><span class="pre">exit()</span></code> を入力したり、<code class="docutils literal notranslate"><span class="pre">Ctrl-C</span></code>で中断や入力を終了し、<code class="docutils literal notranslate"><span class="pre">Ctrl-D</span></code> でJuliaを終了すると、Juliaを起動したシェルへ戻れる。シェルとJuliaの入力場所を区別してから作業を進めよう。</p>
+</div>
+</section>
+<section id="id5">
+<h2><span class="section-number">2.4. </span>ファイルの場所を表す：ディレクトリとパス<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>ファイルはディレクトリの中に置かれ、ディレクトリの中にはさらに別のディレクトリを作れる。この階層を木の枝のようにたどって、ファイルの場所を表したものが<strong>パス</strong>である。LinuxやmacOSでは、階層の一番上を <code class="docutils literal notranslate"><span class="pre">/</span></code>（ルートディレクトリ）で表す。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>表記</p></th>
+<th class="head"><p>意味</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">/</span></code></p></td>
+<td><p>ファイルシステムの一番上</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">~</span></code></p></td>
+<td><p>自分のホームディレクトリ。シェルが自分のホームのパスへ展開する</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">.</span></code></p></td>
+<td><p>現在のディレクトリ</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">..</span></code></p></td>
+<td><p>一つ上のディレクトリ</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">/home/student/project/memo.txt</span></code> のように <code class="docutils literal notranslate"><span class="pre">/</span></code> から始めて場所を指定するものは<strong>絶対パス</strong>である。<code class="docutils literal notranslate"><span class="pre">project/memo.txt</span></code> や <code class="docutils literal notranslate"><span class="pre">../memo.txt</span></code> のように現在地を基準にするものは<strong>相対パス</strong>である。同じ相対パスでも、現在地が変われば指す先も変わる。</p>
+<p>次の図は、Linuxでの階層の一例である。自分の計算機とまったく同じ名前・構成である必要はない。根元の <code class="docutils literal notranslate"><span class="pre">/</span></code> からたどるのが絶対パス、今いる場所からたどるのが相対パスと考えよう。</p>
+<p>※図を読むだけなら実行は不要で、再作成する場合だけ追加パッケージ <code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> を使う。<code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> は、Juliaのパッケージ管理である <code class="docutils literal notranslate"><span class="pre">Pkg</span></code> からインストールできる。</p>
+<div class="cell tag_understanding-plot tag_hide-input tag_remove-output docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="n">positions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dict</span><span class="p">(</span>
+<span class="w">    </span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;home&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">2.4</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;usr&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;tmp&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="mf">2.4</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;student&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">3.2</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;shared&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">1.6</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;bin&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;lib&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="mf">0.6</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;project&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">3.7</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;notes&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mf">2.7</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">edges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;home&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;usr&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;tmp&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s">&quot;home&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;student&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;home&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;shared&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s">&quot;usr&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bin&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;usr&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;lib&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="p">(</span><span class="s">&quot;student&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;project&quot;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;student&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;notes&quot;</span><span class="p">),</span>
+<span class="p">]</span>
+
+<span class="n">fig_filesystem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">900</span><span class="p">,</span><span class="w"> </span><span class="mi">470</span><span class="p">))</span>
+<span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_filesystem</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;A filesystem is a tree&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">parent</span><span class="p">,</span><span class="w"> </span><span class="n">child</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">edges</span>
+<span class="w">    </span><span class="n">xp</span><span class="p">,</span><span class="w"> </span><span class="n">yp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">positions</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+<span class="w">    </span><span class="n">xc</span><span class="p">,</span><span class="w"> </span><span class="n">yc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">positions</span><span class="p">[</span><span class="n">child</span><span class="p">]</span>
+<span class="w">    </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">xp</span><span class="p">,</span><span class="w"> </span><span class="n">xc</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">yp</span><span class="p">,</span><span class="w"> </span><span class="n">yc</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray55</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="p">))</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">positions</span>
+<span class="w">    </span><span class="n">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">label</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;/&quot;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ss">:tomato</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="p">(</span><span class="n">label</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;project&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;notes&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="ss">:seagreen</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="ss">:dodgerblue</span><span class="p">)</span>
+<span class="w">    </span><span class="n">scatter!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">y</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">34</span><span class="p">)</span>
+<span class="w">    </span><span class="n">text!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">y</span><span class="o">-</span><span class="mf">0.30</span><span class="p">;</span><span class="w"> </span><span class="n">text</span><span class="o">=</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="n">align</span><span class="o">=</span><span class="p">(</span><span class="ss">:center</span><span class="p">,</span><span class="w"> </span><span class="ss">:top</span><span class="p">),</span><span class="w"> </span><span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">xlims!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">4.4</span><span class="p">,</span><span class="w"> </span><span class="mf">3.2</span><span class="p">)</span>
+<span class="n">ylims!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">0.65</span><span class="p">,</span><span class="w"> </span><span class="mf">3.45</span><span class="p">)</span>
+<span class="n">hidedecorations!</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">hidespines!</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;linux_filesystem_tree.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_filesystem</span><span class="p">)</span>
+<span class="n">fig_filesystem</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-linux-filesystem-tree">
+<a class="reference internal image-reference" href="../_images/linux_filesystem_tree.svg"><img alt="ルートからhome、student、projectへと枝をたどるファイルシステムの概念図" src="../_images/linux_filesystem_tree.svg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 2.1 </span><span class="caption-text">例えば <code class="docutils literal notranslate"><span class="pre">project</span></code> にいるとき、同じ階層の <code class="docutils literal notranslate"><span class="pre">notes</span></code> へは <code class="docutils literal notranslate"><span class="pre">../notes</span></code> と指定できる。<code class="docutils literal notranslate"><span class="pre">..</span></code> で <code class="docutils literal notranslate"><span class="pre">student</span></code> に戻り、そこから <code class="docutils literal notranslate"><span class="pre">notes</span></code> へ進む。</span><a class="headerlink" href="#fig-linux-filesystem-tree" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id6">
+<h2><span class="section-number">2.5. </span>計算用の作業場所を作る<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>ここからは一つの作業を順に進める。自分がファイルを作成してよい場所で <code class="docutils literal notranslate"><span class="pre">pwd</span></code> と <code class="docutils literal notranslate"><span class="pre">ls</span></code> を確認してから、次を実行しよう。<code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> がすでにある場合は、その内容を確かめ、初回の練習には別の名前を使ってほしい。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>numerical_practice
+<span class="nb">cd</span><span class="w"> </span>numerical_practice
+mkdir<span class="w"> </span>src<span class="w"> </span>logs
+<span class="nb">pwd</span>
+ls
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">mkdir</span></code> はディレクトリを作り、<code class="docutils literal notranslate"><span class="pre">cd</span></code> は現在地を移す。ここでは練習用の <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> の中に、コードを置く <code class="docutils literal notranslate"><span class="pre">src</span></code> と、計算の記録を置く <code class="docutils literal notranslate"><span class="pre">logs</span></code> を作った。<code class="docutils literal notranslate"><span class="pre">ls</span></code> の結果に両方の名前があればよい。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>numerical_practice/
+├── src/       コードを置く
+└── logs/      計算の記録を置く
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">src</span></code> と <code class="docutils literal notranslate"><span class="pre">logs</span></code> は用途が分かるように自分で付けた名前であり、特別な機能を持つわけではない。まずこの程度の構成から始め、入力データや図が増えたら必要なディレクトリを加えるとよい。</p>
+<p>次に、現在地が変わることを確かめる。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>src
+<span class="nb">pwd</span>
+<span class="nb">cd</span><span class="w"> </span>..
+<span class="nb">pwd</span>
+</pre></div>
+</div>
+<p>最初の <code class="docutils literal notranslate"><span class="pre">pwd</span></code> の末尾は <code class="docutils literal notranslate"><span class="pre">numerical_practice/src</span></code>、最後は <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> になる。この後の基本部分は、<strong><code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> にいる状態</strong>で進める。</p>
+</section>
+<section id="id7">
+<h2><span class="section-number">2.6. </span>メモを作り、コピーと保存先を確かめる<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>コードやログは、文字として内容を読める<strong>テキストファイル</strong>である。まず短いメモで、ファイルを作って読むことを試そう。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Euler decay experiment&quot;</span><span class="w"> </span>&gt;<span class="w"> </span>memo.txt
+cat<span class="w"> </span>memo.txt
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">echo</span></code> は指定した文字列を出力する。<code class="docutils literal notranslate"><span class="pre">&gt;</span></code> はその出力をファイルへ保存する記号であり、ここでは <code class="docutils literal notranslate"><span class="pre">memo.txt</span></code> を作る。同名のファイルがある場合は内容を上書きする。<code class="docutils literal notranslate"><span class="pre">cat</span></code> はファイルの内容を表示するので、<code class="docutils literal notranslate"><span class="pre">Euler</span> <span class="pre">decay</span> <span class="pre">experiment</span></code> と読めればよい。</p>
+<p>ファイルを作っても、現在地は変わらない。<code class="docutils literal notranslate"><span class="pre">memo.txt</span></code> は <code class="docutils literal notranslate"><span class="pre">src</span></code> や <code class="docutils literal notranslate"><span class="pre">logs</span></code> と同じく、現在の <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> の中に置かれる。次に、コピーを作って名前を変える。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>memo.txt<span class="w"> </span>memo_backup.txt
+mv<span class="w"> </span>memo_backup.txt<span class="w"> </span>old_memo.txt
+ls
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">cp</span> <span class="pre">コピー元</span> <span class="pre">コピー先</span></code> は元のファイルを残してコピーを作る。<code class="docutils literal notranslate"><span class="pre">mv</span> <span class="pre">元の名前</span> <span class="pre">新しい名前</span></code> は名前を変更する。移動先のディレクトリを指定すれば、ファイルの移動にも使える。この例では <code class="docutils literal notranslate"><span class="pre">memo.txt</span></code> と <code class="docutils literal notranslate"><span class="pre">old_memo.txt</span></code> が残る。コピー先・移動先に同名のファイルがある場合は上書きにつながるため、対象を確かめてから操作しよう。</p>
+<p>練習で作ったコピーだけを削除する。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>rm<span class="w"> </span>old_memo.txt
+ls
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">rm</span></code> は通常ゴミ箱を経由せず削除する。ここでは元の <code class="docutils literal notranslate"><span class="pre">memo.txt</span></code> は残す。ディレクトリを消す <code class="docutils literal notranslate"><span class="pre">rmdir</span></code> は、中身が空の場合に使う。次の例では、空の練習用ディレクトリを作ってから消している。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir<span class="w"> </span>empty_practice
+rmdir<span class="w"> </span>empty_practice
+</pre></div>
+</div>
+<p>作業中の <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> にはファイルやディレクトリが入っているので、<code class="docutils literal notranslate"><span class="pre">rmdir</span></code> では削除できない。計算のコードと記録は、この後も使うため残しておこう。</p>
+</section>
+<section id="id8">
+<h2><span class="section-number">2.7. </span>第1章の計算をファイルに保存して実行する<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<section id="julia">
+<h3><span class="section-number">2.7.1. </span>Juliaの起動を確認する<a class="headerlink" href="#julia" title="Link to this heading">#</a></h3>
+<p>ターミナルから次を実行する。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>julia<span class="w"> </span>--version
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">version</span> <span class="pre">1.12.7</span></code> のように版が表示されれば、このシェルからJuliaを起動できる。これは版の確認であり、まだ計算コードを実行したわけではない。本講義ではJulia 1.12以降を想定しているので、表示の末尾まで同じである必要はない。</p>
+<p><code class="docutils literal notranslate"><span class="pre">command</span> <span class="pre">not</span> <span class="pre">found</span></code> と出る場合は、<a class="reference external" href="https://julialang.org/downloads/">Julia公式のインストール案内</a>に従って準備する。WSLで本章の作業をしている場合は、WSL内のLinux環境で <code class="docutils literal notranslate"><span class="pre">julia</span></code> が使えるようにする。Windows側への導入とWSL内への導入は区別しよう。準備に時間がかかる場合は、以下のコードと出力例を読み、実行は準備後に戻って試せばよい。</p>
+</section>
+<section id="id9">
+<h3><span class="section-number">2.7.2. </span>テキストエディタでコードを保存する<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<p>次のコードを、<strong><code class="docutils literal notranslate"><span class="pre">numerical_practice/src/decay.jl</span></code></strong> というファイルへ保存する。<code class="docutils literal notranslate"><span class="pre">decay.jl</span></code> がファイル名で、<code class="docutils literal notranslate"><span class="pre">.jl</span></code> はJuliaのコードであることを示す拡張子である。ワープロ文書ではなく、プレーンテキストとして保存しよう。</p>
+<p>普段使うテキストエディタで <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> を開き、その中の <code class="docutils literal notranslate"><span class="pre">src</span></code> に新しいファイルを作ればよい。WSLを使う場合も、ターミナルで作ったのと同じディレクトリをエディタで開く。ターミナル内で使えるエディタ <code class="docutils literal notranslate"><span class="pre">nano</span></code> が導入されていれば、<code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> から次のように開く方法もある。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>nano<span class="w"> </span>src/decay.jl
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">nano</span></code> では、以下のコードを貼り付け、Ctrl+O、Enterで保存し、Ctrl+Xで終了する。このときコード枠の囲み記号は貼り付けない。別のエディタを使う場合も、保存先とファイル名は同じにする。</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">main</span><span class="p">()</span>
+<span class="w">    </span><span class="n">lambda</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.4</span>
+<span class="w">    </span><span class="n">N0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">5.0</span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">T</span><span class="o">/</span><span class="n">n</span>
+<span class="w">    </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N0</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">n</span>
+<span class="w">        </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">h</span><span class="o">*</span><span class="n">lambda</span><span class="o">*</span><span class="n">N</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">exact</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">N0</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">lambda</span><span class="o">*</span><span class="n">T</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;lambda=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lambda</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, N0=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">N0</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, T=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;n=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, h=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;numerical=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;exact=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exact</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;absolute_error=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">N</span><span class="o">-</span><span class="n">exact</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">lambda</span></code> は第1章の <span class="math notranslate nohighlight">\(\lambda\)</span>、<code class="docutils literal notranslate"><span class="pre">n</span></code> はステップ数で、更新式は第1章と同じである。計算を <code class="docutils literal notranslate"><span class="pre">main</span></code> という関数にまとめ、最後の <code class="docutils literal notranslate"><span class="pre">main()</span></code> で呼び出している。文法は第3章で学ぶので、ここでは「条件を決める部分」「値を更新する部分」「結果を表示する部分」を確認できればよい。</p>
+</section>
+<section id="id10">
+<h3><span class="section-number">2.7.3. </span>保存したファイルを指定して実行する<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<p>エディタで保存した後、ターミナルの現在地が <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> であることを確かめ、次を実行する。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>ls<span class="w"> </span>src
+cat<span class="w"> </span>src/decay.jl
+julia<span class="w"> </span>src/decay.jl
+</pre></div>
+</div>
+<p>最初の2行でファイル名と内容を確認し、最後の行でJuliaにそのファイルを実行させる。出力は次のようになる。小数の末尾は環境によって異なる場合がある。</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>lambda=0.4, N0=1.0, T=5.0
+n=10, h=0.5
+numerical=0.10737418240000003
+exact=0.1353352832366127
+absolute_error=0.02796110083661267
+</pre></div>
+</div>
+<p>画面に数値が出たら、第1章の <span class="math notranslate nohighlight">\(n=10\)</span> の行と比べよう。値だけでなく、<span class="math notranslate nohighlight">\(T\)</span> や <span class="math notranslate nohighlight">\(n\)</span> が同じことも確認する。ファイルを編集しても<strong>保存前の内容は実行に反映されない</strong>ので、変更後は保存してから実行する。</p>
+<p><code class="docutils literal notranslate"><span class="pre">src/decay.jl</span></code> は、現在地から見た相対パスである。もし <code class="docutils literal notranslate"><span class="pre">src</span></code> の中へ移動して実行するなら <code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">decay.jl</span></code> となる。本章の続きでは <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> を現在地にするので、移動した場合は <code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">..</span></code> で戻ろう。</p>
+</section>
+</section>
+<section id="id11">
+<h2><span class="section-number">2.8. </span>計算条件と結果をログに残す<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<p>画面を閉じた後も結果を読めるように、実行時の出力をファイルに保存しよう。このような実行の記録を<strong>ログ</strong>という。メモを作ったときと同じ <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> を使う。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>julia<span class="w"> </span>src/decay.jl<span class="w"> </span>&gt;<span class="w"> </span>logs/run_n10.log
+cat<span class="w"> </span>logs/run_n10.log
+</pre></div>
+</div>
+<p>1行目では通常の出力が画面に出ず、<code class="docutils literal notranslate"><span class="pre">logs/run_n10.log</span></code> に保存される。2行目でその内容を読める。ログには答えだけでなく <code class="docutils literal notranslate"><span class="pre">lambda</span></code>、<code class="docutils literal notranslate"><span class="pre">N0</span></code>、<code class="docutils literal notranslate"><span class="pre">T</span></code>、<code class="docutils literal notranslate"><span class="pre">n</span></code> も書き出されているため、どの条件の結果だったかを確認できる。</p>
+<p>このファイル名の <code class="docutils literal notranslate"><span class="pre">n10</span></code> は人が付けた目印であり、<strong>ファイル名が計算条件を設定するわけではない</strong>。例えば出力先だけを <code class="docutils literal notranslate"><span class="pre">run_n20.log</span></code> に変えても、コードの <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">=</span> <span class="pre">10</span></code> は変わらない。ログ内の条件も読むことが大切である。</p>
+<section id="id12">
+<h3><span class="section-number">2.8.1. </span>上書きと追記<a class="headerlink" href="#id12" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> は同名ファイルの内容を置き換える。前の結果を残すには別名で保存するか、内容を確認してから <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> による追記を使う。例えば、実行方法をメモへ追記するには次のようにする。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Run: julia src/decay.jl &gt; logs/run_n10.log&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>memo.txt
+cat<span class="w"> </span>memo.txt
+</pre></div>
+</div>
+<p>この <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> は引用符の中にあるので、ここではメモに書く文字として扱われる。実際に追記を行っているのは、引用符の外にある <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> である。<code class="docutils literal notranslate"><span class="pre">memo.txt</span></code> に最初のメモと実行方法の2行が残ったことを確認しよう。</p>
+</section>
+<section id="id13">
+<h3><span class="section-number">2.8.2. </span>エラーメッセージも記録する<a class="headerlink" href="#id13" title="Link to this heading">#</a></h3>
+<p>プログラムの通常の出力を<strong>標準出力</strong>、エラーメッセージなどの出力を<strong>標準エラー出力</strong>という。<code class="docutils literal notranslate"><span class="pre">&gt;</span></code> だけでは、標準エラー出力は通常ターミナルへ出る。両方を同じログに記録する書き方は次の通りである。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>julia<span class="w"> </span>src/decay.jl<span class="w"> </span>&gt;<span class="w"> </span>logs/run_n10.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+cat<span class="w"> </span>logs/run_n10.log
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">2&gt;&amp;1</span></code> は、標準エラー出力の行き先を標準出力と同じにする指定である。本章では、この順序を含めた書き方を参照しながら使えればよい。計算を実行したら、ログが作られたことだけでなく、結果まで出ているか、途中にエラーがないかを読む。</p>
+<p>また、<code class="docutils literal notranslate"><span class="pre">&gt;</span></code> で保存先のファイルは作れても、親ディレクトリは作れない。<code class="docutils literal notranslate"><span class="pre">logs</span></code> が存在しない場合には、出力先を用意できず計算を起動できないので、<code class="docutils literal notranslate"><span class="pre">ls</span></code> で確認する。</p>
+</section>
+</section>
+<section id="id14">
+<h2><span class="section-number">2.9. </span>必要な記録を探して読む<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<p>短いログなら <code class="docutils literal notranslate"><span class="pre">cat</span></code> で全体を読める。長くなったときは、先頭や末尾だけを表示する方法が役立つ。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>head<span class="w"> </span>-n<span class="w"> </span><span class="m">2</span><span class="w"> </span>logs/run_n10.log
+tail<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>logs/run_n10.log
+</pre></div>
+</div>
+<p>この例では、<code class="docutils literal notranslate"><span class="pre">head</span></code> で先頭2行の計算条件、<code class="docutils literal notranslate"><span class="pre">tail</span></code> で最後の行の絶対誤差が読める。<code class="docutils literal notranslate"><span class="pre">-n</span></code> の後ろの数が、表示する行数である。長いファイルをページごとに読む場合は、次も使える。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>less<span class="w"> </span>logs/run_n10.log
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">less</span></code> の画面ではSpaceで先へ進み、<code class="docutils literal notranslate"><span class="pre">b</span></code> で戻り、<code class="docutils literal notranslate"><span class="pre">q</span></code> で終了する。ログが増えた場合には、名前を探す操作と内容を探す操作を使い分けよう。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s1">&#39;*.jl&#39;</span>
+grep<span class="w"> </span><span class="s1">&#39;absolute_error&#39;</span><span class="w"> </span>logs/run_n10.log
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">find</span></code> は現在地 <code class="docutils literal notranslate"><span class="pre">.</span></code> とその下の階層から、名前が <code class="docutils literal notranslate"><span class="pre">.jl</span></code> で終わるファイルなどを探す。この例では <code class="docutils literal notranslate"><span class="pre">./src/decay.jl</span></code> が見つかる。<code class="docutils literal notranslate"><span class="pre">*</span></code> は任意の長さの文字列に対応する記号であり、ここでは引用符を付けて検索条件をそのまま <code class="docutils literal notranslate"><span class="pre">find</span></code> に渡している。<code class="docutils literal notranslate"><span class="pre">grep</span></code> は指定した文字列を含む行をファイルの<strong>内容</strong>から探す。後者では絶対誤差の行が取り出される。</p>
+<p>よく使う操作を、作業の目的から引けるようにまとめておく。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>したいこと</p></th>
+<th class="head"><p>コマンド例</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>現在地・ファイル名を確認する</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pwd</span></code>、<code class="docutils literal notranslate"><span class="pre">ls</span></code>、<code class="docutils literal notranslate"><span class="pre">ls</span> <span class="pre">-l</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>作業場所を作る・移動する</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">src</span> <span class="pre">logs</span></code>、<code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">src</span></code>、<code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">..</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>内容を保存しながらコピー・改名する</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cp</span> <span class="pre">memo.txt</span> <span class="pre">memo_backup.txt</span></code>、<code class="docutils literal notranslate"><span class="pre">mv</span> <span class="pre">memo_backup.txt</span> <span class="pre">old_memo.txt</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>不要なファイル・空のディレクトリを消す</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">rm</span> <span class="pre">old_memo.txt</span></code>、<code class="docutils literal notranslate"><span class="pre">rmdir</span> <span class="pre">empty_practice</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>内容を読む</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cat</span></code>、<code class="docutils literal notranslate"><span class="pre">head</span></code>、<code class="docutils literal notranslate"><span class="pre">tail</span></code>、<code class="docutils literal notranslate"><span class="pre">less</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>名前・内容を探す</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">find</span></code>、<code class="docutils literal notranslate"><span class="pre">grep</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>表の例をすべてもう一度実行する必要はない。使い方が分からなくなったとき、本文の対応する作業へ戻って確認しよう。</p>
+</section>
+<section id="id15">
+<h2><span class="section-number">2.10. </span>うまくいかないときは、何を確認するか<a class="headerlink" href="#id15" title="Link to this heading">#</a></h2>
+<p>コードの誤りを疑う前に、「どこで、何を実行したか」を確かめると解決する問題も多い。例えば <code class="docutils literal notranslate"><span class="pre">src</span></code> に移動した後に <code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">src/decay.jl</span></code> と入力すると、<code class="docutils literal notranslate"><span class="pre">src</span></code> のさらに下の <code class="docutils literal notranslate"><span class="pre">src/decay.jl</span></code> を探してしまう。</p>
+<p>本章の手順では、<code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> に戻って次を確かめる。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">pwd</span>
+ls
+ls<span class="w"> </span>src
+cat<span class="w"> </span>src/decay.jl
+</pre></div>
+</div>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>困ったこと</p></th>
+<th class="head"><p>まず確認すること</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">julia:</span> <span class="pre">command</span> <span class="pre">not</span> <span class="pre">found</span></code></p></td>
+<td><p>今使っている環境にJuliaを導入したか。<code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">--version</span></code> で起動できるか</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">such</span> <span class="pre">file</span> <span class="pre">or</span> <span class="pre">directory</span></code> など、ファイルが見つからない</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pwd</span></code> と <code class="docutils literal notranslate"><span class="pre">ls</span></code> で現在地・名前・保存先を確認する。<code class="docutils literal notranslate"><span class="pre">decay.jl.txt</span></code> のような別名で保存していないかも見る</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">exists</span></code></p></td>
+<td><p>同名のファイルやディレクトリがすでにある。内容を確認して既存のものを使うか、別名にする</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">Permission</span> <span class="pre">denied</span></code></p></td>
+<td><p>自分が読み書きできる場所か、指定先が正しいかを確認する</p></td>
+</tr>
+<tr class="row-even"><td><p>コードを変えたのに結果が変わらない</p></td>
+<td><p>保存したか、実行したファイルは編集したファイルか、古いログを読んでいないか</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> を付けたら画面に結果が出ない</p></td>
+<td><p>指定したログを <code class="docutils literal notranslate"><span class="pre">cat</span></code> で読む。通常の出力を保存先へ送っているためである</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>長い処理を途中で止めたい場合は、実行しているターミナルでCtrl+Cを押すと中断できることが多い。中断した場合のログや出力は途中までかもしれないので、最後まで実行した結果と区別する。</p>
+<p>エラーが出たときの記録には、実行したコマンド、現在地、メッセージをそのまま残すとよい。「動かなかった」だけよりも、原因を自分で調べたり相談したりしやすくなる。</p>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">2.11. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 同じ手順をまとめて実行する<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>ここまでの作業を繰り返すときには、シェルのコマンドをファイルに並べた<strong>シェルスクリプト</strong>が使える。<code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> に <code class="docutils literal notranslate"><span class="pre">run.sh</span></code> というテキストファイルを作り、次の内容を保存する。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>logs
+julia<span class="w"> </span>src/decay.jl<span class="w"> </span>&gt;<span class="w"> </span>logs/run_latest.log<span class="w"> </span><span class="m">2</span>&gt;<span class="p">&amp;</span><span class="m">1</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">mkdir</span> <span class="pre">-p</span></code> は、必要な親ディレクトリも含めて作り、同名のディレクトリがすでにあればそのまま使う。最後の行は先ほどと同じ計算であり、ここでは出力名を <code class="docutils literal notranslate"><span class="pre">run_latest.log</span></code> としている。再実行するとこのログは上書きされるので、残したい結果は先に別名で保存する。</p>
+<p><code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> を現在地にして、次のように実行する。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>run.sh
+cat<span class="w"> </span>logs/run_latest.log
+</pre></div>
+</div>
+<p>この方法ではBashがスクリプトを読み込む。スクリプトへ実行権限を付けて、直接起動する方法もある。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chmod<span class="w"> </span>+x<span class="w"> </span>run.sh
+./run.sh
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">./</span></code> は現在のディレクトリを明示する指定である。この方法では先頭行の <code class="docutils literal notranslate"><span class="pre">#!/usr/bin/env</span> <span class="pre">bash</span></code> が実行に使うプログラムを指定する。<code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">src/decay.jl</span></code> としてJuliaにファイルを読ませる場合には、<code class="docutils literal notranslate"><span class="pre">decay.jl</span></code> 自体へ実行権限を付ける必要はない。</p>
+<p>スクリプトに書いた <code class="docutils literal notranslate"><span class="pre">src/decay.jl</span></code> も、実行時の現在地を基準とする。<code class="docutils literal notranslate"><span class="pre">run.sh</span></code> の置き場所へ自動的に移動するわけではない。この例は <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> から実行する手順として作っている。</p>
+<p>計算条件を大量に変えるときには、この中へ繰り返しを書いたり、Juliaのプログラムに引数を受け取らせたりできる。本章では、まず同じ手順を保存して再実行できることを押さえればよい。</p>
+</section>
+<section id="id16">
+<h2><span class="section-number">2.12. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 出力の組み合わせと実行環境の確認<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<section id="id17">
+<h3><span class="section-number">2.12.1. </span>パイプで出力を次のコマンドへ渡す<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">&gt;</span></code> が出力をファイルへ保存するのに対して、<strong>パイプ</strong> <code class="docutils literal notranslate"><span class="pre">|</span></code> は、あるコマンドの標準出力を次のコマンドの入力へ渡す。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>grep<span class="w"> </span><span class="s1">&#39;absolute_error&#39;</span><span class="w"> </span>logs/run_n10.log<span class="w"> </span><span class="p">|</span><span class="w"> </span>wc<span class="w"> </span>-l
+</pre></div>
+</div>
+<p>この例では、絶対誤差を含む行を取り出し、その行数を <code class="docutils literal notranslate"><span class="pre">wc</span> <span class="pre">-l</span></code> で数える。本章のログなら1行である。ここで数えているのは行数であり、誤差の値ではない。</p>
+</section>
+<section id="path">
+<h3><span class="section-number">2.12.2. </span>PATHはコマンドの探索先<a class="headerlink" href="#path" title="Link to this heading">#</a></h3>
+<p>シェルやプログラムが参照する設定値の一部を<strong>環境変数</strong>という。代表的な <code class="docutils literal notranslate"><span class="pre">PATH</span></code> は、外部コマンドを探すディレクトリの一覧である。</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>julia
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">command</span> <span class="pre">-v</span> <span class="pre">julia</span></code> で、このシェルから <code class="docutils literal notranslate"><span class="pre">julia</span></code> がどのように見つかるかを確認できる。インストール済みでも起動できないときは、別の環境に導入していないか、コマンドの探索先に含まれているかを調べる。<code class="docutils literal notranslate"><span class="pre">PATH</span></code> はコードやデータファイルの探索場所を一律に決めるものではない。</p>
+</section>
+<section id="id18">
+<h3><span class="section-number">2.12.3. </span>実行中のプログラムを確認する<a class="headerlink" href="#id18" title="Link to this heading">#</a></h3>
+<p>実行中のプログラムは<strong>プロセス</strong>として管理される。<code class="docutils literal notranslate"><span class="pre">ps</span></code> はプロセスの情報を表示するコマンドで、例えば <code class="docutils literal notranslate"><span class="pre">ps</span> <span class="pre">-u</span> <span class="pre">ユーザ名</span></code> で自分のプロセスを確認できる。表示されるPIDはプロセスの識別番号である。</p>
+<p>実行中のターミナルでCtrl+Cを使えない場合などには、対象を確認して <code class="docutils literal notranslate"><span class="pre">kill</span> <span class="pre">PID</span></code> で終了を要求する方法がある。<code class="docutils literal notranslate"><span class="pre">PID</span></code> の部分は自分の対象プロセスの番号へ置き換える。強制終了を行う <code class="docutils literal notranslate"><span class="pre">kill</span> <span class="pre">-9</span></code> は後始末の機会を与えないので、通常の終了要求で止まらない場合の手段である。本章の短い計算では、これらを実際に試す必要はない。</p>
+</section>
+</section>
+<section id="id19">
+<h2><span class="section-number">2.13. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 遠隔の計算機を使う場合<a class="headerlink" href="#id19" title="Link to this heading">#</a></h2>
+<p>研究室のワークステーション・サーバーやスパコンなどを使うときは、手元の計算機から <strong>Secure Shell (SSH)</strong> で接続し、接続先のシェルを操作することがある。例えば <code class="docutils literal notranslate"><span class="pre">ssh</span> <span class="pre">ユーザ名&#64;ホスト名</span></code> の形で接続するが、ユーザ名や接続先は利用する計算機の案内に従う。本章の練習のために接続先を用意する必要はない。</p>
+<p>接続後に <code class="docutils literal notranslate"><span class="pre">pwd</span></code> や <code class="docutils literal notranslate"><span class="pre">ls</span></code> を実行すると、表示されるのは<strong>接続先</strong>の現在地やファイルである。手元と接続先に同じ名前のディレクトリがあっても、同じファイルが入っているとは限らない。接続先で <code class="docutils literal notranslate"><span class="pre">exit</span></code> と入力するとSSH接続を終了し、手元のシェルへ戻る。</p>
+<p>ファイルの転送には <code class="docutils literal notranslate"><span class="pre">scp</span></code> などを使える。例えば、接続先に書き込み可能な <code class="docutils literal notranslate"><span class="pre">~/work</span></code> がある場合、手元の <code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> から</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>scp src/decay.jl ユーザ名@ホスト名:~/work/
+</pre></div>
+</div>
+<p>の形でコードを転送できる。接続先で作ったログを手元へ持ち帰るときは、転送元と転送先を逆に指定する。<strong>これは書き方の例であり、実際の接続先に置き換えて使う</strong>。</p>
+<p>スーパーコンピュータでは、接続直後のログインノードで長い計算を実行せず、ジョブスケジューラへ依頼して計算ノードで実行する場合がある。実行方法と保存場所の規則はシステムごとに異なるので、利用案内を確認する。その場合も、コード、条件、出力の場所を把握して記録するという本章の基本は共通している。</p>
+</section>
+<section id="id20">
+<h2><span class="section-number">2.14. </span>まとめ<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<ul class="simple">
+<li><p>ターミナルに入力したコマンドをシェルが解釈し、Juliaなどのプログラムを起動する。</p></li>
+<li><p>ファイルを扱うときは、現在地と保存先を確かめる。相対パスの指す場所は現在地によって変わる。</p></li>
+<li><p>コードをファイルに保存し、計算条件と結果をログへ残すと、後から確認・再実行しやすくなる。</p></li>
+<li><p>エラーが出たときは、実行したコマンド、現在地、ファイルの内容、ログを確認する。</p></li>
+</ul>
+</div>
+<p>次の<a class="reference internal" href="Chap_Julia_LinearAlgebra.html"><span class="std std-doc">第3章「Juliaと線形代数」</span></a>では、用意されたコードを実行する段階から、自分で計算を記述する段階へ進む。本章の <code class="docutils literal notranslate"><span class="pre">decay.jl</span></code> で使った変数や繰り返しに加えて、ベクトル・行列を扱う書き方を学ぶ。</p>
+</section>
+<section id="id21">
+<h2><span class="section-number">2.15. </span>演習<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<p>本文のコマンドやコードを見ながら取り組んでよい。コマンドの暗記ではなく、保存した内容と計算結果を自分で確認できることを目標にする。♣節の操作は使わない。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>作業の記録を残す</strong>：本文の手順に沿って <code class="docutils literal notranslate"><span class="pre">decay.jl</span></code> を実行し、ログへ保存せよ。作業場所、実行したコマンド、ログの保存先を短くメモし、ログからステップ数と最終時刻を読み取れ。Juliaをまだ準備できていない場合は、本文の出力例を使ってメモを作り、実行は準備後に確認すればよい。</p></li>
+<li><p><strong>同じファイルを見つける</strong>：<code class="docutils literal notranslate"><span class="pre">numerical_practice</span></code> と、その中の <code class="docutils literal notranslate"><span class="pre">src</span></code> にいるときでは、<code class="docutils literal notranslate"><span class="pre">decay.jl</span></code> の指定の仕方はどう変わるか。本文のディレクトリ構成を見て説明せよ。ファイルが見つからないとき、最初に確認したいことも挙げよ。</p></li>
+<li><p><strong>結果だけで十分かを考える</strong>：友人から「計算結果は <code class="docutils literal notranslate"><span class="pre">0.107374</span></code> だった」とだけ伝えられた。この結果を第1章の計算と比較するには、ほかに何を知りたいか。本章のログとコードを見て、残しておくと役立つ情報を挙げ、その理由を説明せよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id22">
+<h2><span class="section-number">2.16. </span>関連資料<a class="headerlink" href="#id22" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://sotayoshida.github.io/Lecture_DataScience/notebooks/Python_misc_python_env_forWin11.html">プログラミング演習1：WSLとPython環境</a>：Windowsでの作業環境の背景。具体的な導入手順は、下記の公式案内と照合してほしい。</p></li>
+<li><p><a class="reference external" href="https://learn.microsoft.com/ja-jp/windows/wsl/install">Microsoft：WSLのインストール</a>：WindowsでLinux環境を用意する際の案内。</p></li>
+<li><p><a class="reference external" href="https://julialang.org/downloads/">Julia公式インストール案内</a>：使用するOSに応じたJuliaの導入方法。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_WhyItMatters.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">1. </span>数値解析とは</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_Julia_LinearAlgebra.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Juliaと線形代数</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">2.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">2.2. Linux・ターミナル・シェルの違い</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">2.2.1. コマンドを入力する場所を用意する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">2.3. 最初の操作：現在地とファイルを見る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">2.4. ファイルの場所を表す：ディレクトリとパス</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">2.5. 計算用の作業場所を作る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">2.6. メモを作り、コピーと保存先を確かめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">2.7. 第1章の計算をファイルに保存して実行する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julia">2.7.1. Juliaの起動を確認する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">2.7.2. テキストエディタでコードを保存する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">2.7.3. 保存したファイルを指定して実行する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">2.8. 計算条件と結果をログに残す</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">2.8.1. 上書きと追記</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">2.8.2. エラーメッセージも記録する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">2.9. 必要な記録を探して読む</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">2.10. うまくいかないときは、何を確認するか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">2.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 同じ手順をまとめて実行する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">2.12. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 出力の組み合わせと実行環境の確認</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">2.12.1. パイプで出力を次のコマンドへ渡す</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#path">2.12.2. PATHはコマンドの探索先</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">2.12.3. 実行中のプログラムを確認する</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">2.13. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 遠隔の計算機を使う場合</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">2.14. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">2.15. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">2.16. 関連資料</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

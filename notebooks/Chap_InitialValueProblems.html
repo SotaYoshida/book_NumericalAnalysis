@@ -1,0 +1,1108 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>9. 常微分方程式の初期値問題 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_InitialValueProblems';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="10. 連立一次方程式の反復法" href="Chap_IterativeLinearSystems.html" />
+    <link rel="prev" title="8. 補間・数値微分・数値積分" href="Chap_InterpolationDifferentiationIntegration.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_InitialValueProblems.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>常微分方程式の初期値問題</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">9.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">9.2. 初期値が未来を定める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#euler">9.3. Euler法：現在の傾きで一歩進む</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">9.4. 局所誤差と大域誤差</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#heun">9.5. Heun法：区間の両端の傾きを使う</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runge-kutta">9.6. 4次Runge--Kutta法：区間内の傾きを組み合わせる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">9.7. 精度と仕事量を一緒に見る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">9.8. 絶対安定性：減衰する解を数値的にも減衰させる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">9.9. 数値解の形をモデルの性質と照合する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">9.10. 応用例：新製品の普及を予測する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-stiff">9.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 硬い（stiff）問題と陰的解法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">9.12. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 局所誤差推定と刻み幅制御</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">9.13. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">9.14. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">9.15. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_InitialValueProblems.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">9. </span>常微分方程式の初期値問題<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>第1章では、現在の変化率から次の値を予測するEuler法を試した。第8章の数値積分を使うと、この更新式の意味と改良の仕方が分かる。</p>
+<p>時刻とともに変化する量 <span class="math notranslate nohighlight">\(u(t)\)</span> が</p>
+<div class="math notranslate nohighlight">
+\[
+u'(t)=f(t,u(t)),\qquad u(t_0)=u_0
+\]</div>
+<p>を満たすとする。これは常微分方程式（ordinary differential equation; ODE）の<strong>初期値問題</strong>である。人口、物体の運動、回路の電圧、化学反応の濃度など、多くのモデルがこの形に書ける。</p>
+<p>数値解法は、連続な関数 <span class="math notranslate nohighlight">\(u(t)\)</span> を直接求める代わりに、離散時刻</p>
+<div class="math notranslate nohighlight">
+\[
+t_n=t_0+nh
+\]</div>
+<p>における近似値 <span class="math notranslate nohighlight">\(u_n\approx u(t_n)\)</span> を順に計算する。ここで <span class="math notranslate nohighlight">\(h\)</span> は時間刻みである。本章の中心は、「微分方程式が示す瞬間的な変化率から、次の時刻の状態をどう予測するか」である。</p>
+<p>本章でも、アルゴリズムを次の三つの観点から評価する。</p>
+<ul class="simple">
+<li><p><strong>精度</strong>：<span class="math notranslate nohighlight">\(h\)</span> を小さくしたとき、真の解へどの速さで近づくか。</p></li>
+<li><p><strong>安定性</strong>：微小な誤差や減衰成分を、不自然に増幅しないか。</p></li>
+<li><p><strong>計算量</strong>：所定の時間まで進むのに何ステップ、何回の <span class="math notranslate nohighlight">\(f\)</span> の評価が必要か。</p></li>
+</ul>
+<section id="id2">
+<h2><span class="section-number">9.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>初期値問題と数値解の意味を説明できる。</p></li>
+<li><p>Euler法を積分表示またはTaylor展開から導出できる。</p></li>
+<li><p>1ステップの局所誤差と、一定時間後の大域誤差を区別できる。</p></li>
+<li><p>Heun法の予測と修正を説明し、Euler法・RK4との精度と仕事量の違いを読める。</p></li>
+<li><p>テスト方程式から絶対安定性と刻み幅制限を説明できる。</p></li>
+<li><p>解の不変量や単調性を使って数値解を検証できる。</p></li>
+<li><p>新製品の普及モデルのような応用問題で、解法と刻み幅を選び、結果の信頼性を説明できる。</p></li>
+</ul>
+<div class="note admonition">
+<p class="admonition-title">この章で使う数学（復習）</p>
+<ul class="simple">
+<li><p><strong>微分方程式の解は関数である。</strong> <span class="math notranslate nohighlight">\(u'=-2u\)</span> の解は数ではなく、「どの時刻でも、傾きが自分の値の <span class="math notranslate nohighlight">\(-2\)</span> 倍になっている関数」<span class="math notranslate nohighlight">\(u(t)=Ce^{-2t}\)</span> である。初期値 <span class="math notranslate nohighlight">\(u(0)=1\)</span> を与えると <span class="math notranslate nohighlight">\(C=1\)</span> に決まる。</p></li>
+<li><p><strong>指数関数の微分</strong>：<span class="math notranslate nohighlight">\(\frac{d}{dt}e^{at}=ae^{at}\)</span>。第1章で解析解を確かめたときと同じ計算である。</p></li>
+<li><p><strong>傾きの場</strong>：<span class="math notranslate nohighlight">\(u'=f(t,u)\)</span> は「時刻 <span class="math notranslate nohighlight">\(t\)</span> に値が <span class="math notranslate nohighlight">\(u\)</span> なら、そこでの傾きは <span class="math notranslate nohighlight">\(f(t,u)\)</span>」という指示書と読める。数値解法は、この指示に従って少しずつ進む。</p></li>
+</ul>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">9.2. </span>初期値が未来を定める<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>微分方程式 <span class="math notranslate nohighlight">\(u'=f(t,u)\)</span> は、時刻 <span class="math notranslate nohighlight">\(t\)</span> と現在の状態 <span class="math notranslate nohighlight">\(u\)</span> から、その瞬間の傾きが <span class="math notranslate nohighlight">\(f(t,u)\)</span> であると指定する。さらに出発点 <span class="math notranslate nohighlight">\(u(t_0)=u_0\)</span> を与えることで、未来の軌道が定まる。</p>
+<p>積分の形に書けば</p>
+<div class="math notranslate nohighlight">
+\[
+u(t_{n+1})=u(t_n)+\int_{t_n}^{t_{n+1}}f(t,u(t))\,dt
+\]</div>
+<p>である。したがってODEを1ステップ進める問題は、右辺の積分をどう近似するかという第8章の数値積分の問題でもある。</p>
+<p>たとえば放射性崩壊や単純な冷却を表す</p>
+<div class="math notranslate nohighlight">
+\[
+u'=-2u,\qquad u(0)=1
+\]</div>
+<p>の厳密解は <span class="math notranslate nohighlight">\(u(t)=e^{-2t}\)</span> である。解は正のまま単調に減少する。この「正値性」と「単調減少」は厳密解を知らない場合にも使える検証材料になる。</p>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>関数 <span class="math notranslate nohighlight">\(f\)</span> がLipschitz(リプシッツ)連続であるとは、</p>
+<div class="math notranslate nohighlight">
+\[
+\|f(t,x)-f(t,y)\|\leq L\|x-y\|
+\]</div>
+<p>を満たす定数 <span class="math notranslate nohighlight">\(L\)</span> が存在することである。</p>
+</aside>
+<p><span class="math notranslate nohighlight">\(f\)</span> が時刻 <span class="math notranslate nohighlight">\(t\)</span> について連続で、状態 <span class="math notranslate nohighlight">\(u\)</span> について局所的にLipschitz連続（例えば連続微分可能）なら、初期値の近くで解の存在と一意性が保証される。数値解法の収束解析ではこのような仮定を置く。右辺が不連続、あるいは一意性を失う問題では、数値計算以前に「どの解を求めるか」を確認する必要がある。</p>
+</section>
+<section id="euler">
+<h2><span class="section-number">9.3. </span>Euler法：現在の傾きで一歩進む<a class="headerlink" href="#euler" title="Link to this heading">#</a></h2>
+<p>区間 <span class="math notranslate nohighlight">\([t_n,t_{n+1}]\)</span> で傾きを左端の値 <span class="math notranslate nohighlight">\(f(t_n,u_n)\)</span> に固定して積分を近似すると、</p>
+<div class="math notranslate nohighlight">
+\[
+\int_{t_n}^{t_{n+1}}f(t,u(t))\,dt\approx h f(t_n,u_n)
+\]</div>
+<p>となる。したがって<strong>前進Euler法</strong>は</p>
+<div class="math notranslate nohighlight">
+\[
+u_{n+1}=u_n+h f(t_n,u_n)
+\]</div>
+<p>である。Taylor展開</p>
+<div class="math notranslate nohighlight">
+\[
+u(t_n+h)=u(t_n)+hu'(t_n)+\frac{h^2}{2}u''(\xi_n)
+\]</div>
+<p>で <span class="math notranslate nohighlight">\(u'=f(t,u)\)</span> を代入しても同じ式が得られる。</p>
+<p><span class="math notranslate nohighlight">\(u'=-2u\)</span>、<span class="math notranslate nohighlight">\(h=0.1\)</span> なら <span class="math notranslate nohighlight">\(u_{n+1}=(1-0.2)u_n=0.8u_n\)</span> である。<span class="math notranslate nohighlight">\(u_0=1\)</span> から <span class="math notranslate nohighlight">\(u_1=0.8\)</span>、<span class="math notranslate nohighlight">\(u_2=0.64\)</span> と進む。各ステップは単純だが、<span class="math notranslate nohighlight">\(t=1\)</span> までに10回の近似が積み重なる。</p>
+<figure class="align-default" id="fig-learning-euler-step">
+<a class="reference internal image-reference" href="../_images/learning_euler_step.svg"><img alt="初期値1から刻み幅0.1だけ進む。接線上のEuler値は0.8、厳密解は約0.8187。" src="../_images/learning_euler_step.svg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 9.1 </span><span class="caption-text">青い丸が出発点、橙色の四角がEuler法の次の値。横の移動 <span class="math notranslate nohighlight">\(h=0.1\)</span> に、縦の変化 <span class="math notranslate nohighlight">\(h f(0,1)=-0.2\)</span> を組み合わせる。接線上を進んだ点と黒い曲線の差が、この一歩で生じる誤差である。</span><a class="headerlink" href="#fig-learning-euler-step" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">euler</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tspan</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">t0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;T &gt; t0かつh &gt; 0が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nsteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ceil</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">nsteps</span><span class="w">             </span><span class="c"># 最後がちょうどTになるよう刻み幅を調整</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="n">range</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Vector</span><span class="p">{</span><span class="kt">typeof</span><span class="p">(</span><span class="kt">float</span><span class="p">(</span><span class="kt">u0</span><span class="p">))}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u0</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span>
+<span class="k">end</span>
+
+<span class="n">decay</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="n">u</span>
+<span class="n">decay_exact</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="n">t</span><span class="p">)</span>
+<span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">euler</span><span class="p">(</span><span class="n">decay</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="mi">4</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;t=</span><span class="si">$</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="s">: 数値解=</span><span class="si">$</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">])</span><span class="s">, 厳密解=</span><span class="si">$</span><span class="p">(</span><span class="n">decay_exact</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;t=1での誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">u</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">-</span><span class="n">decay_exact</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>t=0.0: 数値解=1.0, 厳密解=1.0
+t=0.1: 数値解=0.8, 厳密解=0.8187307530779818
+t=0.2: 数値解=0.64, 厳密解=0.6703200460356393
+t=0.3: 数値解=0.512, 厳密解=0.5488116360940265
+t=1での誤差 = 0.02796110083661267
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2><span class="section-number">9.4. </span>局所誤差と大域誤差<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>真の値 <span class="math notranslate nohighlight">\(u(t_n)\)</span> から1ステップだけEuler法を行ったときのずれ</p>
+<div class="math notranslate nohighlight">
+\[
+d_{n+1}=u(t_{n+1})-\{u(t_n)+hf(t_n,u(t_n))\}
+\]</div>
+<p>をここでは<strong>1ステップの局所離散化誤差</strong>と呼ぶ。Taylor展開より <span class="math notranslate nohighlight">\(d_{n+1}=O(h^2)\)</span> である。一方、初期時刻から数値解を繰り返して得た</p>
+<div class="math notranslate nohighlight">
+\[
+e_n=u(t_n)-u_n
+\]</div>
+<p>が<strong>大域誤差</strong>である。一定の時間区間では約 <span class="math notranslate nohighlight">\(1/h\)</span> 回のステップを行うため、各ステップの誤差が安定に蓄積すると大域誤差は <span class="math notranslate nohighlight">\(O(h)\)</span> になる。</p>
+<p>文献によっては <span class="math notranslate nohighlight">\(d_{n+1}\)</span> を <span class="math notranslate nohighlight">\(h\)</span> で割った量を局所離散化誤差と呼び、その次数を <span class="math notranslate nohighlight">\(O(h)\)</span> と記す。本資料では、1ステップ後の値のずれそのものを指して <span class="math notranslate nohighlight">\(O(h^2)\)</span> とする。定義を確認すれば内容は同じである。</p>
+<p>次数を実験で調べるには、<span class="math notranslate nohighlight">\(h\)</span> と <span class="math notranslate nohighlight">\(h/2\)</span> の誤差 <span class="math notranslate nohighlight">\(E_h,E_{h/2}\)</span> から</p>
+<div class="math notranslate nohighlight">
+\[
+p_{\mathrm{obs}}=\log_2\frac{E_h}{E_{h/2}}
+\]</div>
+<p>を計算する。<span class="math notranslate nohighlight">\(E_h\approx Ch^p\)</span> なら <span class="math notranslate nohighlight">\(p_{\mathrm{obs}}\approx p\)</span> となる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">let</span><span class="w"> </span><span class="n">previous_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nothing</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.025</span><span class="p">)</span>
+<span class="w">        </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">euler</span><span class="p">(</span><span class="n">decay</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">        </span><span class="n">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">-</span><span class="n">decay_exact</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="w">        </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isnothing</span><span class="p">(</span><span class="n">previous_error</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;---&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">string</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">log2</span><span class="p">(</span><span class="n">previous_error</span><span class="o">/</span><span class="n">error</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;h=</span><span class="si">$h</span><span class="s">: 終点誤差=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">error</span><span class="p">,</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="s">, 観測次数=</span><span class="si">$order</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">previous_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">error</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>h=0.2: 終点誤差=0.057575, 観測次数=---
+h=0.1: 終点誤差=0.027961, 観測次数=1.042
+h=0.05: 終点誤差=0.013759, 観測次数=1.023
+h=0.025: 終点誤差=0.0068231, 観測次数=1.012
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="heun">
+<h2><span class="section-number">9.5. </span>Heun法：区間の両端の傾きを使う<a class="headerlink" href="#heun" title="Link to this heading">#</a></h2>
+<p>Euler法は区間の始点の傾きだけを使う。まずEuler法で終点を予測し、始点と予測終点の傾きを平均すれば、積分に台形則を使うことに対応する。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\widetilde{u}_{n+1}&amp;=u_n+h f(t_n,u_n),\\
+u_{n+1}&amp;=u_n+\frac{h}{2}\left\{f(t_n,u_n)
++f(t_{n+1},\widetilde{u}_{n+1})\right\}.
+\end{aligned}
+\end{split}\]</div>
+<p>例えば <span class="math notranslate nohighlight">\(u'=-2u\)</span>、<span class="math notranslate nohighlight">\(u_n=1\)</span>、<span class="math notranslate nohighlight">\(h=0.1\)</span> なら、最初の傾きは <span class="math notranslate nohighlight">\(-2\)</span>、予測値は0.8、そこでの傾きは <span class="math notranslate nohighlight">\(-1.6\)</span> となる。平均の傾き <span class="math notranslate nohighlight">\(-1.8\)</span> を使うと、修正後は0.82であり、厳密値 <span class="math notranslate nohighlight">\(e^{-0.2}\approx0.8187\)</span> に近づく。未来の厳密な傾きを知っているのではなく、予測値で代用している。</p>
+<p>これは<strong>Heun法</strong>または改良Euler法と呼ばれる2次Runge--Kutta法で、大域誤差は <span class="math notranslate nohighlight">\(O(h^2)\)</span> である。1ステップで右辺 <span class="math notranslate nohighlight">\(f\)</span> を2回評価するが、同じ精度を得るためにEuler法より大きな刻み幅を使えることが多い。計算量は「1ステップの安さ」だけでなく「必要なステップ数」と合わせて比較する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">heun</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tspan</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">t0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;T &gt; t0かつh &gt; 0が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nsteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ceil</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">nsteps</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="n">range</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Vector</span><span class="p">{</span><span class="kt">typeof</span><span class="p">(</span><span class="kt">float</span><span class="p">(</span><span class="kt">u0</span><span class="p">))}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u0</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">k1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+<span class="w">        </span><span class="n">predictor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k1</span>
+<span class="w">        </span><span class="n">k2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">predictor</span><span class="p">)</span>
+<span class="w">        </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="p">(</span><span class="n">k1</span><span class="o">+</span><span class="n">k2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span>
+<span class="k">end</span>
+
+<span class="k">let</span><span class="w"> </span><span class="n">previous_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nothing</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.025</span><span class="p">)</span>
+<span class="w">        </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">heun</span><span class="p">(</span><span class="n">decay</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">        </span><span class="n">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">-</span><span class="n">decay_exact</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="w">        </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isnothing</span><span class="p">(</span><span class="n">previous_error</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;---&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">string</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">log2</span><span class="p">(</span><span class="n">previous_error</span><span class="o">/</span><span class="n">error</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;h=</span><span class="si">$h</span><span class="s">: Heun法の誤差=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">error</span><span class="p">,</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="s">, 観測次数=</span><span class="si">$order</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">previous_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">error</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>h=0.2: Heun法の誤差=0.010058, 観測次数=---
+h=0.1: Heun法の誤差=0.0021127, 観測次数=2.251
+h=0.05: Heun法の誤差=0.00048717, 観測次数=2.117
+h=0.025: Heun法の誤差=0.00011714, 観測次数=2.056
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="runge-kutta">
+<h2><span class="section-number">9.6. </span>4次Runge--Kutta法：区間内の傾きを組み合わせる<a class="headerlink" href="#runge-kutta" title="Link to this heading">#</a></h2>
+<p>Heun法では2回の傾きを使った。より多くの途中の状態を予測する例が、古典的4次Runge--Kutta法（RK4）である。RK4は、始点、二つの中点予測、終点予測における傾きを組み合わせる。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+k_1&amp;=f(t_n,u_n),\\
+k_2&amp;=f(t_n+h/2,u_n+hk_1/2),\\
+k_3&amp;=f(t_n+h/2,u_n+hk_2/2),\\
+k_4&amp;=f(t_n+h,u_n+hk_3),\\
+u_{n+1}&amp;=u_n+\frac{h}{6}(k_1+2k_2+2k_3+k_4).
+\end{aligned}
+\end{split}\]</div>
+<p>係数 <span class="math notranslate nohighlight">\(1,2,2,1\)</span> は単なる傾きの平均ではなく、Taylor展開の項が4次まで一致するように選ばれている。十分滑らかな問題では局所誤差は <span class="math notranslate nohighlight">\(O(h^5)\)</span>、一定時間後の大域誤差は <span class="math notranslate nohighlight">\(O(h^4)\)</span> である。1ステップで <span class="math notranslate nohighlight">\(f\)</span> を4回評価する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">rk4</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tspan</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">t0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;T &gt; t0かつh &gt; 0が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nsteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ceil</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">nsteps</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="n">range</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Vector</span><span class="p">{</span><span class="kt">typeof</span><span class="p">(</span><span class="kt">float</span><span class="p">(</span><span class="kt">u0</span><span class="p">))}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u0</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">k1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+<span class="w">        </span><span class="n">k2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">k3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">k4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k3</span><span class="p">)</span>
+<span class="w">        </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="p">(</span><span class="n">k1</span><span class="o">+</span><span class="mi">2</span><span class="n">k2</span><span class="o">+</span><span class="mi">2</span><span class="n">k3</span><span class="o">+</span><span class="n">k4</span><span class="p">)</span><span class="o">/</span><span class="mi">6</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span>
+<span class="k">end</span>
+
+<span class="k">let</span><span class="w"> </span><span class="n">previous_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nothing</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.025</span><span class="p">)</span>
+<span class="w">        </span><span class="n">_</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rk4</span><span class="p">(</span><span class="n">decay</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">),</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">        </span><span class="n">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">-</span><span class="n">decay_exact</span><span class="p">(</span><span class="mf">1.0</span><span class="p">))</span>
+<span class="w">        </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isnothing</span><span class="p">(</span><span class="n">previous_error</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;---&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">string</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">log2</span><span class="p">(</span><span class="n">previous_error</span><span class="o">/</span><span class="n">error</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;h=</span><span class="si">$h</span><span class="s">: RK4の誤差=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">error</span><span class="p">,</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="s">, 観測次数=</span><span class="si">$order</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">previous_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">error</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>h=0.2: RK4の誤差=8.0731e-5, 観測次数=---
+h=0.1: RK4の誤差=4.2652e-6, 観測次数=4.242
+h=0.05: RK4の誤差=2.4519e-7, 観測次数=4.121
+h=0.025: RK4の誤差=1.4698e-8, 観測次数=4.06
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2><span class="section-number">9.7. </span>精度と仕事量を一緒に見る<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>解法</p></th>
+<th class="head text-right"><p><span class="math notranslate nohighlight">\(f\)</span> の評価回数/ステップ</p></th>
+<th class="head text-right"><p>大域誤差</p></th>
+<th class="head"><p>特徴</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>前進Euler法</p></td>
+<td class="text-right"><p>1</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(O(h)\)</span></p></td>
+<td><p>最も単純で、考え方の基準になる</p></td>
+</tr>
+<tr class="row-odd"><td><p>Heun法</p></td>
+<td class="text-right"><p>2</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(O(h^2)\)</span></p></td>
+<td><p>予測値を使って傾きを補正する</p></td>
+</tr>
+<tr class="row-even"><td><p>古典的RK4</p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p><span class="math notranslate nohighlight">\(O(h^4)\)</span></p></td>
+<td><p>滑らかな問題で高精度を得やすい</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>十分小さな <span class="math notranslate nohighlight">\(h\)</span> で理論次数が現れる範囲では、高次法は誤差を速く減らせるが、1ステップが高価である。また関数が滑らかでなければ、理論どおりの高次精度が現れないこともある。所要精度までの総関数評価回数、メモリ、安定性を含めて比較する。</p>
+<p>実装の正しさを調べるときは、最初から複雑なモデルを使わない。厳密解の分かる <span class="math notranslate nohighlight">\(u'=\lambda u\)</span> で観測次数を確認し、その後に目的の問題へ進む。この段階的検証は偏微分方程式のソルバーにも引き継がれる。</p>
+</section>
+<section id="id6">
+<h2><span class="section-number">9.8. </span>絶対安定性：減衰する解を数値的にも減衰させる<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>第4章の安定性は計算手順による誤差の増幅を考えた。ここではさらに、時間刻みを固定して何度も更新した際の増幅を調べる。この<strong>絶対安定性</strong>は、浮動小数点演算の後退安定性とは異なる判定である。標準的なテスト方程式</p>
+<div class="math notranslate nohighlight">
+\[
+u'=\lambda u,\qquad \operatorname{Re}\lambda&lt;0
+\]</div>
+<p>の厳密解は減衰する。前進Euler法を適用すると</p>
+<div class="math notranslate nohighlight">
+\[
+u_{n+1}=(1+h\lambda)u_n
+\]</div>
+<p>なので、1ステップの増幅率は <span class="math notranslate nohighlight">\(R(z)=1+z\)</span>、<span class="math notranslate nohighlight">\(z=h\lambda\)</span> である。数値解も減衰するための条件は</p>
+<div class="math notranslate nohighlight">
+\[
+|1+h\lambda|&lt;1
+\]</div>
+<p>である。<span class="math notranslate nohighlight">\(\lambda&lt;0\)</span> が実数なら <span class="math notranslate nohighlight">\(0&lt;h&lt;-2/\lambda\)</span> となる。実数 <span class="math notranslate nohighlight">\(\lambda&lt;0\)</span> で上限を超えると、真の解は減衰するのに数値解は振動しながら増大する。境界 <span class="math notranslate nohighlight">\(h=-2/\lambda\)</span> では符号が交互に変わり、大きさは減らない。</p>
+<p><strong>安定であることは高精度であることを意味しない。</strong> 安定領域内でも <span class="math notranslate nohighlight">\(h\)</span> が大きければ位相や振幅の誤差は大きい。また高次法にも、それぞれ異なる安定領域がある。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">λ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">20.0</span>
+<span class="k">for</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="w"> </span><span class="mf">0.09</span><span class="p">,</span><span class="w"> </span><span class="mf">0.11</span><span class="p">)</span>
+<span class="w">    </span><span class="n">amplification</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">λ</span>
+<span class="w">    </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">amplification</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="mi">20</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;h=</span><span class="si">$h</span><span class="s">: 増幅率=</span><span class="si">$amplification</span><span class="s">, u_20=</span><span class="si">$</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="k">end</span><span class="p">])</span><span class="s">, &quot;</span><span class="w"> </span><span class="o">*</span>
+<span class="w">            </span><span class="s">&quot;安定条件=</span><span class="si">$</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="n">amplification</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>h=0.05: 増幅率=0.0, u_20=0.0, 安定条件=true
+h=0.09: 増幅率=-0.7999999999999998, u_20=0.011529215046068419, 安定条件=true
+h=0.11: 増幅率=-1.2000000000000002, u_20=38.337599924474866, 安定条件=false
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="n">λ_stability</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">20.0</span>
+<span class="n">u0_stability</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="n">T_stability</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.66</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">euler_test_solution</span><span class="p">(</span><span class="n">λ</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nsteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">floor</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="o">/</span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">nsteps</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">h</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">λ</span><span class="p">)</span><span class="o">.^</span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">nsteps</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">t_stable</span><span class="p">,</span><span class="w"> </span><span class="n">u_stable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">euler_test_solution</span><span class="p">(</span><span class="n">λ_stability</span><span class="p">,</span><span class="w"> </span><span class="n">u0_stability</span><span class="p">,</span><span class="w"> </span><span class="n">T_stability</span><span class="p">,</span><span class="w"> </span><span class="mf">0.09</span><span class="p">)</span>
+<span class="n">t_unstable</span><span class="p">,</span><span class="w"> </span><span class="n">u_unstable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">euler_test_solution</span><span class="p">(</span><span class="n">λ_stability</span><span class="p">,</span><span class="w"> </span><span class="n">u0_stability</span><span class="p">,</span><span class="w"> </span><span class="n">T_stability</span><span class="p">,</span><span class="w"> </span><span class="mf">0.11</span><span class="p">)</span>
+<span class="n">t_exact_ode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">T_stability</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">fig_ode_stability</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1050</span><span class="p">,</span><span class="w"> </span><span class="mi">430</span><span class="p">))</span>
+<span class="n">ax_solution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_ode_stability</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;time t&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;u(t)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Stable and unstable Euler steps&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_solution</span><span class="p">,</span><span class="w"> </span><span class="n">t_exact_ode</span><span class="p">,</span><span class="w"> </span><span class="n">exp</span><span class="o">.</span><span class="p">(</span><span class="n">λ_stability</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">t_exact_ode</span><span class="p">);</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;exact&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_solution</span><span class="p">,</span><span class="w"> </span><span class="n">t_stable</span><span class="p">,</span><span class="w"> </span><span class="n">u_stable</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;hλ = -1.8&quot;</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_solution</span><span class="p">,</span><span class="w"> </span><span class="n">t_stable</span><span class="p">,</span><span class="w"> </span><span class="n">u_stable</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_solution</span><span class="p">,</span><span class="w"> </span><span class="n">t_unstable</span><span class="p">,</span><span class="w"> </span><span class="n">u_unstable</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;hλ = -2.2&quot;</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_solution</span><span class="p">,</span><span class="w"> </span><span class="n">t_unstable</span><span class="p">,</span><span class="w"> </span><span class="n">u_unstable</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax_solution</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:lt</span><span class="p">)</span>
+
+<span class="n">ax_region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_ode_stability</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Re(hλ)&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Im(hλ)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Explicit Euler stability region&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">aspect</span><span class="o">=</span><span class="n">DataAspect</span><span class="p">())</span>
+<span class="n">x_region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+<span class="n">y_region</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqrt</span><span class="o">.</span><span class="p">(</span><span class="n">max</span><span class="o">.</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="p">(</span><span class="n">x_region</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">.^</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">band!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="n">x_region</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">y_region</span><span class="p">,</span><span class="w"> </span><span class="n">y_region</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="mf">0.18</span><span class="p">))</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="n">x_region</span><span class="p">,</span><span class="w"> </span><span class="n">y_region</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="n">x_region</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">y_region</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">1.8</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">2.2</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">xlims!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.6</span><span class="p">)</span>
+<span class="n">ylims!</span><span class="p">(</span><span class="n">ax_region</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.4</span><span class="p">,</span><span class="w"> </span><span class="mf">1.4</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;ode_euler_stability.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_ode_stability</span><span class="p">)</span>
+<span class="n">fig_ode_stability</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-ode-euler-stability">
+<a class="reference internal image-reference" href="../_images/ode_euler_stability.svg"><img alt="Euler法の安定な時間刻みと不安定な時間刻みおよび絶対安定領域" src="../_images/ode_euler_stability.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 9.2 </span><span class="caption-text">左では解析解が減衰するにもかかわらず、<span class="math notranslate nohighlight">\(h\lambda=-2.2\)</span> の数値解が振動しながら増幅する。本文と同じ <span class="math notranslate nohighlight">\(\lambda=-20\)</span> を用い、安定側の <span class="math notranslate nohighlight">\(h=0.09\)</span> でも符号の交代が起こる。右の円の内部は <span class="math notranslate nohighlight">\(|1+h\lambda|&lt;1\)</span> を満たして減衰し、円周では大きさが一定になる。</span><a class="headerlink" href="#fig-ode-euler-stability" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id7">
+<h2><span class="section-number">9.9. </span>数値解の形をモデルの性質と照合する<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>厳密解がなくても、モデルから分かる性質を検証に使える。たとえばロジスティック方程式</p>
+<div class="math notranslate nohighlight">
+\[
+u'=r u\left(1-\frac{u}{K}\right),\qquad r,K&gt;0
+\]</div>
+<p>は <span class="math notranslate nohighlight">\(u=0,K\)</span> を平衡点に持つ。<span class="math notranslate nohighlight">\(0&lt;u_0&lt;K\)</span> なら厳密解は正のまま単調に増え、<span class="math notranslate nohighlight">\(K\)</span> に近づく。数値解が負になる、<span class="math notranslate nohighlight">\(K\)</span> の周りで大きく振動する、遠ざかる、といった挙動は刻み幅が大きすぎる兆候である。</p>
+<p>保存系では、不変量も有力な検証量になる。調和振動子</p>
+<div class="math notranslate nohighlight">
+\[
+q'=p,\qquad p'=-q
+\]</div>
+<p>をまとめて <span class="math notranslate nohighlight">\(u=(q,p)^T\)</span> と置けば、右辺もベクトル <span class="math notranslate nohighlight">\((p,-q)^T\)</span> になる。状態が一つの数から配列へ変わるだけで、同じ時間更新を使える。このモデルではエネルギー <span class="math notranslate nohighlight">\(E=(q^2+p^2)/2\)</span> が一定である。各成分のグラフが自然に見えても、長時間でエネルギーが系統的に増減する場合がある。状態だけでなく、モデルが保存または散逸すると予想する量も記録する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">rk4_system</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">tspan</span><span class="p">,</span><span class="w"> </span><span class="n">u0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tspan</span>
+<span class="w">    </span><span class="n">T</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">t0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;T &gt; t0かつh &gt; 0が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nsteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ceil</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">h</span><span class="p">)</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="n">t0</span><span class="p">)</span><span class="o">/</span><span class="n">nsteps</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="n">range</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Vector</span><span class="p">{</span><span class="kt">Vector</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">nsteps</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">u0</span><span class="p">))</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">k1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">],</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
+<span class="w">        </span><span class="n">k2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">k3</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k2</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="w">        </span><span class="n">k4</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">k3</span><span class="p">)</span>
+<span class="w">        </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">u</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="p">(</span><span class="n">k1</span><span class="o">+</span><span class="mi">2</span><span class="n">k2</span><span class="o">+</span><span class="mi">2</span><span class="n">k3</span><span class="o">+</span><span class="n">k4</span><span class="p">)</span><span class="o">/</span><span class="mi">6</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span>
+<span class="k">end</span>
+
+<span class="n">oscillator</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="o">-</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+<span class="n">tosc</span><span class="p">,</span><span class="w"> </span><span class="n">uosc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rk4_system</span><span class="p">(</span><span class="n">oscillator</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="nb">π</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">],</span><span class="w"> </span><span class="mf">0.05</span><span class="p">)</span>
+<span class="n">energies</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[(</span><span class="n">u</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">u</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">uosc</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;初期エネルギー = </span><span class="si">$</span><span class="p">(</span><span class="n">energies</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;最大エネルギー誤差 = </span><span class="si">$</span><span class="p">(</span><span class="n">maximum</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">energies</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">energies</span><span class="p">[</span><span class="mi">1</span><span class="p">])))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;10周期後の状態 = </span><span class="si">$</span><span class="p">(</span><span class="n">uosc</span><span class="p">[</span><span class="k">end</span><span class="p">])</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>初期エネルギー = 0.5
+最大エネルギー誤差 = 1.3611456922690834e-7
+10周期後の状態 = [0.9999998638800888, 3.2657976855310356e-6]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id8">
+<h2><span class="section-number">9.10. </span>応用例：新製品の普及を予測する<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>マーケティングでよく使われる<strong>Bassモデル</strong>は、新製品を採用した人の割合 <span class="math notranslate nohighlight">\(F(t)\)</span>（<span class="math notranslate nohighlight">\(0\le F\le1\)</span>）が</p>
+<div class="math notranslate nohighlight">
+\[
+F'(t)=\bigl(p+qF(t)\bigr)\bigl(1-F(t)\bigr),\qquad F(0)=0
+\]</div>
+<p>に従うと仮定する。<span class="math notranslate nohighlight">\(1-F\)</span> はまだ採用していない人の割合である。そのうち、広告などの外部の情報で採用する人の割合が <span class="math notranslate nohighlight">\(p\)</span>（革新者係数）、すでに採用した人からの口コミで採用する人の割合が <span class="math notranslate nohighlight">\(qF\)</span>（模倣者係数）に比例する。<span class="math notranslate nohighlight">\(p\)</span> だけなら第1章のような単純な増え方だが、<span class="math notranslate nohighlight">\(qF\)</span> の項があるため、採用者が増えるほど普及が加速し、やがて未採用者が減って頭打ちになる。</p>
+<p>このモデルには解析解</p>
+<div class="math notranslate nohighlight">
+\[
+F(t)=\frac{1-e^{-(p+q)t}}{1+\frac{q}{p}e^{-(p+q)t}}
+\]</div>
+<p>があるので、数値解法の誤差を確かめられる。以下では、耐久消費財でよく報告される程度の値として <span class="math notranslate nohighlight">\(p=0.03\)</span>、<span class="math notranslate nohighlight">\(q=0.38\)</span>（時間の単位は年）を使う。年次の販売データに合わせて <span class="math notranslate nohighlight">\(h=1\)</span> 年で計算したくなるが、その刻みで十分だろうか。実行前に、Euler法の <span class="math notranslate nohighlight">\(h=1\)</span> の誤差がおよそどの程度になるか予想してみよう。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">p_bass</span><span class="p">,</span><span class="w"> </span><span class="n">q_bass</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.03</span><span class="p">,</span><span class="w"> </span><span class="mf">0.38</span><span class="w">          </span><span class="c"># 革新者係数（広告など）、模倣者係数（口コミ）</span>
+<span class="n">bass</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">p_bass</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">q_bass</span><span class="o">*</span><span class="n">F</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">F</span><span class="p">)</span>
+<span class="n">bass_exact</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">p_bass</span><span class="o">+</span><span class="n">q_bass</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">q_bass</span><span class="o">/</span><span class="n">p_bass</span><span class="p">)</span><span class="o">*</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">p_bass</span><span class="o">+</span><span class="n">q_bass</span><span class="p">)</span><span class="o">*</span><span class="n">t</span><span class="p">))</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="s">&quot;Euler&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">euler</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Heun&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">heun</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;RK4&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rk4</span><span class="p">))</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+<span class="w">        </span><span class="n">tb</span><span class="p">,</span><span class="w"> </span><span class="n">Fb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">method</span><span class="p">(</span><span class="n">bass</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">15.0</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">h</span><span class="p">)</span>
+<span class="w">        </span><span class="n">max_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">maximum</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">Fb</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">bass_exact</span><span class="o">.</span><span class="p">(</span><span class="n">tb</span><span class="p">)))</span>
+<span class="w">        </span><span class="n">println</span><span class="p">(</span><span class="n">rpad</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; h=</span><span class="si">$h</span><span class="s">: 最大誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">max_error</span><span class="p">,</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">                </span><span class="s">&quot;, 右辺の評価回数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;Euler&quot;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;Heun&quot;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">tb</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="k">end</span>
+
+<span class="c"># 普及の速さ（新規採用者の割合）が最大になる時刻</span>
+<span class="n">tb</span><span class="p">,</span><span class="w"> </span><span class="n">Fb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rk4</span><span class="p">(</span><span class="n">bass</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">15.0</span><span class="p">),</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01</span><span class="p">)</span>
+<span class="n">rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">bass</span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">F</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">tb</span><span class="p">,</span><span class="w"> </span><span class="n">Fb</span><span class="p">)]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;数値解から読んだピーク時刻 ≈ &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">tb</span><span class="p">[</span><span class="n">argmax</span><span class="p">(</span><span class="n">rates</span><span class="p">)],</span><span class="w"> </span><span class="s">&quot; 年&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;理論値 log(q/p)/(p+q) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">log</span><span class="p">(</span><span class="n">q_bass</span><span class="o">/</span><span class="n">p_bass</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">p_bass</span><span class="o">+</span><span class="n">q_bass</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span><span class="w"> </span><span class="s">&quot; 年&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Euler  h=1.0: 最大誤差 = 0.0714, 右辺の評価回数 = 15
+Euler  h=0.5: 最大誤差 = 0.036, 右辺の評価回数 = 30
+Heun   h=1.0: 最大誤差 = 0.00818, 右辺の評価回数 = 30
+Heun   h=0.5: 最大誤差 = 0.00224, 右辺の評価回数 = 60
+RK4    h=1.0: 最大誤差 = 4.22e-5, 右辺の評価回数 = 60
+RK4    h=0.5: 最大誤差 = 2.92e-6, 右辺の評価回数 = 120
+数値解から読んだピーク時刻 ≈ 6.19 年
+理論値 log(q/p)/(p+q) = 6.193 年
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\(h=1\)</span> 年のEuler法では、採用割合に最大で約0.07（7ポイント）の誤差が出る。市場規模が100万世帯なら約7万世帯分のずれであり、需要予測としては無視できない。一方、RK4は同じ <span class="math notranslate nohighlight">\(h=1\)</span> でも誤差が <span class="math notranslate nohighlight">\(10^{-4}\)</span> 以下である。右辺の評価回数あたりで比べても、RK4（60回で約 <span class="math notranslate nohighlight">\(4\times10^{-5}\)</span>）は、Euler法を細かくする（30回で約0.036）より効率がよい。</p>
+<p>普及の速さ <span class="math notranslate nohighlight">\(F'(t)\)</span> が最大になる時刻（販売のピーク）は、解析解から <span class="math notranslate nohighlight">\(t^*=\log(q/p)/(p+q)\approx6.19\)</span> 年と求まり、細かい刻みの数値解から読んだ値と一致する。</p>
+<p>ただし、ここで確かめたのは<strong>モデルの方程式に対する</strong>数値誤差である。実際の販売データに対しては、<span class="math notranslate nohighlight">\(p,q\)</span> をデータから推定する誤差（第6章の最小二乗法や第7章の非線形方程式の知識が使える）や、そもそもモデルの仮定が成り立つか（競合製品、価格の変化など）という<strong>モデル誤差</strong>のほうが大きいことが多い。第1章で区別した誤差の種類を、応用問題でも意識しよう。</p>
+</section>
+<section id="clubsuit-stiff">
+<h2><span class="section-number">9.11. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 硬い（stiff）問題と陰的解法<a class="headerlink" href="#clubsuit-stiff" title="Link to this heading">#</a></h2>
+<p>例えばゆっくり変化する温度を追いたいのに、モデルにはすぐ消える非常に速い成分も含まれているとしよう。解の中に非常に速く減衰する成分とゆっくり変化する成分が共存すると、前進Euler法などの陽解法は、精度上必要な値よりはるかに小さな <span class="math notranslate nohighlight">\(h\)</span> を安定性のためだけに要求される。このような問題を<strong>硬い問題（stiff問題）</strong> という。</p>
+<p>後退Euler法は</p>
+<div class="math notranslate nohighlight">
+\[
+u_{n+1}=u_n+h f(t_{n+1},u_{n+1})
+\]</div>
+<p>と、未知の次ステップの右辺を使う<strong>陰的解法</strong>である。テスト方程式では</p>
+<div class="math notranslate nohighlight">
+\[
+u_{n+1}=\frac{1}{1-h\lambda}u_n
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(\operatorname{Re}\lambda&lt;0\)</span> なら任意の <span class="math notranslate nohighlight">\(h&gt;0\)</span> に対して増幅率の絶対値が1未満であり、後退Euler法はA安定である。</p>
+<p>代わりに、一般の非線形 <span class="math notranslate nohighlight">\(f\)</span> では各ステップで</p>
+<div class="math notranslate nohighlight">
+\[
+G(v)=v-u_n-hf(t_{n+1},v)=0
+\]</div>
+<p>を解かなければならない。ここで第7章のNewton法が必要になる。大規模な連立ODEではJacobianを含む線形方程式が主な計算コストとなる。安定性の向上は、1ステップ当たりの仕事量との交換条件で得られる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">λstiff</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mf">20.0</span>
+<span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.2</span>
+<span class="n">nsteps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">forward_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">h</span><span class="o">*</span><span class="n">λstiff</span><span class="p">)</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">nsteps</span><span class="p">)</span>
+<span class="n">backward_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">h</span><span class="o">*</span><span class="n">λstiff</span><span class="p">))</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">nsteps</span><span class="p">)</span>
+<span class="n">exact_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">exp</span><span class="o">.</span><span class="p">(</span><span class="n">λstiff</span><span class="o">*</span><span class="n">h</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">nsteps</span><span class="p">))</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;前進Euler法 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">forward_values</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;後退Euler法 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">backward_values</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;厳密解       = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exact_values</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;後退Euler法は安定だが、このhでは精度が高いわけではない&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>前進Euler法 = [1.0, -3.0, 9.0, -27.0, 81.0, -243.0]
+後退Euler法 = [1.0, 0.2, 0.04000000000000001, 0.008000000000000002, 0.0016000000000000003, 0.0003200000000000001]
+厳密解       = [1.0, 0.01831563888873418, 0.00033546262790251185, 6.14421235332821e-6, 1.1253517471925912e-7, 2.061153622438558e-9]
+後退Euler法は安定だが、このhでは精度が高いわけではない
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">9.12. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 局所誤差推定と刻み幅制御<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>一定刻み幅では、解が急変する区間に合わせて全区間を細かくすると無駄が多い。実用的なソルバーは、次数の異なる二つの近似、または1ステップと半分の2ステップの差から局所誤差を推定する。</p>
+<p><span class="math notranslate nohighlight">\(p\)</span> 次法の局所誤差推定値を <code class="docutils literal notranslate"><span class="pre">err</span></code>、利用者が指定する許容値を <code class="docutils literal notranslate"><span class="pre">tol</span></code> とすると、概念的には</p>
+<div class="math notranslate nohighlight">
+\[
+h_{\mathrm{new}}=
+\text{safety}\times h
+\left(\frac{\mathrm{tol}}{\mathrm{err}}\right)^{1/(p+1)}
+\]</div>
+<p>のように次の刻み幅を決める。<code class="docutils literal notranslate"><span class="pre">err</span> <span class="pre">&gt;</span> <span class="pre">tol</span></code> ならステップを棄却して小さな <span class="math notranslate nohighlight">\(h\)</span> でやり直し、十分小さければステップを採用する。実装では絶対許容誤差と相対許容誤差を</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{tol}=\mathrm{atol}+\mathrm{rtol}|u|
+\]</div>
+<p>のように組み合わせ、成分ごとのスケール差にも対応する。</p>
+<p>許容誤差は大域誤差そのものの保証ではない。また不連続点、途中で条件が切り替わる出来事（イベント）、硬さ（stiffness）がある場合は、誤差制御だけでなく問題に適したソルバーの選択が必要である。</p>
+</section>
+<section id="id9">
+<h2><span class="section-number">9.13. </span>まとめ<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>Euler法は現在の傾き、Heun法は予測を使った二つの傾き、RK4は四つの傾きを利用する。滑らかな問題での大域精度は、それぞれ1次・2次・4次である。1回の誤差と、一定時刻まで積み重なった誤差を区別しよう。</p>
+<p>検証では、初期値・最終時刻をそろえ、刻みを半分にした結果を比べる。さらに、モデルが持つ正値性・単調性・保存量を確認する。安定な更新でも精度が不足することはあり、刻みの選択には両方の観点が必要である。</p>
+<p>掲載関数では最終時刻に合わせて刻み幅を調整するため、実際の刻みは戻り値の時刻配列から確認できる。</p>
+</div>
+<p>ここまでが講義の中心となる基本アルゴリズムである。次の<a class="reference internal" href="Chap_IterativeLinearSystems.html"><span class="std std-doc">第10章「連立一次方程式の反復法」</span></a>からは、大規模な連立一次方程式の解法、行列の固有方向・低次元表現・確率的な計算へ応用を広げる。</p>
+</section>
+<section id="id10">
+<h2><span class="section-number">9.14. </span>演習<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>予測と修正</strong>：<span class="math notranslate nohighlight">\(u'=-2u\)</span>、<span class="math notranslate nohighlight">\(u_0=1\)</span>、<span class="math notranslate nohighlight">\(h=0.1\)</span> で、Euler法とHeun法をそれぞれ1ステップ行え。Heun法が平均する二つの傾きは、どの状態で評価したものか。</p></li>
+<li><p><strong>誤差と仕事量</strong>：本文の表から、刻みを半分にしたときEuler法・Heun法・RK4の誤差が概ね何分の1になるか読め。同じ時間区間では、各方法の関数評価回数はそれぞれ何倍になるか。</p></li>
+<li><p><strong>減衰を確かめる</strong>：<span class="math notranslate nohighlight">\(u'=-20u\)</span> にEuler法を使う。<span class="math notranslate nohighlight">\(h=0.09\)</span> と <span class="math notranslate nohighlight">\(h=0.11\)</span> で増幅率 <span class="math notranslate nohighlight">\(1-20h\)</span> を求め、値の符号と大きさがどう変わるか説明せよ。大きさが減る場合にも、厳密解の正値性は保たれているか。</p></li>
+<li><p><strong>普及モデルの検証</strong>：Bassモデルで <span class="math notranslate nohighlight">\(q=0\)</span> とすると、方程式と解析解はどうなるか。<span class="math notranslate nohighlight">\(F'=p(1-F)\)</span> を第1章の減衰の式と比べ、数値解がどのような性質（単調性、上限1を超えないか）を満たすべきか述べよ。次に、<span class="math notranslate nohighlight">\(p=0.03\)</span> としてEuler法で <span class="math notranslate nohighlight">\(h=1,20,40\)</span>（最終時刻は120年）としたとき、その性質が保たれるか計算で確かめよ。結果を、第1章で求めた「非負で単調」となる <span class="math notranslate nohighlight">\(h\lambda\)</span> の範囲と結びつけて説明せよ。</p></li>
+<li><p><strong>探究：感染や口コミの広がり</strong>：人口を「未感染 <span class="math notranslate nohighlight">\(S\)</span>」「感染中 <span class="math notranslate nohighlight">\(I\)</span>」「回復 <span class="math notranslate nohighlight">\(R\)</span>」の割合に分けるSIRモデル <span class="math notranslate nohighlight">\(S'=-\beta SI\)</span>、<span class="math notranslate nohighlight">\(I'=\beta SI-\gamma I\)</span>、<span class="math notranslate nohighlight">\(R'=\gamma I\)</span> を、本文の <code class="docutils literal notranslate"><span class="pre">rk4_system</span></code> で解け（例えば <span class="math notranslate nohighlight">\(\beta=0.5\)</span>、<span class="math notranslate nohighlight">\(\gamma=0.1\)</span>、<span class="math notranslate nohighlight">\(S(0)=0.99\)</span>、<span class="math notranslate nohighlight">\(I(0)=0.01\)</span>、<span class="math notranslate nohighlight">\(R(0)=0\)</span>、時間の単位は日）。厳密解は分からないが、どのような量や性質を使えば数値解を検証できるか（ヒント：<span class="math notranslate nohighlight">\(S+I+R\)</span>、各変数の符号、刻みを半分にしたときの変化）を自分で三つ以上挙げ、実際に確かめよ。さらに、感染者のピークの時刻と高さが、刻み幅や <span class="math notranslate nohighlight">\(\beta,\gamma\)</span> にどれだけ敏感かを調べ、「この予測値はどの程度信頼できるか」を一段落で述べよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id11">
+<h2><span class="section-number">9.15. </span>参考文献と関連する節<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Driscoll and Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/ivp/overview.html">Initial-value problems for ODEs</a>.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_InterpolationDifferentiationIntegration.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">8. </span>補間・数値微分・数値積分</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_IterativeLinearSystems.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>連立一次方程式の反復法</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">9.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">9.2. 初期値が未来を定める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#euler">9.3. Euler法：現在の傾きで一歩進む</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">9.4. 局所誤差と大域誤差</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#heun">9.5. Heun法：区間の両端の傾きを使う</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runge-kutta">9.6. 4次Runge--Kutta法：区間内の傾きを組み合わせる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">9.7. 精度と仕事量を一緒に見る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">9.8. 絶対安定性：減衰する解を数値的にも減衰させる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">9.9. 数値解の形をモデルの性質と照合する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">9.10. 応用例：新製品の普及を予測する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-stiff">9.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 硬い（stiff）問題と陰的解法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">9.12. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 局所誤差推定と刻み幅制御</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">9.13. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">9.14. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">9.15. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

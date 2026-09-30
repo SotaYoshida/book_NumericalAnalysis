@@ -1,0 +1,1159 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>15. マルコフ連鎖モンテカルロ法 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_MCMC';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="16. 並列計算とGPU" href="Chap_ParallelComputation.html" />
+    <link rel="prev" title="14. 動的モード分解" href="Chap_DMD.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_MCMC.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>マルコフ連鎖モンテカルロ法</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">15.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">15.2. 分布に関する平均を、標本で近似する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">15.2.1. 正規化定数が分からなくてもよい</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metropolis-hastings">15.3. Metropolis--Hastings法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">15.4. 提案尺度、自己相関、有効標本数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">15.5. 山が二つある分布と初期値依存性</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">15.6. 結果の読み方：一つの診断だけで決めない</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#affine-invariant-mcmc-walker">15.7. Affine invariant MCMC：複数walkerで分布の形を捉える</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#walker">15.7.1. 勾配を使わず、ほかのwalkerを提案に利用する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stretch-move-2">15.7.2. Stretch move：2点を結ぶ方向に伸び縮みする</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#affine-invariant">15.7.3. 「Affine invariant」の意味</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">15.7.4. 二つの群に分けると並列化できる</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julia">15.7.5. Juliaで実装する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">15.7.6. 実験：丸い分布と細長い分布を同じ設定で探索する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#walkerchain">15.7.7. 「walkerが多い」と「独立なchainが多い」は異なる</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hmc">15.7.8. 実用上の選び方：HMCとの比較</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-hmc">15.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 勾配を使って遠くへ動く：HMC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">15.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 他の提案方法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">15.10. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">15.11. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">15.12. 参考文献</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_MCMC.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">15. </span>マルコフ連鎖モンテカルロ法<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>マルコフ連鎖モンテカルロ法（Markov chain Monte Carlo; MCMC）は、直接サンプリングしにくい確率分布から、依存性を持つ標本列を生成する方法である。目的は最大値を一つ求めることではなく、期待値、分散、信用区間など、分布全体に関する量を評価することにある。</p>
+<section id="id2">
+<h2><span class="section-number">15.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>正規化されていない目標密度からMCMCを構成できる理由を説明できる。</p></li>
+<li><p>候補を作り、受容または棄却する1ステップを説明できる。</p></li>
+<li><p>提案分布の尺度が受容率と自己相関に与える影響を説明できる。</p></li>
+<li><p>warmup、自己相関、有効標本数、複数chainによる診断の役割を説明できる。</p></li>
+<li><p>複数の初期値と標本平均の精度から、計算結果を点検できる。</p></li>
+<li><p>Affine invariant MCMCのstretch moveと、複数walkerを使う利点を説明できる。</p></li>
+<li><p>ensembleの並列更新と診断を、独立なchainの場合と区別できる。</p></li>
+</ul>
+</section>
+<section id="id3">
+<h2><span class="section-number">15.2. </span>分布に関する平均を、標本で近似する<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>第8章では積分を格子点の値の和で近似した。確率分布に関する期待値も</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbb{E}_\pi[f(X)]=\int f(x)\pi(x)\,dx
+\]</div>
+<p>という積分である。例えば <span class="math notranslate nohighlight">\(f(x)=x\)</span> なら平均、<span class="math notranslate nohighlight">\(f(x)=x^2\)</span> なら二乗の平均、区間内で1・外で0の関数ならその区間の確率になる。次元が大きい場合、各軸に格子を作ると点数が急増する。分布に従う標本を作って <span class="math notranslate nohighlight">\(N^{-1}\sum_{t=1}^N f(X_t)\)</span> で近似するのがMonte Carlo法の考え方である。</p>
+<p>単純な正規分布なら <code class="docutils literal notranslate"><span class="pre">randn</span></code> で独立な標本を直接作れる。一方、密度の形を計算できても直接標本を作る方法が分からない場合がある。そこで現在の位置から次の候補へ移る反復を使う。</p>
+<section id="id4">
+<h3><span class="section-number">15.2.1. </span>正規化定数が分からなくてもよい<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<p>目標密度が <span class="math notranslate nohighlight">\(\pi(x)=w(x)/Z\)</span> と書け、正規化定数 <span class="math notranslate nohighlight">\(Z=\int w(x)dx\)</span> は難しくても <span class="math notranslate nohighlight">\(w(x)\)</span> は評価できるとする。比なら <span class="math notranslate nohighlight">\(\pi(y)/\pi(x)=w(y)/w(x)\)</span> となり、<span class="math notranslate nohighlight">\(Z\)</span> は消える。ベイズ推論の事後密度 <span class="math notranslate nohighlight">\(p(\theta\mid D)\propto p(D\mid\theta)p(\theta)\)</span> はその代表例である。</p>
+<p>次の状態の分布が現在の状態だけで決まる確率的な列を<strong>マルコフ連鎖</strong>という。現在の状態が <span class="math notranslate nohighlight">\(\pi\)</span> に従うとき、1回更新した後も <span class="math notranslate nohighlight">\(\pi\)</span> に従うなら、<span class="math notranslate nohighlight">\(\pi\)</span> はその更新の<strong>不変分布</strong>である。MCMCでは、この性質を持ち、必要な領域を探索できる更新を作る。</p>
+<p>不変分布があるだけでは任意の初期値から十分探索できるとは限らない。適切な既約性・再帰性などの条件のもとで標本平均が期待値へ近づく。以下では、既知の標準正規分布を使って仕組みを確かめる。標本は一般に独立でないため、個数をそのまま独立標本数とは数えない。</p>
+</section>
+</section>
+<section id="metropolis-hastings">
+<h2><span class="section-number">15.3. </span>Metropolis--Hastings法<a class="headerlink" href="#metropolis-hastings" title="Link to this heading">#</a></h2>
+<p>現在値 <span class="math notranslate nohighlight">\(x\)</span> から提案分布 <span class="math notranslate nohighlight">\(q(y\mid x)\)</span> に従って候補 <span class="math notranslate nohighlight">\(y\)</span> を生成し、確率</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\alpha(x,y)=\min\left\{1,
+\frac{\pi(y)q(x\mid y)}{\pi(x)q(y\mid x)}\right\}
+\end{align}
+\]</div>
+<p>で移動する。棄却した場合は <span class="math notranslate nohighlight">\(X_{t+1}=X_t\)</span> とし、同じ値をchainへ記録する。この受容確率では、異なる2点間の確率の流れは</p>
+<div class="math notranslate nohighlight">
+\[
+\pi(x)q(y\mid x)\alpha(x,y)
+=\min\{\pi(x)q(y\mid x),\pi(y)q(x\mid y)\}
+\]</div>
+<p>となり、<span class="math notranslate nohighlight">\(x\)</span> と <span class="math notranslate nohighlight">\(y\)</span> を交換しても変わらない。この<strong>詳細釣り合い</strong>が、目標密度を不変に保つ理由である。棄却した状態を記録しないと、その位置に留まった時間を落としてしまい、一般に目標分布とは異なる列になる。</p>
+<p>数値計算ではunderflowを避けるため対数を使う。対称なrandom-walk提案</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+y=x+s\xi,\qquad \xi\sim N(0,I)
+\end{align}
+\]</div>
+<p>では <span class="math notranslate nohighlight">\(q(y\mid x)=q(x\mid y)\)</span> なので、対数受容率は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\log\alpha=\min\{0,\log\pi(y)-\log\pi(x)\}
+\end{align}
+\]</div>
+<p>となる。例えば <span class="math notranslate nohighlight">\(w(x)=e^{-x^2/2}\)</span> で現在値0、候補1なら、受容確率は <span class="math notranslate nohighlight">\(e^{-1/2}\approx0.607\)</span> である。一様乱数が0.4なら移動し、0.9なら現在値0をもう一度記録する。密度が低い方へも確率的に移るので、最頻値を一つ探す最適化とは異なる。</p>
+<figure class="align-default" id="fig-learning-mcmc-branch">
+<a class="reference internal image-reference" href="../_images/learning_mcmc_branch.svg"><img alt="現在値0、候補1、受容確率0.607の分岐。乱数0.4なら1を記録し、0.9なら現在値0をもう一度記録する。" src="../_images/learning_mcmc_branch.svg" style="width: 95%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 15.1 </span><span class="caption-text">分岐の両側で、必ず一つの状態を記録する。例えば次の反復も棄却なら、列は <span class="math notranslate nohighlight">\(0,0,0,\ldots\)</span> と同じ値が続く。この繰り返しも滞在時間を表す標本の一部である。</span><a class="headerlink" href="#fig-learning-mcmc-branch" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="p">,</span><span class="w"> </span><span class="n">Random</span><span class="p">,</span><span class="w"> </span><span class="n">Statistics</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">rwmh</span><span class="p">(</span><span class="n">logtarget</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">,</span><span class="w"> </span><span class="n">nsteps</span><span class="p">;</span><span class="w"> </span><span class="n">proposal_scale</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="o">=</span><span class="n">Random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">())</span>
+<span class="w">    </span><span class="n">nsteps</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;nstepsは正にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">proposal_scale</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;proposal_scaleは正にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">logp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logtarget</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="n">isfinite</span><span class="p">(</span><span class="n">logp</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;初期値で対数密度が有限ではありません&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">chain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">nsteps</span><span class="p">)</span>
+<span class="w">    </span><span class="n">accepted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">proposal_scale</span><span class="o">*</span><span class="n">randn</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="w">        </span><span class="n">logpy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logtarget</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="w">        </span><span class="n">isnan</span><span class="p">(</span><span class="n">logpy</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;対数密度がNaNです&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">logalpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">logpy</span><span class="o">-</span><span class="n">logp</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="n">rand</span><span class="p">(</span><span class="n">rng</span><span class="p">))</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">logalpha</span>
+<span class="w">            </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">logp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="n">logpy</span>
+<span class="w">            </span><span class="n">accepted</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">chain</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">t</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">chain</span><span class="p">,</span><span class="w"> </span><span class="n">accepted</span><span class="o">/</span><span class="n">nsteps</span>
+<span class="k">end</span>
+
+
+<span class="n">logtarget</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="o">/</span><span class="mi">2</span><span class="w">  </span><span class="c"># 標準正規分布。正規化定数は省略できる。</span>
+<span class="n">results</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Dict</span><span class="p">{</span><span class="kt">Float64</span><span class="p">,</span><span class="kt">Tuple</span><span class="p">{</span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">},</span><span class="kt">Float64</span><span class="p">}}()</span>
+<span class="k">for</span><span class="w"> </span><span class="n">scale</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">chain</span><span class="p">,</span><span class="w"> </span><span class="n">acceptance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rwmh</span><span class="p">(</span><span class="n">logtarget</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">],</span><span class="w"> </span><span class="mi">20_000</span><span class="p">;</span>
+<span class="w">        </span><span class="n">proposal_scale</span><span class="o">=</span><span class="n">scale</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="o">=</span><span class="n">MersenneTwister</span><span class="p">(</span><span class="mi">2026</span><span class="p">))</span>
+<span class="w">    </span><span class="n">results</span><span class="p">[</span><span class="n">scale</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">chain</span><span class="p">,</span><span class="w"> </span><span class="n">acceptance</span><span class="p">)</span>
+<span class="w">    </span><span class="n">kept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chain</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2001</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;提案尺度=</span><span class="si">$scale</span><span class="s">: 受容率=&quot;</span><span class="p">,</span><span class="n">round</span><span class="p">(</span><span class="n">acceptance</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">        </span><span class="s">&quot;, 平均=&quot;</span><span class="p">,</span><span class="n">round</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">kept</span><span class="p">),</span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span><span class="s">&quot;, 二乗の平均=&quot;</span><span class="p">,</span><span class="n">round</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">abs2</span><span class="p">,</span><span class="n">kept</span><span class="p">),</span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>提案尺度=0.1: 受容率=0.969, 平均=0.007, 二乗の平均=0.985
+提案尺度=0.8: 受容率=0.765, 平均=-0.002, 二乗の平均=0.955
+提案尺度=3.0: 受容率=0.378, 平均=-0.007, 二乗の平均=0.985
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2><span class="section-number">15.4. </span>提案尺度、自己相関、有効標本数<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>出力の平均は0、二乗の平均は1が比較の基準である。最初の2000点を除いているが、この長さに普遍的な保証はない。反復番号に対して状態を描いた<strong>トレース</strong>と、離れた時点同士の似方を測る<strong>自己相関</strong>も見る。</p>
+<p>random-walkの尺度 <span class="math notranslate nohighlight">\(s\)</span> が小さすぎると受容率は高くても移動距離が短く、chainは強く自己相関する。大きすぎると候補が低密度領域へ出やすく、棄却が増える。したがって、受容率だけで効率や収束を判断できない。</p>
+<p>平均と分散が時間によらない状態で、<span class="math notranslate nohighlight">\(k\)</span> ステップ離れた値同士の相関をlag-<span class="math notranslate nohighlight">\(k\)</span> 自己相関という。和が収束して中心極限定理を使える場合、その自己相関を <span class="math notranslate nohighlight">\(\rho_k\)</span> とすると、標本平均の分散は概略</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\operatorname{Var}(\bar X)\approx
+\frac{\sigma^2}{N}\left(1+2\sum_{k=1}^{\infty}\rho_k\right)
+\end{align}
+\]</div>
+<p>となる。括弧内を積分自己相関時間 <span class="math notranslate nohighlight">\(\tau\)</span> と呼び、</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+N_{\mathrm{eff}}\approx\frac{N}{\tau}
+\end{align}
+\]</div>
+<p>を有効標本数とみなす。有限標本から無限和を推定するには慎重な打切りが必要であり、ここで用いる打切り則は、正の自己相関が続く間だけ和を取る簡易法である。負の相関で効率が改善する場合を扱わず、実用的な診断の代用品ではない。ESSは推定する量 <span class="math notranslate nohighlight">\(f(X)\)</span> ごとに異なる。</p>
+<p>例えば標本が10000個でも <span class="math notranslate nohighlight">\(\tau=20\)</span> なら、平均に関するESSは約500となる。独立標本の場合より誤差が大きく、平均のMonte Carlo標準誤差は概ね <span class="math notranslate nohighlight">\(\sqrt{\widehat{\operatorname{Var}}(X)/N_{\mathrm{eff}}}\)</span> と見積もる。これは目標分布自体のばらつきと、平均を計算した際の不確かさを区別する量である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">autocorrelations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">maxlag</span><span class="p">)</span>
+<span class="w">    </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="n">denominator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">z</span><span class="p">)</span>
+<span class="w">    </span><span class="n">denominator</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;定数列の自己相関は計算できません&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="w">    </span><span class="mi">0</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">maxlag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;lagの範囲を確認してください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">dot</span><span class="p">(</span><span class="n">view</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">n</span><span class="o">-</span><span class="n">lag</span><span class="p">),</span><span class="n">view</span><span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="mi">1</span><span class="o">+</span><span class="n">lag</span><span class="o">:</span><span class="n">n</span><span class="p">))</span><span class="o">/</span><span class="n">denominator</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">lag</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">maxlag</span><span class="p">]</span>
+<span class="k">end</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">simple_ess</span><span class="p">(</span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="n">maxlag</span><span class="o">=</span><span class="n">min</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">ρ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">autocorrelations</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">maxlag</span><span class="p">)</span>
+<span class="w">    </span><span class="n">τ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">lag</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxlag</span>
+<span class="w">        </span><span class="n">ρ</span><span class="p">[</span><span class="n">lag</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">break</span>
+<span class="w">        </span><span class="n">τ</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">2</span><span class="n">ρ</span><span class="p">[</span><span class="n">lag</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">τ</span><span class="p">),</span><span class="n">ρ</span>
+<span class="k">end</span>
+
+<span class="k">for</span><span class="w"> </span><span class="n">scale</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">chain</span><span class="p">,</span><span class="w"> </span><span class="n">acceptance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">results</span><span class="p">[</span><span class="n">scale</span><span class="p">]</span>
+<span class="w">    </span><span class="n">x1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">chain</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2001</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+<span class="w">    </span><span class="n">ess</span><span class="p">,</span><span class="n">ρ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simple_ess</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;scale=</span><span class="si">$scale</span><span class="s">: 受容率=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">acceptance</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span><span class="s">, lag-1相関=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">ρ</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span><span class="s">, 簡易ESS=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">ess</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>scale=0.1: 受容率=0.969, lag-1相関=0.995, 簡易ESS=32.4
+scale=0.8: 受容率=0.765, lag-1相関=0.818, 簡易ESS=1821.7
+scale=3.0: 受容率=0.378, lag-1相関=0.623, 簡易ESS=4358.4
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 掲載図の再作成用</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+<span class="k">let</span>
+<span class="w">    </span><span class="n">fig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1050</span><span class="p">,</span><span class="mi">450</span><span class="p">),</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="w">    </span><span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;iteration after warmup&quot;</span><span class="p">,</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;state&quot;</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Trace of the same sampled chains&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">scale</span><span class="p">,</span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">zip</span><span class="p">((</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">),(</span><span class="ss">:orange</span><span class="p">,</span><span class="ss">:dodgerblue</span><span class="p">))</span>
+<span class="w">        </span><span class="n">chain</span><span class="p">,</span><span class="w"> </span><span class="n">acceptance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">results</span><span class="p">[</span><span class="n">scale</span><span class="p">]</span>
+<span class="w">        </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="mi">1000</span><span class="p">,</span><span class="n">chain</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2001</span><span class="o">:</span><span class="mi">3000</span><span class="p">];</span><span class="n">color</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+<span class="w">            </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;scale=</span><span class="si">$scale</span><span class="s">, accept=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">acceptance</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">axislegend</span><span class="p">(</span><span class="n">ax</span><span class="p">;</span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="w">    </span><span class="n">ax2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">];</span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;lag&quot;</span><span class="p">,</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;autocorrelation&quot;</span><span class="p">,</span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Dependence between samples&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">scale</span><span class="p">,</span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">zip</span><span class="p">((</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.8</span><span class="p">,</span><span class="mf">3.0</span><span class="p">),(</span><span class="ss">:orange</span><span class="p">,</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="ss">:tomato</span><span class="p">))</span>
+<span class="w">        </span><span class="n">correlation</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">autocorrelations</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">scale</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">,</span><span class="mi">2001</span><span class="o">:</span><span class="k">end</span><span class="p">],</span><span class="mi">60</span><span class="p">)</span>
+<span class="w">        </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax2</span><span class="p">,</span><span class="mi">0</span><span class="o">:</span><span class="mi">60</span><span class="p">,</span><span class="n">correlation</span><span class="p">;</span><span class="n">color</span><span class="p">,</span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span><span class="n">label</span><span class="o">=</span><span class="s">&quot;scale=</span><span class="si">$scale</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">hlines!</span><span class="p">(</span><span class="n">ax2</span><span class="p">,[</span><span class="mf">0.0</span><span class="p">];</span><span class="n">color</span><span class="o">=</span><span class="ss">:gray60</span><span class="p">)</span>
+<span class="w">    </span><span class="n">axislegend</span><span class="p">(</span><span class="n">ax2</span><span class="p">;</span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="w">    </span><span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="s">&quot;mcmc_proposal_autocorrelation.svg&quot;</span><span class="p">),</span><span class="n">fig</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-mcmc-proposal-autocorrelation">
+<a class="reference internal image-reference" href="../_images/mcmc_proposal_autocorrelation.svg"><img alt="random-walk Metropolis法の提案尺度によるtraceと自己相関の違い" src="../_images/mcmc_proposal_autocorrelation.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 15.2 </span><span class="caption-text">本文の標準正規分布に対する同じ標本列を表示している。小さすぎる提案は高い受容率を持っても少しずつしか動かず、自己相関が長く残る。大きすぎる提案も棄却による停滞を増やすため、受容率だけでなくtraceと自己相関を併せて調べる。</span><a class="headerlink" href="#fig-mcmc-proposal-autocorrelation" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>初期値の影響を調べたり提案を調整したりする準備区間を<strong>ウォームアップ</strong>と呼ぶ。本文の最初の2000点も準備区間として除いた。提案分布の調整はウォームアップ中に行い、その後は固定して標本を集めるのが基本である。標本収集中も無制限に適応を続けると、不変分布を保つための条件を損なう場合がある。実用ライブラリでは、理論的条件を満たす適応法が実装されている。</p>
+</section>
+<section id="id6">
+<h2><span class="section-number">15.5. </span>山が二つある分布と初期値依存性<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>離れたmodeを持つ分布では、各mode内でよく動いていてもmode間を移動できないことがある。次の1次元混合分布は <span class="math notranslate nohighlight">\(-5\)</span> と <span class="math notranslate nohighlight">\(5\)</span> の近くに山（モード）を持ち、各成分の標準偏差は0.8である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">logaddexp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">max</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">m</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="nb">Inf</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">-</span><span class="nb">Inf</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="n">exp</span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="n">m</span><span class="p">)</span><span class="o">+</span><span class="n">exp</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">m</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">log_bimodal</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="n">component_scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.8</span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">component_scale</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="n">component_scale</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>
+<span class="w">    </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">component_scale</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="o">*</span><span class="p">((</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="mi">5</span><span class="p">)</span><span class="o">/</span><span class="n">component_scale</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">logaddexp</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">left_chain</span><span class="p">,</span><span class="n">left_acceptance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rwmh</span><span class="p">(</span><span class="n">log_bimodal</span><span class="p">,[</span><span class="o">-</span><span class="mf">5.0</span><span class="p">],</span><span class="mi">30_000</span><span class="p">;</span>
+<span class="w">                                   </span><span class="n">proposal_scale</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+<span class="w">                                   </span><span class="n">rng</span><span class="o">=</span><span class="n">MersenneTwister</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">right_chain</span><span class="p">,</span><span class="n">right_acceptance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rwmh</span><span class="p">(</span><span class="n">log_bimodal</span><span class="p">,[</span><span class="mf">5.0</span><span class="p">],</span><span class="mi">30_000</span><span class="p">;</span>
+<span class="w">                                     </span><span class="n">proposal_scale</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+<span class="w">                                     </span><span class="n">rng</span><span class="o">=</span><span class="n">MersenneTwister</span><span class="p">(</span><span class="mi">20</span><span class="p">))</span>
+<span class="n">left_kept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">left_chain</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5001</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+<span class="n">right_kept</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">right_chain</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">5001</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;左mode開始: 平均=</span><span class="si">$</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">left_kept</span><span class="p">))</span><span class="s">, x&gt;0の割合=</span><span class="si">$</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">left_kept</span><span class="o">.&gt;</span><span class="mi">0</span><span class="p">))</span><span class="s">, 受容率=</span><span class="si">$left_acceptance</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;右mode開始: 平均=</span><span class="si">$</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">right_kept</span><span class="p">))</span><span class="s">, x&gt;0の割合=</span><span class="si">$</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">right_kept</span><span class="o">.&gt;</span><span class="mi">0</span><span class="p">))</span><span class="s">, 受容率=</span><span class="si">$right_acceptance</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>左mode開始: 平均=-4.984943053051939, x&gt;0の割合=0.0, 受容率=0.7062333333333334
+右mode開始: 平均=4.995548682036515, x&gt;0の割合=1.0, 受容率=0.7010333333333333
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id7">
+<h2><span class="section-number">15.6. </span>結果の読み方：一つの診断だけで決めない<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>二つの山の例では、全体の平均は対称性から0である。しかし、一つの山に留まる列の平均は約 <span class="math notranslate nohighlight">\(-5\)</span> または5となる。受容率が高くても、分布全体を十分に見ていない。</p>
+<p>異なる初期値から複数の列を動かし、トレース、推定平均、自己相関を比べる。実用的には、列内と列間のばらつきを比べる <span class="math notranslate nohighlight">\(\widehat R\)</span>、推定する量ごとのESS、Monte Carlo標準誤差を併用する。<span class="math notranslate nohighlight">\(\widehat R\)</span> が1に近いことも、すべての領域を探索したという証明ではない。最初の一定個数を捨てるだけでも収束は保証されない。</p>
+<p>標本数を増やすと、適切に混合している場合の標準誤差は概ね <span class="math notranslate nohighlight">\(1/\sqrt{N_{\mathrm{eff}}}\)</span> で減る。半分の誤差にしたければ、約4倍の有効標本が必要である。これは第8章の格子細分化による誤差とは異なる減り方である。</p>
+</section>
+<section id="affine-invariant-mcmc-walker">
+<h2><span class="section-number">15.7. </span>Affine invariant MCMC：複数walkerで分布の形を捉える<a class="headerlink" href="#affine-invariant-mcmc-walker" title="Link to this heading">#</a></h2>
+<section id="walker">
+<h3><span class="section-number">15.7.1. </span>勾配を使わず、ほかのwalkerを提案に利用する<a class="headerlink" href="#walker" title="Link to this heading">#</a></h3>
+<p>パラメータごとの尺度が大きく異なったり、強い相関があったりすると、等方的なrandom-walk提案は調整が難しくなる。細長い分布の短い方向に歩幅を合わせると長い方向の探索が遅くなり、長い方向に合わせると分布の外へ出て棄却されやすい。</p>
+<p><strong>Affine invariant ensemble MCMC</strong>は、複数の探索点（<strong>walker</strong>）を持ち、その相対位置を使って次の候補を作る方法である。walkerの集まりを<strong>ensemble</strong>という。分布に沿ってwalkerが広がっていれば、その位置の差を使った提案も分布の向きと尺度を反映する。共分散行列や勾配を明示的に計算せずに、こうした形の違いへ対応できる。</p>
+<p>特に、尤度を評価するたびにシミュレーションを実行する問題など、<strong>密度は評価できるが勾配を用意するのが難しい場合</strong>に使いやすい。後述する分割更新では複数の候補の密度評価を同時に行えるため、評価が重い問題で並列計算を活用しやすいことも利点である。</p>
+<p>以下では、Goodman–Weareの <strong>stretch move</strong> を扱う。Pythonの <code class="docutils literal notranslate"><span class="pre">emcee</span></code> でも代表的な更新法として使われている。方法の原典は <a class="reference external" href="https://doi.org/10.2140/camcos.2010.5.65">Goodman and Weare (2010)</a>、並列化を含む実装は <a class="reference external" href="https://arxiv.org/abs/1202.3665">Foreman-Mackey et al. (2013)</a> を参照されたい。</p>
+</section>
+<section id="stretch-move-2">
+<h3><span class="section-number">15.7.2. </span>Stretch move：2点を結ぶ方向に伸び縮みする<a class="headerlink" href="#stretch-move-2" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(d\)</span> 次元の探索点を <span class="math notranslate nohighlight">\(X_1,\ldots,X_K\)</span> とする。現在のwalker <span class="math notranslate nohighlight">\(X_i\)</span> を動かすために、別のwalker <span class="math notranslate nohighlight">\(X_j\)</span> を選び、</p>
+<div class="math notranslate nohighlight">
+\[
+Y=X_j+z(X_i-X_j)
+\]</div>
+<p>を候補にする。<span class="math notranslate nohighlight">\(z=1\)</span> なら現在位置、<span class="math notranslate nohighlight">\(z&lt;1\)</span> なら相手へ近づき、<span class="math notranslate nohighlight">\(z&gt;1\)</span> なら相手から遠ざかる方向へ動く。例えば <span class="math notranslate nohighlight">\(X_j=(0,0)\)</span>、<span class="math notranslate nohighlight">\(X_i=(2,1)\)</span>、<span class="math notranslate nohighlight">\(z=1.5\)</span> なら <span class="math notranslate nohighlight">\(Y=(3,1.5)\)</span> である。一度の提案はこの直線上だが、相手を選び直すことで異なる方向へ動ける。</p>
+<p>伸縮率は</p>
+<div class="math notranslate nohighlight">
+\[
+g(z)=\frac{z^{-1/2}}{2(\sqrt a-1/\sqrt a)},
+\qquad \frac1a\leq z\leq a,\quad a&gt;1
+\]</div>
+<p>から引く。この分布は <span class="math notranslate nohighlight">\(g(1/z)=zg(z)\)</span> を満たす。実装では <span class="math notranslate nohighlight">\(u\sim U(0,1)\)</span> として <span class="math notranslate nohighlight">\(z=\{1+(a-1)u\}^2/a\)</span> とすればよい。<span class="math notranslate nohighlight">\(a=2\)</span> はよく用いられる設定である。</p>
+<p>受容確率は、単なる密度比ではなく</p>
+<div class="math notranslate nohighlight">
+\[
+\alpha(X_i,Y)=\min\left\{1,z^{d-1}\frac{\pi(Y)}{\pi(X_i)}\right\}
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(z^{d-1}\)</span> は、相手の点から見た距離を伸縮するときの体積要素を補正する因子である。この因子を落とすと、<span class="math notranslate nohighlight">\(d&gt;1\)</span> では一般に正しい分布を保てない。数値計算では</p>
+<div class="math notranslate nohighlight">
+\[
+\log\alpha=\min\{0,(d-1)\log z+\log\pi(Y)-\log\pi(X_i)\}
+\]</div>
+<p>を使い、棄却した場合も元の位置を記録する。</p>
+</section>
+<section id="affine-invariant">
+<h3><span class="section-number">15.7.3. </span>「Affine invariant」の意味<a class="headerlink" href="#affine-invariant" title="Link to this heading">#</a></h3>
+<p>可逆な行列 <span class="math notranslate nohighlight">\(A\)</span> とベクトル <span class="math notranslate nohighlight">\(b\)</span> を使って <span class="math notranslate nohighlight">\(\widetilde X=AX+b\)</span> と座標を変えると、平行移動、回転、伸縮、せん断を表せる。この変換に対し</p>
+<div class="math notranslate nohighlight">
+\[
+AY+b=(AX_j+b)+z\{(AX_i+b)-(AX_j+b)\}
+\]</div>
+<p>が成り立つので、提案の作り方は変わらない。また変換後の密度に入る定数 <span class="math notranslate nohighlight">\(1/|\det A|\)</span> は受容確率の比で消える。初期ensembleも対応させて同じ乱数を使えば、理想的な厳密演算では標本列全体が同じアフィン変換で対応する。これが<strong>アフィン不変性</strong>である。</p>
+<p>このため、線形な相関や単位の違いに合わせて座標ごとの提案尺度を調整する負担が小さい。ただし、非線形に曲がった谷、離れたモード、高次元化そのものが解消される性質ではない。</p>
+</section>
+<section id="id8">
+<h3><span class="section-number">15.7.4. </span>二つの群に分けると並列化できる<a class="headerlink" href="#id8" title="Link to this heading">#</a></h3>
+<p>ensemble全体の不変密度を</p>
+<div class="math notranslate nohighlight">
+\[
+\Pi(X_1,\ldots,X_K)=\prod_{i=1}^{K}\pi(X_i)
+\]</div>
+<p>とする。相手の位置を固定したstretch moveが正しい条件付き分布を保つように更新すれば、ensemble全体でもこの密度を保てる。</p>
+<p>並列実装では、walkerを二つの群 <span class="math notranslate nohighlight">\(\mathcal A,\mathcal B\)</span> に分ける。</p>
+<ol class="arabic simple">
+<li><p><span class="math notranslate nohighlight">\(\mathcal B\)</span> を固定する。<span class="math notranslate nohighlight">\(\mathcal A\)</span> の各walkerは、<span class="math notranslate nohighlight">\(\mathcal B\)</span> から相手を選び、候補を作って受容・棄却を判定する。この群内の密度評価は並列に行える。</p></li>
+<li><p>更新後の <span class="math notranslate nohighlight">\(\mathcal A\)</span> を固定し、<span class="math notranslate nohighlight">\(\mathcal B\)</span> を同様に更新する。</p></li>
+<li><p>両群の更新が終わった状態を、1回の <strong>sweep</strong> として記録する。</p></li>
+</ol>
+<p>すべてのwalkerを、互いを動かしながら一斉更新してよいわけではない。固定した相手の群を使うことと、二つの段階の間で全更新の完了を待つことが必要である。この分割方式は <code class="docutils literal notranslate"><span class="pre">emcee</span></code> の <a class="reference external" href="https://emcee.readthedocs.io/en/stable/user/moves/">red–blue update</a> にも使われている。</p>
+<p>等分した場合、各段階では約 <span class="math notranslate nohighlight">\(K/2\)</span> 個の密度評価を同時に進められる。1 sweepには合計 <span class="math notranslate nohighlight">\(K\)</span> 回の候補評価が必要なので、単一chainの1ステップとは費用が異なる。並列化による利得は、密度評価が重いほど得やすい。安価な密度では通信やタスク起動の費用が上回ることもある（<a class="reference external" href="https://emcee.readthedocs.io/en/stable/tutorials/parallel/">emceeの並列化解説</a>）。</p>
+</section>
+<section id="julia">
+<h3><span class="section-number">15.7.5. </span>Juliaで実装する<a class="headerlink" href="#julia" title="Link to this heading">#</a></h3>
+<p>以下は2群に分けるstretch moveの実装である。<code class="docutils literal notranslate"><span class="pre">initial</span></code> は「次元 × walker数」の行列、戻り値の標本は「次元 × walker数 × sweep数」の配列とする。この実装では偶数個かつ <span class="math notranslate nohighlight">\(K\geq2d\)</span> を要求し、初期点が低次元の平面に潰れていないことも確認する。すべてを同じ位置に置くと差が0になり、動けない。</p>
+<p>乱数は群ごとにあらかじめ生成し、密度評価だけを並列化する。そのため、決定論的な <code class="docutils literal notranslate"><span class="pre">logdensity</span></code> ならスレッドの実行順に乱数列が左右されない。<code class="docutils literal notranslate"><span class="pre">parallel=true</span></code> を使う際には、共有状態を書き換えないなど、<code class="docutils literal notranslate"><span class="pre">logdensity</span></code> 自体もスレッドから安全に呼べる必要がある。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">affine_stretch</span><span class="p">(</span><span class="n">logdensity</span><span class="p">,</span><span class="w"> </span><span class="n">initial</span><span class="p">,</span><span class="w"> </span><span class="n">nsweeps</span><span class="p">;</span>
+<span class="w">                        </span><span class="n">a</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">parallel</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="o">=</span><span class="n">Random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">())</span>
+<span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">initial</span><span class="p">)</span>
+<span class="w">    </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">nwalkers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="w">    </span><span class="n">d</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">nsweeps</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;次元とsweep数は正にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">iseven</span><span class="p">(</span><span class="n">nwalkers</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">nwalkers</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2</span><span class="n">d</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;walker数は偶数かつ2×次元以上にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">isfinite</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;有限なa &gt; 1が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">all</span><span class="p">(</span><span class="n">isfinite</span><span class="p">,</span><span class="w"> </span><span class="n">X</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;初期点は有限値にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">rank</span><span class="p">(</span><span class="n">X</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">X</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">])</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;初期点を全次元に広げてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">logp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">logdensity</span><span class="p">(</span><span class="n">view</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nwalkers</span><span class="p">]</span>
+<span class="w">    </span><span class="n">all</span><span class="p">(</span><span class="n">isfinite</span><span class="p">,</span><span class="w"> </span><span class="n">logp</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;初期点で対数密度が有限ではありません&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">chain</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Array</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="n">nwalkers</span><span class="p">,</span><span class="w"> </span><span class="n">nsweeps</span><span class="p">)</span>
+<span class="w">    </span><span class="n">accepted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="kt">Int</span><span class="p">,</span><span class="w"> </span><span class="n">nwalkers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">half</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">nwalkers</span><span class="w"> </span><span class="o">÷</span><span class="w"> </span><span class="mi">2</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsweeps</span>
+<span class="w">        </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">randperm</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">nwalkers</span><span class="p">)</span>
+<span class="w">        </span><span class="n">group_a</span><span class="p">,</span><span class="w"> </span><span class="n">group_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">order</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">half</span><span class="p">],</span><span class="w"> </span><span class="n">order</span><span class="p">[</span><span class="n">half</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="k">end</span><span class="p">]</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">active</span><span class="p">,</span><span class="w"> </span><span class="n">fixed</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="n">group_a</span><span class="p">,</span><span class="w"> </span><span class="n">group_b</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="n">group_b</span><span class="p">,</span><span class="w"> </span><span class="n">group_a</span><span class="p">))</span>
+<span class="w">            </span><span class="n">partners</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rand</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">fixed</span><span class="p">,</span><span class="w"> </span><span class="n">half</span><span class="p">)</span>
+<span class="w">            </span><span class="n">stretches</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.*</span><span class="n">rand</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">half</span><span class="p">))</span><span class="o">.^</span><span class="mi">2</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">a</span>
+<span class="w">            </span><span class="n">log_uniforms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log</span><span class="o">.</span><span class="p">(</span><span class="n">rand</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span><span class="w"> </span><span class="n">half</span><span class="p">))</span>
+<span class="w">            </span><span class="n">proposals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">X</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">partners</span><span class="p">]</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">reshape</span><span class="p">(</span><span class="n">stretches</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="p">]</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">X</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">partners</span><span class="p">])</span>
+<span class="w">            </span><span class="n">proposed_logp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Vector</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="nb">undef</span><span class="p">,</span><span class="w"> </span><span class="n">half</span><span class="p">)</span>
+<span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">parallel</span>
+<span class="w">                </span><span class="n">Threads</span><span class="o">.</span><span class="nd">@threads</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">half</span>
+<span class="w">                    </span><span class="n">proposed_logp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logdensity</span><span class="p">(</span><span class="n">view</span><span class="p">(</span><span class="n">proposals</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">))</span>
+<span class="w">                </span><span class="k">end</span>
+<span class="w">            </span><span class="k">else</span>
+<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">half</span>
+<span class="w">                    </span><span class="n">proposed_logp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">logdensity</span><span class="p">(</span><span class="n">view</span><span class="p">(</span><span class="n">proposals</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">))</span>
+<span class="w">                </span><span class="k">end</span>
+<span class="w">            </span><span class="k">end</span><span class="w">  </span><span class="c"># 全評価が完了してから、群の状態を更新する。</span>
+<span class="w">            </span><span class="n">all</span><span class="p">(</span><span class="n">v</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">isfinite</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="o">-</span><span class="nb">Inf</span><span class="p">,</span><span class="w"> </span><span class="n">proposed_logp</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;対数密度がNaNまたは+Infです&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">enumerate</span><span class="p">(</span><span class="n">active</span><span class="p">)</span>
+<span class="w">                </span><span class="n">logalpha</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">d</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">log</span><span class="p">(</span><span class="n">stretches</span><span class="p">[</span><span class="n">k</span><span class="p">])</span><span class="o">+</span><span class="n">proposed_logp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">-</span><span class="n">logp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="n">log_uniforms</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">logalpha</span>
+<span class="w">                    </span><span class="n">X</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">proposals</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">]</span>
+<span class="w">                    </span><span class="n">logp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">proposed_logp</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+<span class="w">                    </span><span class="n">accepted</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">                </span><span class="k">end</span>
+<span class="w">            </span><span class="k">end</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">chain</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">X</span><span class="w">  </span><span class="c"># 棄却されたwalkerもそのまま記録する。</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">chain</span><span class="p">,</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">nsweeps</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id9">
+<h3><span class="section-number">15.7.6. </span>実験：丸い分布と細長い分布を同じ設定で探索する<a class="headerlink" href="#id9" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(u\sim N(0,I)\)</span> を <span class="math notranslate nohighlight">\(x=Au+b\)</span> で変換した2次元正規分布を考える。平均と共分散の真値は <span class="math notranslate nohighlight">\(b\)</span> と <span class="math notranslate nohighlight">\(AA^T\)</span> なので、標本による推定値を検証できる。ここでは強い相関を持つ行列を選び、丸い分布と細長い分布を同じ <span class="math notranslate nohighlight">\(a\)</span>、walker数、乱数seedで探索する。</p>
+<p>以下の設定値を直接編集して試せる。<code class="docutils literal notranslate"><span class="pre">parallel=true</span></code> は、複数のJuliaスレッドを有効にして実行する場合に使う。この例の密度評価は安価なので、速度比較のための例ではない。図では点の数を減らして表示するが、平均や共分散はwarmup後の全標本から計算する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 手で変更して試す設定</span>
+<span class="n">nwalkers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">32</span>
+<span class="n">nsweeps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6000</span>
+<span class="n">warmup</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1000</span>
+<span class="n">a_stretch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span>
+<span class="n">parallel_density</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">false</span>
+<span class="mi">0</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">warmup</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nsweeps</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;warmupは0以上、nsweeps未満にしてください&quot;</span><span class="p">)</span>
+
+<span class="n">A_affine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="mf">1.8</span><span class="w"> </span><span class="mf">0.2</span><span class="p">]</span>
+<span class="n">b_affine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">log_isotropic</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">dot</span><span class="p">(</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="n">log_correlated</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">log_isotropic</span><span class="p">(</span><span class="n">A_affine</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">b_affine</span><span class="p">))</span>
+
+<span class="n">initial_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="n">MersenneTwister</span><span class="p">(</span><span class="mi">123</span><span class="p">),</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">nwalkers</span><span class="p">)</span>
+<span class="n">initial_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_affine</span><span class="o">*</span><span class="n">initial_u</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">b_affine</span>
+<span class="n">chain_u</span><span class="p">,</span><span class="w"> </span><span class="n">acceptance_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">affine_stretch</span><span class="p">(</span><span class="n">log_isotropic</span><span class="p">,</span><span class="w"> </span><span class="n">initial_u</span><span class="p">,</span><span class="w"> </span><span class="n">nsweeps</span><span class="p">;</span>
+<span class="w">    </span><span class="n">a</span><span class="o">=</span><span class="n">a_stretch</span><span class="p">,</span><span class="w"> </span><span class="n">parallel</span><span class="o">=</span><span class="n">parallel_density</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="o">=</span><span class="n">MersenneTwister</span><span class="p">(</span><span class="mi">2026</span><span class="p">))</span>
+<span class="n">chain_x</span><span class="p">,</span><span class="w"> </span><span class="n">acceptance_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">affine_stretch</span><span class="p">(</span><span class="n">log_correlated</span><span class="p">,</span><span class="w"> </span><span class="n">initial_x</span><span class="p">,</span><span class="w"> </span><span class="n">nsweeps</span><span class="p">;</span>
+<span class="w">    </span><span class="n">a</span><span class="o">=</span><span class="n">a_stretch</span><span class="p">,</span><span class="w"> </span><span class="n">parallel</span><span class="o">=</span><span class="n">parallel_density</span><span class="p">,</span><span class="w"> </span><span class="n">rng</span><span class="o">=</span><span class="n">MersenneTwister</span><span class="p">(</span><span class="mi">2026</span><span class="p">))</span>
+
+<span class="c"># 平均・共分散の集計ではまとめてよいが、時系列の診断では次元を保持する。</span>
+<span class="n">kept_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reshape</span><span class="p">(</span><span class="n">chain_u</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">warmup</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">)</span>
+<span class="n">kept_x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">reshape</span><span class="p">(</span><span class="n">chain_x</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">warmup</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;平均受容率: 丸い分布=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">acceptance_u</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;, 細長い分布=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">acceptance_x</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;推定平均 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">vec</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">kept_x</span><span class="p">,</span><span class="w"> </span><span class="n">dims</span><span class="o">=</span><span class="mi">2</span><span class="p">)),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;, 真値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">b_affine</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;推定共分散 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">cov</span><span class="p">(</span><span class="n">kept_x</span><span class="p">,</span><span class="w"> </span><span class="n">dims</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;共分散の真値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_affine</span><span class="o">*</span><span class="n">A_affine</span><span class="o">&#39;</span><span class="p">)</span>
+
+<span class="c"># 最初の100 sweepで、標本列そのもののアフィン変換への対応も確認する。</span>
+<span class="n">ncheck</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="n">nsweeps</span><span class="p">)</span>
+<span class="n">transformed_u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_affine</span><span class="o">*</span><span class="n">reshape</span><span class="p">(</span><span class="n">chain_u</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">ncheck</span><span class="p">],</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">)</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">b_affine</span>
+<span class="n">transformation_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">maximum</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">reshape</span><span class="p">(</span><span class="n">chain_x</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">ncheck</span><span class="p">],</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">transformed_u</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;座標変換した標本列との最大差（最初の</span><span class="si">$ncheck</span><span class="s"> sweep）= &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">transformation_error</span><span class="p">)</span>
+
+<span class="c"># ensemble平均の時系列を使って、平均のMonte Carlo誤差を簡易評価する。</span>
+<span class="n">ensemble_means</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">vec</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">chain_x</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">warmup</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="k">end</span><span class="p">],</span><span class="w"> </span><span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ess_ensemble</span><span class="p">,</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">simple_ess</span><span class="p">(</span><span class="n">ensemble_means</span><span class="p">)</span>
+<span class="n">mcse_ensemble</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqrt</span><span class="p">(</span><span class="n">var</span><span class="p">(</span><span class="n">ensemble_means</span><span class="p">)</span><span class="o">/</span><span class="n">ess_ensemble</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;x₁の推定平均 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">mean</span><span class="p">(</span><span class="n">ensemble_means</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+<span class="w">    </span><span class="s">&quot;, ensemble平均の簡易MCSE = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">mcse_ensemble</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>平均受容率: 丸い分布=0.715, 細長い分布=0.715
+推定平均 = [0.977, -1.021], 真値 = [1.0, -1.0]
+推定共分散 = [3.977 3.58; 3.58 3.264]
+共分散の真値 = [4.0 3.6; 3.6 3.2800000000000002]
+座標変換した標本列との最大差（最初の100 sweep）= 1.3738343795921537e-11
+x₁の推定平均 = 0.977, ensemble平均の簡易MCSE = 0.033
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 同じ乱数で得た標本の対応と、1 walkerの動きを描く。</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+<span class="k">let</span>
+<span class="w">    </span><span class="n">fig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1050</span><span class="p">,</span><span class="w"> </span><span class="mi">540</span><span class="p">),</span><span class="w"> </span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="w">    </span><span class="n">angles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="nb">π</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">301</span><span class="p">)</span>
+<span class="w">    </span><span class="n">circle</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">&#39;</span><span class="p">;</span><span class="w"> </span><span class="n">sin</span><span class="o">.</span><span class="p">(</span><span class="n">angles</span><span class="p">)</span><span class="o">&#39;</span><span class="p">]</span>
+<span class="w">    </span><span class="n">shown</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="mi">127</span><span class="o">:</span><span class="n">min</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">kept_u</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="mi">160_000</span><span class="p">)</span>
+<span class="w">    </span><span class="n">trace_steps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">warmup</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="n">min</span><span class="p">(</span><span class="n">warmup</span><span class="o">+</span><span class="mi">40</span><span class="p">,</span><span class="w"> </span><span class="n">nsweeps</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">column</span><span class="p">,</span><span class="w"> </span><span class="n">samples</span><span class="p">,</span><span class="w"> </span><span class="n">trace</span><span class="p">,</span><span class="w"> </span><span class="n">transform</span><span class="p">,</span><span class="w"> </span><span class="n">offset</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span>
+<span class="w">        </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">kept_u</span><span class="p">,</span><span class="w"> </span><span class="n">chain_u</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">trace_steps</span><span class="p">],</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;Isotropic target: u&quot;</span><span class="p">),</span>
+<span class="w">        </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">kept_x</span><span class="p">,</span><span class="w"> </span><span class="n">chain_x</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">trace_steps</span><span class="p">],</span><span class="w"> </span><span class="n">A_affine</span><span class="p">,</span><span class="w"> </span><span class="n">b_affine</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Correlated target: x = A u + b&quot;</span><span class="p">))</span>
+<span class="w">        </span><span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">column</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="n">column</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;u₁&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;x₁&quot;</span><span class="p">,</span>
+<span class="w">            </span><span class="n">ylabel</span><span class="o">=</span><span class="n">column</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;u₂&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">&quot;x₂&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="p">,</span><span class="w"> </span><span class="n">aspect</span><span class="o">=</span><span class="n">DataAspect</span><span class="p">())</span>
+<span class="w">        </span><span class="n">scatter!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">samples</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">shown</span><span class="p">],</span><span class="w"> </span><span class="n">samples</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">shown</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="mf">0.28</span><span class="p">),</span>
+<span class="w">            </span><span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;ensemble samples&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">radius</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">)</span>
+<span class="w">            </span><span class="n">contour</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">radius</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">(</span><span class="n">transform</span><span class="o">*</span><span class="n">circle</span><span class="p">)</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">offset</span>
+<span class="w">            </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">contour</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">],</span><span class="w"> </span><span class="n">contour</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray55</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">1.2</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">trace</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">],</span><span class="w"> </span><span class="n">trace</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="o">:</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">1.8</span><span class="p">,</span>
+<span class="w">            </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;one walker: first 40 kept sweeps&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">scatter!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">trace</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]],</span><span class="w"> </span><span class="p">[</span><span class="n">trace</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">]];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">column</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">            </span><span class="n">limits!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">limits!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">7</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">Legend</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">column</span><span class="p">],</span><span class="w"> </span><span class="n">ax</span><span class="p">;</span><span class="w"> </span><span class="n">labelsize</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span><span class="w"> </span><span class="n">tellwidth</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">tellheight</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">rowgap!</span><span class="p">(</span><span class="n">fig</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">)</span>
+<span class="w">    </span><span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;mcmc_affine_ensemble.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-mcmc-affine-ensemble">
+<a class="reference internal image-reference" href="../_images/mcmc_affine_ensemble.svg"><img alt="丸い正規分布とアフィン変換で細長くした正規分布のensemble標本。赤線は一つのwalkerの軌跡、灰色線は等密度線。" src="../_images/mcmc_affine_ensemble.svg" style="width: 100%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 15.3 </span><span class="caption-text">左は標準正規分布、右は強い相関を持つ正規分布。同じ設定と対応する初期点を使うと、右の提案は分布の細長い形に沿って伸び縮みする。赤線はwarmup直後の同じwalker、黒点はその表示開始位置である。図の灰色線は真の分布から描いたもので、samplerに等密度線を与える必要はない。</span><a class="headerlink" href="#fig-mcmc-affine-ensemble" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="walkerchain">
+<h3><span class="section-number">15.7.7. </span>「walkerが多い」と「独立なchainが多い」は異なる<a class="headerlink" href="#walkerchain" title="Link to this heading">#</a></h3>
+<p>複数walkerが分布の広がりを捉え、提案方向を互いに提供するため、尺度や線形相関による停滞を減らしやすい。一方、全walkerが同じモードに集まったままになることもある。複数の山にwalkerを置けた場合でも、山の間を十分行き来しなければ、各山の確率を正しく推定できるとは限らない。</p>
+<p>また、定常状態での<strong>一時点</strong>の不変密度は積 <span class="math notranslate nohighlight">\(\prod_i\pi(X_i)\)</span> だが、更新で相手を参照するため、walkerごとの<strong>時系列</strong>は互いに独立ではない。そのため次のように診断する。</p>
+<ul class="simple">
+<li><p>walkerを横に連結した列へ、そのまま自己相関やESSの計算を適用しない。配列のsweep方向を保持する。</p></li>
+<li><p>同じensembleのwalkerを、独立に実行したchainとして <span class="math notranslate nohighlight">\(\widehat R\)</span> に投入しない。初期値と乱数seedを変えた<strong>独立なensembleを複数実行</strong>し、推定値や探索範囲の一致を調べる（<a class="reference external" href="https://emcee.readthedocs.io/en/stable/tutorials/autocorr/">emceeの診断の解説</a>）。</p></li>
+<li><p>求めたい量 <span class="math notranslate nohighlight">\(f\)</span> に対し、<span class="math notranslate nohighlight">\(F_t=K^{-1}\sum_i f(X_{i,t})\)</span> というensemble平均の時系列を調べる方法もある。この列の分散と自己相関から、<span class="math notranslate nohighlight">\(\bar F\)</span> のMonte Carlo標準誤差を評価できる。上のコードの <code class="docutils literal notranslate"><span class="pre">ess_ensemble</span></code> はこの <span class="math notranslate nohighlight">\(F_t\)</span> の有効標本数であり、保存した全walker標本のESSではない。</p></li>
+</ul>
+<p>上の平均と共分散の検証は、一つの既知分布での動作確認である。実際の問題では、独立なensemble間の差、各モードの滞在割合、その時間変化も点検する。</p>
+</section>
+<section id="hmc">
+<h3><span class="section-number">15.7.8. </span>実用上の選び方：HMCとの比較<a class="headerlink" href="#hmc" title="Link to this heading">#</a></h3>
+<p>勾配が使えないモデル、強い線形相関を持つ低～中次元の分布、密度評価を複数CPUに分散できる問題では、affine invariant ensemble samplerは有力な選択肢になる。調整対象を少なくし、既存のシミュレーションを対数密度の関数として組み込みやすい。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>観点</p></th>
+<th class="head"><p>Affine invariant ensemble MCMC（stretch move）</p></th>
+<th class="head"><p>HMC / NUTS</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>モデルに求める計算</p></td>
+<td><p>対数密度の評価</p></td>
+<td><p>対数密度とその勾配の評価</p></td>
+</tr>
+<tr class="row-odd"><td><p>移動方向</p></td>
+<td><p>ほかのwalkerとの相対位置</p></td>
+<td><p>勾配と補助運動量による軌道</p></td>
+</tr>
+<tr class="row-even"><td><p>主な調整</p></td>
+<td><p>walker数、伸縮範囲 <span class="math notranslate nohighlight">\(a\)</span>、初期ensemble</p></td>
+<td><p>積分刻み、質量行列、軌道長。NUTS等では多くを自動調整</p></td>
+</tr>
+<tr class="row-odd"><td><p>並列化</p></td>
+<td><p>固定群を参照する候補の密度評価</p></td>
+<td><p>独立chain、モデル内部の尤度・勾配計算</p></td>
+</tr>
+<tr class="row-even"><td><p>注意する対象</p></td>
+<td><p>非線形な形状、離れたモード、高次元</p></td>
+<td><p>勾配が得にくいモデル、非滑らかさ、難しい幾何構造や離れたモード</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>HMCは勾配や数値積分を必要とする分、実装・評価の費用があるが、滑らかな高次元分布ではrandom-walk的な移動を抑える利点がある（<a class="reference external" href="https://arxiv.org/abs/1206.1901">Neal, 2011</a>）。一方、アフィン不変性は「次元が増えても効率が落ちない」ことを意味しない。stretch moveの高次元での遅い混合は <a class="reference external" href="https://arxiv.org/abs/1509.02230">Huijser et al.</a> でも検討されている。</p>
+<p>したがって比較の基準は、受容率や保存標本数だけでなく、<strong>同じ計算資源・実時間で、目的の期待値をどれだけ小さいMonte Carlo誤差で推定できるか</strong>とする。次のHMCの節は、勾配が利用できる場合の別の提案方法として読む。</p>
+</section>
+</section>
+<section id="clubsuit-hmc">
+<h2><span class="section-number">15.8. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 勾配を使って遠くへ動く：HMC<a class="headerlink" href="#clubsuit-hmc" title="Link to this heading">#</a></h2>
+<p>Hamiltonian Monte Carlo（HMC）は、連続パラメータ <span class="math notranslate nohighlight">\(q\)</span> に補助運動量 <span class="math notranslate nohighlight">\(p\)</span> を導入する。目標密度を <span class="math notranslate nohighlight">\(\pi(q)\propto e^{-U(q)}\)</span>、<span class="math notranslate nohighlight">\(p\sim N(0,M)\)</span> とすると、Hamiltonianは</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+H(q,p)=U(q)+\frac12p^TM^{-1}p
+\end{align}
+\]</div>
+<p>である。Hamilton方程式に沿う遠方の状態を提案することで、random-walk的な拡散を減らす。</p>
+<p>第9章で学んだように、実際には微分方程式を数値的に解く。HMCでは可逆性・体積保存を保つleapfrog法で近似する。質量行列を <span class="math notranslate nohighlight">\(M=I\)</span> とした1 stepは</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\begin{aligned}
+p_{n+1/2}&amp;=p_n-\frac{\varepsilon}{2}\nabla U(q_n),\\
+q_{n+1}&amp;=q_n+\varepsilon p_{n+1/2},\\
+p_{n+1}&amp;=p_{n+1/2}-\frac{\varepsilon}{2}\nabla U(q_{n+1})
+\end{aligned}
+\end{align}
+\end{split}\]</div>
+<p>である。leapfrog法はHamiltonianを厳密に保存するわけではないが、可逆かつ体積保存で、energy誤差を制御しやすい。各提案の前に運動量を正規分布から引き直し、軌道を計算した後に <span class="math notranslate nohighlight">\(\min\{1,e^{-\Delta H}\}\)</span> のMetropolis判定を行う。棄却なら元の位置に留まり、この補正によって数値積分誤差による分布の偏りを防ぐ。次のコードは軌道1本と受容確率の例であり、標本列を作るHMC全体ではない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">leapfrog</span><span class="p">(</span><span class="n">q0</span><span class="p">,</span><span class="n">p0</span><span class="p">,</span><span class="n">gradU</span><span class="p">,</span><span class="n">step_size</span><span class="p">,</span><span class="n">nsteps</span><span class="p">)</span>
+<span class="w">    </span><span class="n">step_size</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">nsteps</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;正の刻みとステップ数が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">q0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">p0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">.-=</span><span class="w"> </span><span class="p">(</span><span class="n">step_size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.*</span><span class="n">gradU</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">step</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">q</span><span class="w"> </span><span class="o">.+=</span><span class="w"> </span><span class="n">step_size</span><span class="o">.*</span><span class="n">p</span>
+<span class="w">        </span><span class="n">step</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nsteps</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="w"> </span><span class="o">.-=</span><span class="w"> </span><span class="n">step_size</span><span class="o">.*</span><span class="n">gradU</span><span class="p">(</span><span class="n">q</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">p</span><span class="w"> </span><span class="o">.-=</span><span class="w"> </span><span class="p">(</span><span class="n">step_size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">.*</span><span class="n">gradU</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">q</span><span class="p">,</span><span class="o">-</span><span class="n">p</span>
+<span class="k">end</span>
+
+<span class="n">U</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">q</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="n">gradU</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q</span>
+<span class="n">H</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">U</span><span class="p">(</span><span class="n">q</span><span class="p">)</span><span class="o">+</span><span class="n">dot</span><span class="p">(</span><span class="n">p</span><span class="p">,</span><span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+
+<span class="n">q0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">p0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">0.7</span><span class="p">]</span>
+<span class="n">q1</span><span class="p">,</span><span class="n">p1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">leapfrog</span><span class="p">(</span><span class="n">q0</span><span class="p">,</span><span class="n">p0</span><span class="p">,</span><span class="n">gradU</span><span class="p">,</span><span class="mf">0.15</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">ΔH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">H</span><span class="p">(</span><span class="n">q1</span><span class="p">,</span><span class="n">p1</span><span class="p">)</span><span class="o">-</span><span class="n">H</span><span class="p">(</span><span class="n">q0</span><span class="p">,</span><span class="n">p0</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Hamiltonianの変化 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ΔH</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Metropolis受容確率 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">ΔH</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Hamiltonianの変化 = -0.00016041181298565022
+Metropolis受容確率 = 1.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>step幅が大きすぎればenergy誤差と棄却が増え、小さすぎれば計算量が増える。軌道長も短すぎれば移動が小さく、周期に近い長さでは出発点へ戻り得る。No-U-Turn Sampler（NUTS）は軌道長を自動的に決め、実用的なHMC実装で広く用いられる。</p>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">15.9. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 他の提案方法<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>勾配を使わないensemble法と、勾配を使うHMCを見てきた。一方、離れた山の探索には、なだらかにした密度を持つ複数の連鎖で状態を交換するparallel temperingという方法もある。各成分の条件付き分布から直接引けるならGibbs法を使える。どの方法も、正しい不変分布を持つことと、有限時間で十分探索できることを分けて考える。</p>
+</section>
+<section id="id10">
+<h2><span class="section-number">15.10. </span>まとめ<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>MCMCは、分布に関する積分を依存する標本列の平均で近似する。Metropolis–Hastings法は密度比で受容を決めるため、正規化定数を知らなくても使える。棄却時の値も記録し、受容率・探索範囲・自己相関・平均の不確かさを合わせて確認する。</p>
+<p>Affine invariant ensemble MCMCは、複数walkerの相対位置から、線形相関や尺度に対応した提案を作る。勾配を必要とせず、2群に分けた候補評価を並列化できる。一方、walkerを独立なchainとみなすことや、多峰性の問題が自動的に解決すると考えることはできない。</p>
+</div>
+<p>最終章の<a class="reference internal" href="Chap_ParallelComputation.html"><span class="std std-doc">第16章</span></a>では、このような計算のどの部分を同時に進められるかを考える。</p>
+</section>
+<section id="id11">
+<h2><span class="section-number">15.11. </span>演習<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>1回の更新</strong>：標準正規分布を目標に、現在値0から候補1を提案した。受容確率を求め、一様乱数が0.4の場合と0.9の場合に記録する値を答えよ。棄却した回を捨ててはいけない理由は何か。</p></li>
+<li><p><strong>受容率だけで判断しない</strong>：提案尺度0.1の受容率が高くても効率がよいとは限らない。本文のトレースと自己相関から理由を説明せよ。</p></li>
+<li><p><strong>平均の精度</strong>：10000標本で <span class="math notranslate nohighlight">\(\tau=20\)</span> ならESSはいくらか。同じ混合の程度を保ち、平均の標準誤差を半分にするには、標本数を概ね何倍にする必要があるか。</p></li>
+<li><p><strong>Stretch move</strong>：<span class="math notranslate nohighlight">\(d=2\)</span>、<span class="math notranslate nohighlight">\(X_j=(0,0)\)</span>、<span class="math notranslate nohighlight">\(X_i=(2,1)\)</span>、<span class="math notranslate nohighlight">\(z=1.5\)</span> とする。候補 <span class="math notranslate nohighlight">\(Y\)</span> を求めよ。密度比 <span class="math notranslate nohighlight">\(\pi(Y)/\pi(X_i)=0.4\)</span> のとき受容確率はいくらか。単なる密度比と異なる理由も述べよ。</p></li>
+<li><p><strong>並列化と診断</strong>：32 walkerを2群に等分した場合、1段階で何個の候補評価を並列化できるか。また、この32 walkerを独立な32 chainとして扱えない理由と、初期値依存性を調べる方法を説明せよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id12">
+<h2><span class="section-number">15.12. </span>参考文献<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Hastings, <a class="reference external" href="https://doi.org/10.1093/biomet/57.1.97">Monte Carlo Sampling Methods Using Markov Chains and Their Applications</a>, <em>Biometrika</em> 57(1), 1970.</p></li>
+<li><p>Neal, <a class="reference external" href="https://arxiv.org/abs/1206.1901">MCMC Using Hamiltonian Dynamics</a>, in <em>Handbook of Markov Chain Monte Carlo</em>, 2011.</p></li>
+<li><p>Vehtari et al., <a class="reference external" href="https://doi.org/10.1214/20-BA1221">Rank-Normalization, Folding, and Localization: An Improved <span class="math notranslate nohighlight">\(\widehat R\)</span> for Assessing Convergence of MCMC</a>, <em>Bayesian Analysis</em> 16(2), 2021.</p></li>
+<li><p>Goodman and Weare, <a class="reference external" href="https://doi.org/10.2140/camcos.2010.5.65">Ensemble Samplers with Affine Invariance</a>, <em>Communications in Applied Mathematics and Computational Science</em> 5(1), 2010.</p></li>
+<li><p>Foreman-Mackey et al., <a class="reference external" href="https://arxiv.org/abs/1202.3665">emcee: The MCMC Hammer</a>, <em>PASP</em> 125, 2013.</p></li>
+<li><p>Huijser, Goodman, and Brewer, <a class="reference external" href="https://arxiv.org/abs/1509.02230">Properties of the Affine Invariant Ensemble Sampler in high dimensions</a>.</p></li>
+<li><p>emcee公式ドキュメント：<a class="reference external" href="https://emcee.readthedocs.io/en/stable/user/moves/">更新法</a>、<a class="reference external" href="https://emcee.readthedocs.io/en/stable/tutorials/parallel/">並列化</a>、<a class="reference external" href="https://emcee.readthedocs.io/en/stable/tutorials/autocorr/">自己相関と収束診断</a>。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_DMD.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">14. </span>動的モード分解</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_ParallelComputation.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">16. </span>並列計算とGPU</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">15.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">15.2. 分布に関する平均を、標本で近似する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">15.2.1. 正規化定数が分からなくてもよい</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#metropolis-hastings">15.3. Metropolis--Hastings法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">15.4. 提案尺度、自己相関、有効標本数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">15.5. 山が二つある分布と初期値依存性</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">15.6. 結果の読み方：一つの診断だけで決めない</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#affine-invariant-mcmc-walker">15.7. Affine invariant MCMC：複数walkerで分布の形を捉える</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#walker">15.7.1. 勾配を使わず、ほかのwalkerを提案に利用する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#stretch-move-2">15.7.2. Stretch move：2点を結ぶ方向に伸び縮みする</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#affine-invariant">15.7.3. 「Affine invariant」の意味</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">15.7.4. 二つの群に分けると並列化できる</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julia">15.7.5. Juliaで実装する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">15.7.6. 実験：丸い分布と細長い分布を同じ設定で探索する</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#walkerchain">15.7.7. 「walkerが多い」と「独立なchainが多い」は異なる</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#hmc">15.7.8. 実用上の選び方：HMCとの比較</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-hmc">15.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 勾配を使って遠くへ動く：HMC</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">15.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 他の提案方法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">15.10. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">15.11. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">15.12. 参考文献</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

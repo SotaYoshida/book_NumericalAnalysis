@@ -1,0 +1,1138 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>11. 固有値問題と反復法 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_EigenvalueProblems';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="12. 特異値分解と低ランク近似" href="Chap_SVDLowRankApproximation.html" />
+    <link rel="prev" title="10. 連立一次方程式の反復法" href="Chap_IterativeLinearSystems.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_EigenvalueProblems.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>固有値問題と反復法</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">11.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">11.2. 固有値と固有ベクトルを小さな例で確認する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">11.2.1. 対角でない行列の固有値を手で求める</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">11.3. 対称・エルミート固有値問題は特別に扱いやすい</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rayleigh">11.4. Rayleigh商と固有対残差：答えをどう検証するか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">11.5. 全固有値を求めるか、少数だけ求めるか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">11.6. べき乗法：最大絶対値固有値を取り出す</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">11.7. シフト付き逆反復：指定値に近い固有値を選ぶ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">11.8. 応用例：ブランドのシェアはどこへ落ち着くか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-rayleigh">11.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> Rayleigh商反復</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#krylov">11.10. Krylov部分空間：反復中の情報を捨てない</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-arnoldilanczos">11.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> Arnoldi法とLanczos法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">11.12. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 非正規行列では何が難しくなるか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">11.13. 解法を選ぶ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">11.14. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">11.15. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">11.16. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_EigenvalueProblems.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">11. </span>固有値問題と反復法<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>正方行列 <span class="math notranslate nohighlight">\(A\)</span> に対する固有値問題は</p>
+<div class="math notranslate nohighlight">
+\[
+Av=\lambda v,\qquad v\neq0
+\]</div>
+<p>を満たす固有値 <span class="math notranslate nohighlight">\(\lambda\)</span> と固有ベクトル <span class="math notranslate nohighlight">\(v\)</span> を求める問題である。<span class="math notranslate nohighlight">\(A\)</span> を作用させると、同じベクトルのスカラー倍になる特別な方向を探している。実数の負の固有値なら向きは反転し、長さは <span class="math notranslate nohighlight">\(|\lambda|\)</span> 倍になる。</p>
+<p>固有対は、振動の固有モード、時間発展の成長・減衰、量子系のエネルギー、グラフの構造、主成分分析（PCA）などに現れる。離散ラプラシアンの各固有ベクトルは独立に減衰する空間モードと考えられる。</p>
+<p>実際の計算では、最初に次の二点を決める。</p>
+<ul class="simple">
+<li><p>行列は密か疎か、対称・エルミートか一般行列か。</p></li>
+<li><p>すべての固有対が必要か、最大・最小または指定値付近の少数だけでよいか。</p></li>
+</ul>
+<p>小さな密行列の全固有値を求める問題と、100万次元の疎行列から最大固有値だけを求める問題では、使うべきアルゴリズムが異なる。本章では、近似固有対の検証から始め、べき乗法、逆反復、Krylov部分空間法へ段階的に進む。</p>
+<section id="id2">
+<h2><span class="section-number">11.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>固有値・固有ベクトルの意味と、対称固有値問題の特別な性質を説明できる。</p></li>
+<li><p>Rayleigh商と固有対残差を計算し、近似固有対を検証できる。</p></li>
+<li><p>べき乗法の収束を固有値比と初期ベクトルから説明できる。</p></li>
+<li><p>シフト付き逆反復が、分解を再利用して近い固有値を選ぶ方法だと説明できる。</p></li>
+<li><p>Krylov部分空間とRayleigh--Ritz近似の考え方を説明できる。</p></li>
+<li><p>問題の構造、必要な固有対の位置と個数から解法を選べる。</p></li>
+<li><p>マルコフ連鎖の定常状態を、固有値1の固有ベクトルとして求められる。</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">注釈</p>
+<p>掲載図の再作成には <code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> を用いる。図は再実行せずに読める。固有値のアルゴリズムそのものは標準ライブラリ <code class="docutils literal notranslate"><span class="pre">LinearAlgebra</span></code>、<code class="docutils literal notranslate"><span class="pre">SparseArrays</span></code>、<code class="docutils literal notranslate"><span class="pre">Random</span></code> だけで実行できる。</p>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">11.2. </span>固有値と固有ベクトルを小さな例で確認する<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>対角行列</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{bmatrix}4&amp;0\\0&amp;2\end{bmatrix}
+\end{split}\]</div>
+<p>を考える。<span class="math notranslate nohighlight">\(e_1=[1,0]^T\)</span> は <span class="math notranslate nohighlight">\(Ae_1=4e_1\)</span>、<span class="math notranslate nohighlight">\(e_2=[0,1]^T\)</span> は <span class="math notranslate nohighlight">\(Ae_2=2e_2\)</span> を満たす。一方、<span class="math notranslate nohighlight">\([1,1]^T\)</span> は <span class="math notranslate nohighlight">\([4,2]^T\)</span> へ移り、元のベクトルと平行ではない。</p>
+<p>固有ベクトルはスカラー倍しても同じ方向を表すため、長さは一意に定まらない。数値計算では通常</p>
+<div class="math notranslate nohighlight">
+\[
+\|v\|_2=1
+\]</div>
+<p>と正規化する。固有値が重複すると固有ベクトル自体が一意でない場合もあり、個々のベクトルより、それらが張る部分空間を比較する方が適切なことがある。</p>
+<p>すべての正方行列が固有ベクトルの基底を持つわけではない。対角化可能な場合は</p>
+<div class="math notranslate nohighlight">
+\[
+A=V\Lambda V^{-1}
+\]</div>
+<p>と書けるが、一般行列では <span class="math notranslate nohighlight">\(V\)</span> が非常に悪条件になったり、対角化できなかったりする。このため、まず対称行列の扱いやすい場合を中心に学ぶ。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="p">,</span><span class="w"> </span><span class="n">SparseArrays</span><span class="p">,</span><span class="w"> </span><span class="n">Random</span>
+<span class="n">A_demo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Diagonal</span><span class="p">([</span><span class="mf">4.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">])</span>
+<span class="n">E_demo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigen</span><span class="p">(</span><span class="n">A_demo</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">E_demo</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;固有ベクトル（列） = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">E_demo</span><span class="o">.</span><span class="n">vectors</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;分解残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_demo</span><span class="o">*</span><span class="n">E_demo</span><span class="o">.</span><span class="n">vectors</span><span class="o">-</span><span class="n">E_demo</span><span class="o">.</span><span class="n">vectors</span><span class="o">*</span><span class="n">Diagonal</span><span class="p">(</span><span class="n">E_demo</span><span class="o">.</span><span class="n">values</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>固有値 = [4.0, 2.0]
+固有ベクトル（列） = Diagonal([1.0, 1.0])
+分解残差 = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id4">
+<h3><span class="section-number">11.2.1. </span>対角でない行列の固有値を手で求める<a class="headerlink" href="#id4" title="Link to this heading">#</a></h3>
+<p>対角行列では固有ベクトルが座標軸と一致したが、一般には斜めの方向になる。線形代数で学んだ方法を思い出そう。<span class="math notranslate nohighlight">\(Av=\lambda v\)</span> は <span class="math notranslate nohighlight">\((A-\lambda I)v=0\)</span> と書ける。<span class="math notranslate nohighlight">\(v\neq0\)</span> の解があるためには <span class="math notranslate nohighlight">\(A-\lambda I\)</span> が特異、すなわち</p>
+<div class="math notranslate nohighlight">
+\[
+\det(A-\lambda I)=0
+\]</div>
+<p>でなければならない。これを<strong>特性方程式</strong>という。例えば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{bmatrix}2&amp;1\\1&amp;2\end{bmatrix},\qquad
+\det\begin{bmatrix}2-\lambda&amp;1\\1&amp;2-\lambda\end{bmatrix}=(2-\lambda)^2-1=0
+\end{split}\]</div>
+<p>から <span class="math notranslate nohighlight">\(\lambda=3,1\)</span> を得る。<span class="math notranslate nohighlight">\(\lambda=3\)</span> なら <span class="math notranslate nohighlight">\((A-3I)v=0\)</span> の第1式 <span class="math notranslate nohighlight">\(-v_1+v_2=0\)</span> から <span class="math notranslate nohighlight">\(v=(1,1)^T\)</span>、<span class="math notranslate nohighlight">\(\lambda=1\)</span> なら <span class="math notranslate nohighlight">\(v=(1,-1)^T\)</span> である。二つの固有ベクトルは直交しており、対角線方向のベクトルは3倍に伸び、それと直交する方向は変わらない。</p>
+<p>2×2なら2次方程式で済むが、<span class="math notranslate nohighlight">\(n\times n\)</span> では <span class="math notranslate nohighlight">\(n\)</span> 次方程式になり、5次以上には一般の解の公式がない（第7章）。さらに、特性方程式の係数を経由すると丸め誤差に非常に敏感になる。そのため、数値計算では特性方程式を解かず、本章で学ぶ反復法や、行列の直交変換を繰り返す方法（<code class="docutils literal notranslate"><span class="pre">eigen</span></code> の内部で使われるQR法など）を使う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A_sym</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">2.0</span><span class="p">]</span>
+<span class="n">E_sym</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigen</span><span class="p">(</span><span class="n">Symmetric</span><span class="p">(</span><span class="n">A_sym</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">E_sym</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;固有ベクトル（列） = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">E_sym</span><span class="o">.</span><span class="n">vectors</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">])</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;v = </span><span class="si">$v</span><span class="s"> → A*v = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A_sym</span><span class="o">*</span><span class="n">v</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>固有値 = [1.0, 3.0]
+固有ベクトル（列） = [-0.7071 0.7071; 0.7071 0.7071]
+v = [1.0, 1.0] → A*v = [3.0, 3.0]
+v = [1.0, -1.0] → A*v = [1.0, -1.0]
+v = [1.0, 0.0] → A*v = [2.0, 1.0]
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">eigen</span></code> は固有値を小さい順に返し、固有ベクトルを長さ1に正規化する（符号は計算方法によって反転し得る）。<span class="math notranslate nohighlight">\((1,0)^T\)</span> は <span class="math notranslate nohighlight">\((2,1)^T\)</span> へ移り、向きが変わるので固有ベクトルではない。</p>
+</section>
+</section>
+<section id="id5">
+<h2><span class="section-number">11.3. </span>対称・エルミート固有値問題は特別に扱いやすい<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>本章の基本例は実対称行列である。複素数へ広げる場合、<span class="math notranslate nohighlight">\(A^*\)</span> は転置して各成分を複素共役にした行列を表す（Juliaの <code class="docutils literal notranslate"><span class="pre">A'</span></code>）。実対称行列 <span class="math notranslate nohighlight">\(A=A^T\)</span>、または複素エルミート行列 <span class="math notranslate nohighlight">\(A=A^*\)</span> では、スペクトル定理により</p>
+<div class="math notranslate nohighlight">
+\[
+A=Q\Lambda Q^*,\qquad Q^*Q=I
+\]</div>
+<p>と直交またはユニタリ対角化できる。このとき</p>
+<ul class="simple">
+<li><p>固有値はすべて実数である。</p></li>
+<li><p>異なる固有値に属する固有ベクトルは直交する。</p></li>
+<li><p>直交基底なので、ベクトルを各固有モードへ安定に分解できる。</p></li>
+<li><p>最大・最小固有値をRayleigh商の最大・最小として特徴付けられる。</p></li>
+</ul>
+<p>行列に既知の対称性があるときは、Juliaでも <code class="docutils literal notranslate"><span class="pre">Symmetric(A)</span></code> や <code class="docutils literal notranslate"><span class="pre">Hermitian(A)</span></code> として明示する。対称行列用のアルゴリズムを選択できる。<code class="docutils literal notranslate"><span class="pre">Symmetric(A)</span></code> は既定で上三角部分を参照して対称行列とみなす指定であり、上下を平均する操作や対称性の検査ではない。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p>入力が「ほぼ対称」だからといって自動的に対称化してよいとは限らない。非対称成分が測定誤差なのか、モデルに必要な効果なのかを先に判断する。</p>
+</div>
+</section>
+<section id="rayleigh">
+<h2><span class="section-number">11.4. </span>Rayleigh商と固有対残差：答えをどう検証するか<a class="headerlink" href="#rayleigh" title="Link to this heading">#</a></h2>
+<p>非零ベクトル <span class="math notranslate nohighlight">\(x\)</span> のRayleigh商を</p>
+<div class="math notranslate nohighlight">
+\[
+\rho(x)=\frac{x^*Ax}{x^*x}
+\]</div>
+<p>と定める。例えば <span class="math notranslate nohighlight">\(A=\operatorname{diag}(4,2)\)</span>、<span class="math notranslate nohighlight">\(x=(1,1)^T\)</span> なら <span class="math notranslate nohighlight">\(\rho(x)=(4+2)/(1+1)=3\)</span> である。この値だけではまだ固有値でなく、実際に <span class="math notranslate nohighlight">\(Ax-3x=(1,-1)^T\ne0\)</span> となる。<span class="math notranslate nohighlight">\(x\)</span> が固有ベクトルなら <span class="math notranslate nohighlight">\(\rho(x)\)</span> は対応する固有値である。エルミート行列では</p>
+<div class="math notranslate nohighlight">
+\[
+\lambda_{\min}\leq\rho(x)\leq\lambda_{\max}
+\]</div>
+<p>が成り立つ。単位ベクトルの向きを変えてRayleigh商を最大化・最小化すると、端の固有値が得られる。</p>
+<p>近似固有対 <span class="math notranslate nohighlight">\((\theta,q)\)</span>、<span class="math notranslate nohighlight">\(\|q\|_2=1\)</span> に対する<strong>固有対残差</strong>は</p>
+<div class="math notranslate nohighlight">
+\[
+r=Aq-\theta q
+\]</div>
+<p>である。残差は、候補の倍率 <span class="math notranslate nohighlight">\(\theta\)</span> を含めて固有方程式をどれだけ満たすかを測る。固定した <span class="math notranslate nohighlight">\(q\)</span> に対して <span class="math notranslate nohighlight">\(\|Aq-\theta q\|_2\)</span> を最小にする <span class="math notranslate nohighlight">\(\theta\)</span> は <span class="math notranslate nohighlight">\(\rho(q)\)</span> であり、この選択では <span class="math notranslate nohighlight">\(q^*r=0\)</span> となる。</p>
+<p>エルミート行列なら、真の固有値のどれかが <span class="math notranslate nohighlight">\(\theta\)</span> から高々 <span class="math notranslate nohighlight">\(\|r\|_2\)</span> の距離にある。ただし、どの固有ベクトルに近いかを評価するには、目的固有値と他の固有値の間隔も必要である。固有値が密集していると、小さい残差でも個々の固有ベクトルの向きは決まりにくい。</p>
+<p>異なる尺度の問題を比較するには、たとえば</p>
+<div class="math notranslate nohighlight">
+\[
+\eta=\frac{\|Aq-\theta q\|_2}
+{\|A\|_2+|\theta|}
+\]</div>
+<p>のように尺度化した残差を用いる（分母が0の場合は絶対残差を見る）。以下のコードでは計算が容易な <code class="docutils literal notranslate"><span class="pre">opnorm(A,</span> <span class="pre">Inf)</span></code> を尺度に使うため、この2ノルムの式と数値は必ずしも同じではない。真の固有値や固有ベクトルを知らなくても計算できるため、残差は反復法の停止判定の中心となる。</p>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="n">A_rayleigh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Diagonal</span><span class="p">([</span><span class="mf">4.0</span><span class="p">,</span><span class="mf">2.0</span><span class="p">])</span>
+<span class="n">eigenvalues_rayleigh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sort</span><span class="p">(</span><span class="n">eigvals</span><span class="p">(</span><span class="n">A_rayleigh</span><span class="p">))</span>
+<span class="n">angles</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="nb">π</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">401</span><span class="p">)</span>
+<span class="n">directions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="n">cos</span><span class="p">(</span><span class="n">θ</span><span class="p">),</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">θ</span><span class="p">)]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">θ</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">angles</span><span class="p">]</span>
+<span class="n">quotients</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">A_rayleigh</span><span class="o">*</span><span class="n">q</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">directions</span><span class="p">]</span>
+
+<span class="n">fig_rayleigh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">850</span><span class="p">,</span><span class="w"> </span><span class="mi">470</span><span class="p">))</span>
+<span class="n">ax_rayleigh</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_rayleigh</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;direction angle / pi&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Rayleigh quotient&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Rayleigh quotient over all directions&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_rayleigh</span><span class="p">,</span><span class="w"> </span><span class="n">angles</span><span class="o">./</span><span class="nb">π</span><span class="p">,</span><span class="w"> </span><span class="n">quotients</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;ρ(q)&quot;</span><span class="p">)</span>
+<span class="n">hlines!</span><span class="p">(</span><span class="n">ax_rayleigh</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">eigenvalues_rayleigh</span><span class="p">[</span><span class="mi">1</span><span class="p">]];</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:seagreen</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;λmin&quot;</span><span class="p">)</span>
+<span class="n">hlines!</span><span class="p">(</span><span class="n">ax_rayleigh</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">eigenvalues_rayleigh</span><span class="p">[</span><span class="mi">2</span><span class="p">]];</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;λmax&quot;</span><span class="p">)</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax_rayleigh</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;eigen_rayleigh_quotient.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_rayleigh</span><span class="p">)</span>
+<span class="n">fig_rayleigh</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-eigen-rayleigh">
+<a class="reference internal image-reference" href="../_images/eigen_rayleigh_quotient.svg"><img alt="単位ベクトルの方向に対するRayleigh商と最小・最大固有値" src="../_images/eigen_rayleigh_quotient.svg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 11.1 </span><span class="caption-text">単位ベクトル <span class="math notranslate nohighlight">\(q=[\cos\theta,\sin\theta]^T\)</span> の方向を変えたときのRayleigh商。極小値と極大値が対称行列の最小・最大固有値になる。</span><a class="headerlink" href="#fig-eigen-rayleigh" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id6">
+<h2><span class="section-number">11.5. </span>全固有値を求めるか、少数だけ求めるか<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">eigen(A)</span></code> は密な行列のすべての固有値・固有ベクトルが必要な場合に適する。密な <span class="math notranslate nohighlight">\(n\times n\)</span> 行列では、全固有値分解に概ね <span class="math notranslate nohighlight">\(O(n^3)\)</span> の演算と <span class="math notranslate nohighlight">\(O(n^2)\)</span> の保存量が必要である。</p>
+<p>一方、<span class="math notranslate nohighlight">\(A\)</span> が巨大な疎行列で最大固有値だけが必要なら、全分解は過剰である。反復法では主に</p>
+<div class="math notranslate nohighlight">
+\[
+x\longmapsto Ax
+\]</div>
+<p>という行列ベクトル積を繰り返す。非零成分数を <span class="math notranslate nohighlight">\(\operatorname{nnz}(A)\)</span> とすれば、疎行列ベクトル積の主な積和は非零成分に対して行う。出力の初期化なども含めると、<span class="math notranslate nohighlight">\(n\times n\)</span> 行列では <span class="math notranslate nohighlight">\(O(\operatorname{nnz}(A)+n)\)</span> 程度となる。行列を明示せず、入力 <span class="math notranslate nohighlight">\(x\)</span> に対して <span class="math notranslate nohighlight">\(Ax\)</span> を返す関数だけを実装する行列フリー計算も可能である。</p>
+<p>反復法は、必要な固有対が少ないときに計算量とメモリを大きく減らせる。ただし収束判定、初期ベクトル、求めたい固有値の位置を利用者が意識する必要がある。</p>
+</section>
+<section id="id7">
+<h2><span class="section-number">11.6. </span>べき乗法：最大絶対値固有値を取り出す<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>まず <span class="math notranslate nohighlight">\(A=\operatorname{diag}(4,2)\)</span> を <span class="math notranslate nohighlight">\((1,1)^T\)</span> に繰り返しかけると、<span class="math notranslate nohighlight">\((4,2)^T\)</span>、<span class="math notranslate nohighlight">\((16,4)^T\)</span>、<span class="math notranslate nohighlight">\((64,8)^T\)</span> となる。第1成分に対する第2成分の比は <span class="math notranslate nohighlight">\(1/2,1/4,1/8\)</span> と縮む。長さを毎回1にそろえてもこの比は変わらず、第1軸の方向が残る。</p>
+<p>一般に、<span class="math notranslate nohighlight">\(A\)</span> が固有ベクトルの基底 <span class="math notranslate nohighlight">\(v_1,\ldots,v_n\)</span> を持ち、</p>
+<div class="math notranslate nohighlight">
+\[
+|\lambda_1|&gt;|\lambda_2|\geq\cdots\geq|\lambda_n|
+\]</div>
+<p>とする。初期ベクトルを <span class="math notranslate nohighlight">\(x_0=\sum_i c_iv_i\)</span> と展開すると、</p>
+<div class="math notranslate nohighlight">
+\[
+A^kx_0=\lambda_1^k\left[
+c_1v_1+\sum_{i=2}^n c_i
+\left(\frac{\lambda_i}{\lambda_1}\right)^kv_i
+\right]
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(c_1\neq0\)</span> なら、括弧内の第2項以降は相対的に小さくなり、方向は <span class="math notranslate nohighlight">\(v_1\)</span> へ近づく。オーバーフローやアンダーフローを防ぐため、各ステップで正規化する。</p>
+<div class="math notranslate nohighlight">
+\[
+z_k=Aq_{k-1},\qquad
+q_k=\frac{z_k}{\|z_k\|_2},\qquad
+\theta_k=\rho(q_k)
+\]</div>
+<p>これがべき乗法である。漸近的な収束率は主に <span class="math notranslate nohighlight">\(|\lambda_2/\lambda_1|\)</span> で決まる。この比が1に近い、すなわち最大絶対値固有値が次の固有値から十分離れていない場合は遅い。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">power_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">;</span><span class="w"> </span><span class="n">x0</span><span class="o">=</span><span class="n">ones</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">10_000</span><span class="p">)</span>
+<span class="w">    </span><span class="n">norm</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">maxiter</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;非零の初期値と正の反復上限が必要です&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalize</span><span class="p">(</span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">opnorm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">NamedTuple</span><span class="p">[]</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">q</span>
+<span class="w">        </span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;A*qが零ベクトルになりました&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">z</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="w">        </span><span class="n">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+<span class="w">        </span><span class="n">residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">θ</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+<span class="w">        </span><span class="n">relative_residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">residual</span><span class="o">/</span><span class="p">(</span><span class="n">scale</span><span class="o">+</span><span class="n">abs</span><span class="p">(</span><span class="n">θ</span><span class="p">))</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">iteration</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="o">=</span><span class="n">θ</span><span class="p">,</span><span class="w"> </span><span class="n">residual</span><span class="o">=</span><span class="n">residual</span><span class="p">,</span>
+<span class="w">                        </span><span class="n">relative_residual</span><span class="o">=</span><span class="n">relative_residual</span><span class="p">))</span>
+<span class="w">        </span><span class="n">relative_residual</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">tol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+<span class="w">            </span><span class="n">value</span><span class="o">=</span><span class="n">θ</span><span class="p">,</span><span class="w"> </span><span class="n">vector</span><span class="o">=</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">vector</span><span class="o">=</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+
+<span class="n">result_demo</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">power_iteration</span><span class="p">(</span><span class="n">A_demo</span><span class="p">;</span><span class="w"> </span><span class="n">x0</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;べき乗法の固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result_demo</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;正規化した固有ベクトル = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result_demo</span><span class="o">.</span><span class="n">vector</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;尺度化残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">result_demo</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">.</span><span class="n">relative_residual</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>べき乗法の固有値 = 4.0
+正規化した固有ベクトル = [1.0, 2.3283064365386963e-10]
+尺度化残差 = 5.820766091346741e-11
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig_power</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">850</span><span class="p">,</span><span class="w"> </span><span class="mi">470</span><span class="p">))</span>
+<span class="n">ax_power</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_power</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;iteration&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;scaled residual&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">xscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span><span class="w"> </span><span class="n">yscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Power iteration and spectral separation&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">ratio</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">zip</span><span class="p">((</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.98</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="ss">:seagreen</span><span class="p">,</span><span class="w"> </span><span class="ss">:orange</span><span class="p">,</span><span class="w"> </span><span class="ss">:tomato</span><span class="p">))</span>
+<span class="w">    </span><span class="n">A_ratio</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Diagonal</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">ratio</span><span class="p">])</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">power_iteration</span><span class="p">(</span><span class="n">A_ratio</span><span class="p">;</span><span class="w"> </span><span class="n">x0</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="w">    </span><span class="n">iterations</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">iteration</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">]</span>
+<span class="w">    </span><span class="n">residuals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">max</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">relative_residual</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">())</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">]</span>
+<span class="w">    </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax_power</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="n">residuals</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+<span class="w">        </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;|λ₂/λ₁| = </span><span class="si">$ratio</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">scatter!</span><span class="p">(</span><span class="n">ax_power</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="n">residuals</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">ylims!</span><span class="p">(</span><span class="n">ax_power</span><span class="p">,</span><span class="w"> </span><span class="mf">1e-14</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax_power</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;eigen_power_convergence.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_power</span><span class="p">)</span>
+<span class="n">fig_power</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-eigen-power-convergence">
+<a class="reference internal image-reference" href="../_images/eigen_power_convergence.svg"><img alt="固有値比の異なる行列に対するべき乗法の残差履歴" src="../_images/eigen_power_convergence.svg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 11.2 </span><span class="caption-text">べき乗法の尺度化残差。<span class="math notranslate nohighlight">\(|\lambda_2/\lambda_1|\)</span> が1に近いほど、支配固有ベクトル以外の成分が減りにくく、収束が遅くなる。</span><a class="headerlink" href="#fig-eigen-power-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>べき乗法では次の点にも注意する。</p>
+<ul class="simple">
+<li><p>固有ベクトル展開で <span class="math notranslate nohighlight">\(c_1=0\)</span> なら（対称行列では <span class="math notranslate nohighlight">\(x_0\)</span> が <span class="math notranslate nohighlight">\(v_1\)</span> と直交する場合）、厳密演算では目的成分は生成されない。乱数初期ベクトルがよく使われる理由である。</p></li>
+<li><p>最大<strong>絶対値</strong>固有値を求める。最大の実数値固有値とは限らない。</p></li>
+<li><p><span class="math notranslate nohighlight">\(\lambda_1&lt;0\)</span> ならベクトルの符号はステップごとに反転し得るが、Rayleigh商と残差は収束する。</p></li>
+<li><p><span class="math notranslate nohighlight">\(|\lambda_1|=|\lambda_2|\)</span> なら、一般には一つの方向へ収束しない。</p></li>
+</ul>
+<p>停止判定を固有値近似 <span class="math notranslate nohighlight">\(\theta_k\)</span> の変化だけにすると、値が停滞してもベクトルが十分収束していない場合を見落とす。必ず固有対残差も確認する。</p>
+</section>
+<section id="id8">
+<h2><span class="section-number">11.7. </span>シフト付き逆反復：指定値に近い固有値を選ぶ<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(A\)</span> の固有値を <span class="math notranslate nohighlight">\(\lambda_i\)</span> とすると、<span class="math notranslate nohighlight">\(A-\sigma I\)</span> の逆作用素は同じ固有ベクトルを持ち、固有値は</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{1}{\lambda_i-\sigma}
+\]</div>
+<p>となる。したがって <span class="math notranslate nohighlight">\((A-\sigma I)^{-1}\)</span> にべき乗法を適用すれば、シフト <span class="math notranslate nohighlight">\(\sigma\)</span> に最も近い固有値が最大絶対値成分として強調される。</p>
+<div class="math notranslate nohighlight">
+\[
+(A-\sigma I)y_k=q_{k-1},\qquad
+q_k=\frac{y_k}{\|y_k\|_2}
+\]</div>
+<p>例えば固有値が1、3、5で <span class="math notranslate nohighlight">\(\sigma=2.8\)</span> なら、逆作用の倍率は約 <span class="math notranslate nohighlight">\(-0.556,5,0.455\)</span> となり、3に対応する方向が強調される。目的成分を含む初期値と、一つだけ最も近い固有値があることも必要である。</p>
+<p>逆行列は作らない。同じ <span class="math notranslate nohighlight">\(\sigma\)</span> を使う間は <span class="math notranslate nohighlight">\(A-\sigma I\)</span> を一度だけ分解し、その分解を各反復で再利用する。これは第5章のLU分解で学んだ方針である。</p>
+<p><span class="math notranslate nohighlight">\(\sigma\)</span> が固有値に近いほど目的成分は強調されるが、線形方程式は悪条件になる。残差を確認し、<span class="math notranslate nohighlight">\(\sigma\)</span> を固有値そのものに設定して特異行列を作らないようにする。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">inverse_iteration</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">σ</span><span class="p">;</span><span class="w"> </span><span class="n">x0</span><span class="o">=</span><span class="n">ones</span><span class="p">(</span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="mi">1</span><span class="p">)),</span><span class="w"> </span><span class="n">tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="w">    </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalize</span><span class="p">(</span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">factorization</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factorize</span><span class="p">(</span><span class="n">A</span><span class="o">-</span><span class="n">σ</span><span class="o">*</span><span class="n">I</span><span class="p">)</span><span class="w">  </span><span class="c"># 反復の外で一度だけ分解</span>
+<span class="w">    </span><span class="n">scale</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">opnorm</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">NamedTuple</span><span class="p">[]</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">factorization</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">q</span>
+<span class="w">        </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="w">        </span><span class="n">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+<span class="w">        </span><span class="n">residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">θ</span><span class="o">*</span><span class="n">q</span><span class="p">)</span>
+<span class="w">        </span><span class="n">relative_residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">residual</span><span class="o">/</span><span class="p">(</span><span class="n">scale</span><span class="o">+</span><span class="n">abs</span><span class="p">(</span><span class="n">θ</span><span class="p">))</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">iteration</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="o">=</span><span class="n">θ</span><span class="p">,</span>
+<span class="w">                        </span><span class="n">relative_residual</span><span class="o">=</span><span class="n">relative_residual</span><span class="p">))</span>
+<span class="w">        </span><span class="n">relative_residual</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">tol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span>
+<span class="w">            </span><span class="n">value</span><span class="o">=</span><span class="n">θ</span><span class="p">,</span><span class="w"> </span><span class="n">vector</span><span class="o">=</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="n">vector</span><span class="o">=</span><span class="n">q</span><span class="p">,</span>
+<span class="w">            </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">A_shift</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Diagonal</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">,</span><span class="mf">5.0</span><span class="p">])</span>
+<span class="n">exact_shift_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigvals</span><span class="p">(</span><span class="n">A_shift</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;真の固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">exact_shift_values</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">σ</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mf">2.8</span><span class="p">,</span><span class="w"> </span><span class="mf">4.9</span><span class="p">)</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">inverse_iteration</span><span class="p">(</span><span class="n">A_shift</span><span class="p">,</span><span class="w"> </span><span class="n">σ</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;シフト=</span><span class="si">$σ</span><span class="s"> -&gt; 固有値≈</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span><span class="s">, &quot;</span><span class="w"> </span><span class="o">*</span>
+<span class="w">            </span><span class="s">&quot;反復=</span><span class="si">$</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">))</span><span class="s">, &quot;</span><span class="w"> </span><span class="o">*</span>
+<span class="w">            </span><span class="s">&quot;残差=</span><span class="si">$</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="k">end</span><span class="p">]</span><span class="o">.</span><span class="n">relative_residual</span><span class="p">)</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>真の固有値 = [1.0, 3.0, 5.0]
+シフト=1.1 -&gt; 固有値≈1.0, 反復=8, 残差=1.9627215190845856e-11
+シフト=2.8 -&gt; 固有値≈3.0, 反復=10, 残差=7.234425930919756e-11
+シフト=4.9 -&gt; 固有値≈5.0, 反復=8, 残差=1.1776329114507064e-11
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id9">
+<h2><span class="section-number">11.8. </span>応用例：ブランドのシェアはどこへ落ち着くか<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<p>三つのブランドA、B、Cの顧客が、毎月一定の確率で乗り換えるとする。例えば、今月Aを買った顧客のうち80%は来月もA、15%はB、5%はCを買う。この確率を並べた行列 <span class="math notranslate nohighlight">\(P\)</span> の <span class="math notranslate nohighlight">\((i,j)\)</span> 成分を「ブランド <span class="math notranslate nohighlight">\(j\)</span> からブランド <span class="math notranslate nohighlight">\(i\)</span> へ移る確率」とすると、各列の和は1であり、今月のシェア <span class="math notranslate nohighlight">\(s_k\)</span> から来月のシェアは</p>
+<div class="math notranslate nohighlight">
+\[
+s_{k+1}=Ps_k
+\]</div>
+<p>で求まる。これは<strong>マルコフ連鎖</strong>と呼ばれるモデルで、同じ行列を繰り返しかける計算は、正規化を除けばべき乗法そのものである。</p>
+<p>十分時間が経ってシェアが変わらなくなれば <span class="math notranslate nohighlight">\(Ps=s\)</span>、すなわち <span class="math notranslate nohighlight">\(s\)</span> は<strong>固有値1の固有ベクトル</strong>である。この <span class="math notranslate nohighlight">\(P\)</span> は対称行列ではないが、すべての成分が正で各列の和が1なので、固有値1が最大絶対値の固有値となり、他の固有値の絶対値は1より小さいことが知られている。したがってべき乗法が収束する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 列 j から行 i へ移る確率（各列の和が1）。ブランドの順は A, B, C。</span>
+<span class="n">P_switch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.80</span><span class="w"> </span><span class="mf">0.10</span><span class="w"> </span><span class="mf">0.15</span><span class="p">;</span>
+<span class="w">            </span><span class="mf">0.15</span><span class="w"> </span><span class="mf">0.75</span><span class="w"> </span><span class="mf">0.15</span><span class="p">;</span>
+<span class="w">            </span><span class="mf">0.05</span><span class="w"> </span><span class="mf">0.15</span><span class="w"> </span><span class="mf">0.70</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;各列の和 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">P_switch</span><span class="p">,</span><span class="w"> </span><span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">evolve_share</span><span class="p">(</span><span class="n">P</span><span class="p">,</span><span class="w"> </span><span class="n">s0</span><span class="p">,</span><span class="w"> </span><span class="n">nmonths</span><span class="p">;</span><span class="w"> </span><span class="n">report</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">40</span><span class="p">))</span>
+<span class="w">    </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">s0</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">month</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nmonths</span>
+<span class="w">        </span><span class="n">s_new</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">P</span><span class="o">*</span><span class="n">s</span><span class="w">                       </span><span class="c"># 1か月後のシェア（べき乗法の1反復）</span>
+<span class="w">        </span><span class="n">change</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">s_new</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+<span class="w">        </span><span class="n">s</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s_new</span>
+<span class="w">        </span><span class="n">month</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">report</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;月 </span><span class="si">$month</span><span class="s">: シェア = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">),</span>
+<span class="w">                                   </span><span class="s">&quot;, 前月からの変化 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">change</span><span class="p">,</span><span class="w"> </span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">s</span>
+<span class="k">end</span>
+<span class="n">share_60</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">evolve_share</span><span class="p">(</span><span class="n">P_switch</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="mi">3</span><span class="p">],</span><span class="w"> </span><span class="mi">60</span><span class="p">)</span>
+
+<span class="n">E_switch</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigen</span><span class="p">(</span><span class="n">P_switch</span><span class="p">)</span>
+<span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">argmin</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">E_switch</span><span class="o">.</span><span class="n">values</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<span class="n">stationary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">E_switch</span><span class="o">.</span><span class="n">vectors</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">])</span>
+<span class="n">stationary</span><span class="w"> </span><span class="o">./=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">stationary</span><span class="p">)</span><span class="w">            </span><span class="c"># 合計1に規格化する</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;固有値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">E_switch</span><span class="o">.</span><span class="n">values</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;固有値1の固有ベクトル（合計1） = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">stationary</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 ||P s - s|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">P_switch</span><span class="o">*</span><span class="n">stationary</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">stationary</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>各列の和 = [1.0 1.0 1.0]
+月 1: シェア = [0.35, 0.35, 0.3], 前月からの変化 = 0.0667
+月 2: シェア = [0.36, 0.36, 0.28], 前月からの変化 = 0.04
+月 5: シェア = [0.3718, 0.3718, 0.2565], 前月からの変化 = 0.00864
+月 10: シェア = [0.3747, 0.3747, 0.2505], 前月からの変化 = 0.000672
+月 20: シェア = [0.375, 0.375, 0.25], 前月からの変化 = 4.06e-6
+月 40: シェア = [0.375, 0.375, 0.25], 前月からの変化 = 1.49e-10
+固有値 = [0.6, 0.65, 1.0]
+固有値1の固有ベクトル（合計1） = [0.375, 0.375, 0.25]
+残差 ||P s - s|| = 1.594436429147036e-16
+</pre></div>
+</div>
+</div>
+</div>
+<p>シェアは <span class="math notranslate nohighlight">\((0.375,0.375,0.25)\)</span> に落ち着き、<code class="docutils literal notranslate"><span class="pre">eigen</span></code> で求めた固有値1の固有ベクトル（合計を1にそろえたもの）と一致する。この<strong>定常状態</strong>は、最初のシェアによらず同じになる。長期的なシェアを知りたいなら、何か月分もシミュレーションする代わりに、固有ベクトルを直接求めればよい。</p>
+<p>前月からの変化は、毎月約0.6倍ずつ小さくなっている。べき乗法の収束の速さが、1以外の固有値（0.65と0.6）の大きさで決まることの現れである。ただし、この初期値は固有値0.65の固有ベクトルの成分をちょうど含まないため、ここでは0.6倍の縮み方が見えている（初期値の成分 <span class="math notranslate nohighlight">\(c_i\)</span> の役割は、本章のべき乗法の節で見た）。</p>
+<p>Web検索で使われたPageRankも同じ考え方である。ページを状態、リンクをたどる確率を行列の成分とし、固有値1の固有ベクトルの成分を各ページの重要度とみなす。行列は数十億次元の疎行列になるため、全固有値分解ではなく、行列ベクトル積を繰り返す反復法が使われる。</p>
+</section>
+<section id="clubsuit-rayleigh">
+<h2><span class="section-number">11.9. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> Rayleigh商反復<a class="headerlink" href="#clubsuit-rayleigh" title="Link to this heading">#</a></h2>
+<p>逆反復のシフトを毎回</p>
+<div class="math notranslate nohighlight">
+\[
+\sigma_k=\rho(q_k)
+\]</div>
+<p>と更新する方法をRayleigh商反復という。</p>
+<div class="math notranslate nohighlight">
+\[
+(A-\sigma_k I)y_k=q_k,
+\qquad q_{k+1}=y_k/\|y_k\|_2
+\]</div>
+<p>エルミート行列では固有ベクトルに十分近いところから始めると、通常は3次収束する。ただしシフトが毎回変わるため、逆反復のように一つの行列分解を再利用できない。少ない反復回数と、1反復ごとの高い費用の交換になる。</p>
+<p><span class="math notranslate nohighlight">\(A-\sigma_kI\)</span> は収束とともに特異行列へ近づく。このこと自体はアルゴリズムの仕組みだが、線形方程式の解き方と停止判定には注意が必要である。十分小さい固有対残差が得られた時点で終了する。</p>
+</section>
+<section id="krylov">
+<h2><span class="section-number">11.10. </span>Krylov部分空間：反復中の情報を捨てない<a class="headerlink" href="#krylov" title="Link to this heading">#</a></h2>
+<p>べき乗法は <span class="math notranslate nohighlight">\(q,Aq,A^2q,\ldots\)</span> を順に作るが、各ステップでは直前のベクトルだけを残す。Krylov法は、これらが張る部分空間</p>
+<div class="math notranslate nohighlight">
+\[
+\mathcal{K}_m(A,b)
+=\operatorname{span}\{b,Ab,A^2b,\ldots,A^{m-1}b\}
+\]</div>
+<p>を利用する。<span class="math notranslate nohighlight">\(\mathcal{K}_m\)</span> のベクトルは <span class="math notranslate nohighlight">\(p_{m-1}(A)b\)</span> と書けるので、適切な多項式 <span class="math notranslate nohighlight">\(p\)</span> によって欲しい固有成分を強調し、不要な成分を抑える方法と解釈できる。</p>
+<p>実際に <span class="math notranslate nohighlight">\(A^kb\)</span> をそのまま並べると、べき乗法と同じ理由でベクトルがほぼ平行になり、基底が悪条件になる。そこでQR分解と同じ考え方で正規直交基底</p>
+<div class="math notranslate nohighlight">
+\[
+Q_m=[q_1,\ldots,q_m],\qquad Q_m^*Q_m=I
+\]</div>
+<p>を逐次構成する。</p>
+<p>大きな <span class="math notranslate nohighlight">\(A\)</span> を小さな部分空間へ射影して</p>
+<div class="math notranslate nohighlight">
+\[
+H_m=Q_m^*AQ_m
+\]</div>
+<p>を作る。<span class="math notranslate nohighlight">\(H_my=\theta y\)</span> を解けば</p>
+<div class="math notranslate nohighlight">
+\[
+q=Q_my
+\]</div>
+<p>が元の空間における近似固有ベクトルになる。<span class="math notranslate nohighlight">\((\theta,q)\)</span> をRitz対という。大規模問題を、小さな <span class="math notranslate nohighlight">\(m\times m\)</span> 固有値問題へ変換している。最終的な品質は元の残差 <span class="math notranslate nohighlight">\(\|Aq-\theta q\|\)</span> で検証する。</p>
+</section>
+<section id="clubsuit-arnoldilanczos">
+<h2><span class="section-number">11.11. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> Arnoldi法とLanczos法<a class="headerlink" href="#clubsuit-arnoldilanczos" title="Link to this heading">#</a></h2>
+<p>一般行列に対するArnoldi法は、<span class="math notranslate nohighlight">\(Aq_j\)</span> をそれまでの基底へ直交化してKrylov基底を作り、</p>
+<div class="math notranslate nohighlight">
+\[
+AQ_m=Q_mH_m+h_{m+1,m}q_{m+1}e_m^T
+\]</div>
+<p>という関係を得る。<span class="math notranslate nohighlight">\(H_m\)</span> は第1副対角線より下が0の上ヘッセンベルグ行列である。<span class="math notranslate nohighlight">\(H_my=\theta y\)</span>、<span class="math notranslate nohighlight">\(\|y\|_2=1\)</span> に対応するRitzベクトル <span class="math notranslate nohighlight">\(q=Q_my\)</span> の残差は</p>
+<div class="math notranslate nohighlight">
+\[
+\|Aq-\theta q\|_2
+=|h_{m+1,m}|\,|e_m^Ty|
+\]</div>
+<p>から小さな行列と最後の係数だけでも評価できる。</p>
+<p><span class="math notranslate nohighlight">\(A\)</span> がエルミート行列なら、<span class="math notranslate nohighlight">\(H_m\)</span> もエルミートかつ上Hessenbergなので三重対角行列になる。Arnoldi法はLanczos法へ簡約され、</p>
+<div class="math notranslate nohighlight">
+\[
+\beta_jq_{j+1}
+=Aq_j-\alpha_jq_j-\beta_{j-1}q_{j-1}
+\]</div>
+<p>という3項漸化式を用いる。一般のArnoldi法のように理論上すべての過去ベクトルを使う必要がなく、漸化式だけなら直前の少数のベクトルで更新できる。ただしRitzベクトルの復元や再直交化には基底の保存が必要になる。</p>
+<p>ただし有限精度ではLanczosベクトルの直交性が徐々に失われ、収束済みの固有値が重複して現れることがある。以下の教育用実装では理解しやすさを優先して再直交化を行う。実用的な大規模ソルバーでは、リスタート、部分再直交化、収束した固有対を固定するロッキングなどが必要になる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">lanczos</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="w"> </span><span class="n">q1</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">;</span><span class="w"> </span><span class="n">reorthogonalize</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
+<span class="w">    </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">q1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">promote_type</span><span class="p">(</span><span class="n">eltype</span><span class="p">(</span><span class="n">A</span><span class="p">),</span><span class="w"> </span><span class="n">eltype</span><span class="p">(</span><span class="n">q1</span><span class="p">)),</span><span class="w"> </span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="kt">Float64</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span>
+<span class="w">    </span><span class="n">β</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="kt">Float64</span><span class="p">,</span><span class="w"> </span><span class="n">max</span><span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">normalize</span><span class="p">(</span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">q1</span><span class="p">))</span>
+<span class="w">    </span><span class="n">q_previous</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">eltype</span><span class="p">(</span><span class="n">Q</span><span class="p">),</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="n">β_previous</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">m</span>
+<span class="w">        </span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q</span>
+<span class="w">        </span><span class="n">z</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">β_previous</span><span class="o">*</span><span class="n">q_previous</span>
+<span class="w">        </span><span class="n">α</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real</span><span class="p">(</span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="p">))</span>
+<span class="w">        </span><span class="n">z</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">α</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="n">q</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">reorthogonalize</span>
+<span class="w">            </span><span class="n">z</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">j</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">j</span><span class="p">]</span><span class="o">&#39;*</span><span class="n">z</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">m</span>
+<span class="w">            </span><span class="n">β</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+<span class="w">            </span><span class="n">β</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">100</span><span class="o">*</span><span class="n">eps</span><span class="p">(</span><span class="kt">Float64</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">j</span><span class="p">],</span><span class="w"> </span><span class="n">α</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">j</span><span class="p">],</span><span class="w"> </span><span class="n">β</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">j</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="w">            </span><span class="n">q_previous</span><span class="p">,</span><span class="w"> </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">q</span><span class="p">,</span><span class="w"> </span><span class="n">z</span><span class="o">/</span><span class="n">β</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+<span class="w">            </span><span class="n">β_previous</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">β</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">α</span><span class="p">,</span><span class="w"> </span><span class="n">β</span>
+<span class="k">end</span>
+
+<span class="n">n_lanczos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">500</span>
+<span class="n">A_lanczos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SymTridiagonal</span><span class="p">(</span><span class="n">fill</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">n_lanczos</span><span class="p">),</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">n_lanczos</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">Q_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">α_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">β_lanczos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">lanczos</span><span class="p">(</span><span class="n">A_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">randn</span><span class="p">(</span><span class="n">n_lanczos</span><span class="p">),</span><span class="w"> </span><span class="mi">40</span><span class="p">)</span>
+<span class="n">exact_largest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigmax</span><span class="p">(</span><span class="n">A_lanczos</span><span class="p">)</span>
+
+<span class="n">dimensions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="mi">2</span><span class="o">:</span><span class="n">length</span><span class="p">(</span><span class="n">α_lanczos</span><span class="p">))</span>
+<span class="n">value_errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">[]</span>
+<span class="n">residuals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">[]</span>
+<span class="k">for</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">dimensions</span>
+<span class="w">    </span><span class="n">Tm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">SymTridiagonal</span><span class="p">(</span><span class="n">α_lanczos</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">m</span><span class="p">],</span><span class="w"> </span><span class="n">β_lanczos</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+<span class="w">    </span><span class="n">Em</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">eigen</span><span class="p">(</span><span class="n">Tm</span><span class="p">)</span>
+<span class="w">    </span><span class="n">θ</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Em</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="k">end</span><span class="p">]</span>
+<span class="w">    </span><span class="n">q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Q_lanczos</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">m</span><span class="p">]</span><span class="o">*</span><span class="n">Em</span><span class="o">.</span><span class="n">vectors</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="k">end</span><span class="p">]</span>
+<span class="w">    </span><span class="n">push!</span><span class="p">(</span><span class="n">value_errors</span><span class="p">,</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">θ</span><span class="o">-</span><span class="n">exact_largest</span><span class="p">))</span>
+<span class="w">    </span><span class="n">push!</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_lanczos</span><span class="o">*</span><span class="n">q</span><span class="o">-</span><span class="n">θ</span><span class="o">*</span><span class="n">q</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig_lanczos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">850</span><span class="p">,</span><span class="w"> </span><span class="mi">470</span><span class="p">))</span>
+<span class="n">ax_lanczos</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_lanczos</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Krylov dimension m&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;error / residual&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">yscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Lanczos Ritz-pair convergence&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">dimensions</span><span class="p">,</span><span class="w"> </span><span class="n">max</span><span class="o">.</span><span class="p">(</span><span class="n">value_errors</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">());</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Ritz value error&quot;</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">dimensions</span><span class="p">,</span><span class="w"> </span><span class="n">max</span><span class="o">.</span><span class="p">(</span><span class="n">value_errors</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">());</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">dimensions</span><span class="p">,</span><span class="w"> </span><span class="n">max</span><span class="o">.</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">());</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Ritz residual&quot;</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_lanczos</span><span class="p">,</span><span class="w"> </span><span class="n">dimensions</span><span class="p">,</span><span class="w"> </span><span class="n">max</span><span class="o">.</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">());</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">marker</span><span class="o">=</span><span class="ss">:rect</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax_lanczos</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;eigen_lanczos_convergence.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_lanczos</span><span class="p">)</span>
+<span class="n">fig_lanczos</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-eigen-lanczos-convergence">
+<a class="reference internal image-reference" href="../_images/eigen_lanczos_convergence.svg"><img alt="Krylov部分空間の次元に対する最大Ritz値誤差と固有対残差" src="../_images/eigen_lanczos_convergence.svg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 11.3 </span><span class="caption-text">1次元離散ラプラシアン型行列に対するLanczos法。Krylov部分空間を広げるにつれて最大Ritz値と固有対残差が改善する。誤差は必ずしも各ステップで単調に同じ割合だけ減るわけではない。</span><a class="headerlink" href="#fig-eigen-lanczos-convergence" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>この例で <span class="math notranslate nohighlight">\(A\)</span> は三重対角行列なので、行列ベクトル積は <span class="math notranslate nohighlight">\(O(n)\)</span> である。<span class="math notranslate nohighlight">\(m\)</span> 回の行列ベクトル積は合計 <span class="math notranslate nohighlight">\(O(nm)\)</span> だが、上の完全再直交化は合計 <span class="math notranslate nohighlight">\(O(nm^2)\)</span> の演算と <span class="math notranslate nohighlight">\(O(nm)\)</span> の基底保存を要する。この例では直交化の費用も大きくなり得るため、<span class="math notranslate nohighlight">\(m\)</span> を無制限に増やすことはできない。これがリスタートを行う理由の一つである。</p>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">11.12. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 非正規行列では何が難しくなるか<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(A^*A=AA^*\)</span> を満たす行列を正規行列という。エルミート行列は正規行列であり、ユニタリ固有ベクトル基底を持つ。一般の非正規行列では、固有ベクトルがほぼ平行になり、固有値と固有ベクトルが摂動に敏感になり得る。</p>
+<p>たとえば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+A=\begin{bmatrix}1&amp;M\\0&amp;2\end{bmatrix}
+\end{split}\]</div>
+<p>の固有ベクトルは、<span class="math notranslate nohighlight">\(M\)</span> が大きいとほぼ平行になる。左下成分へ小さな摂動 <span class="math notranslate nohighlight">\(\delta\)</span> を加えると、特性方程式には積 <span class="math notranslate nohighlight">\(M\delta\)</span> が現れ、小さな行列摂動でも固有値が大きく動く場合がある。</p>
+<p>エルミート行列で成り立った</p>
+<div class="math notranslate nohighlight">
+\[
+\min_i|\theta-\lambda_i|\leq\|Aq-\theta q\|_2
+\]</div>
+<p>の単純な解釈は、一般の非正規行列へそのまま拡張できない。残差は依然として必要だが、固有ベクトル行列の条件数や擬スペクトル（pseudospectrum）も考える必要がある。非正規問題では、固有値だけで短時間の増幅や時間発展を説明できないことにも注意する。</p>
+</section>
+<section id="id10">
+<h2><span class="section-number">11.13. </span>解法を選ぶ<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<p>小さな密行列の全固有対なら <code class="docutils literal notranslate"><span class="pre">eigen</span></code>、対称性が既知なら <code class="docutils literal notranslate"><span class="pre">eigen(Symmetric(A))</span></code> を使う。少数だけが必要なら、べき乗法・逆反復・Krylov法という選択肢がある。反復法では、目的の固有値の位置、初期値、残差を併せて確認する。</p>
+<p>固有値近似が動かなくなっただけでは十分ではない。正規化したベクトルで元の固有方程式の残差を測り、対称問題の複数の固有ベクトルなら直交性も確認する。小さな問題では全分解の結果が比較の基準になる。</p>
+</section>
+<section id="id11">
+<h2><span class="section-number">11.14. </span>まとめ<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>固有対は、行列の作用を方向と倍率に分けて理解する道具である。べき乗法は相対的によく伸びる成分を残し、逆反復は指定値に近い成分を強調する。Krylov法は反復で得た複数の方向を利用して小さな問題を作る。いずれも、求めた固有対を元の行列の残差で検証する。</p>
+</div>
+<p>次の<a class="reference internal" href="Chap_SVDLowRankApproximation.html"><span class="std std-doc">第12章</span></a>では、長方形の行列にも使える「直交する方向と伸び率」の分解へ進む。</p>
+</section>
+<section id="id12">
+<h2><span class="section-number">11.15. </span>演習<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>方向と倍率</strong>：<span class="math notranslate nohighlight">\(A=\operatorname{diag}(4,2)\)</span> に対し、<span class="math notranslate nohighlight">\((1,0)^T\)</span>、<span class="math notranslate nohighlight">\((0,1)^T\)</span>、<span class="math notranslate nohighlight">\((1,1)^T\)</span> の像を求めよ。どれが固有ベクトルか。</p></li>
+<li><p><strong>反復の行き先</strong>：同じ行列を <span class="math notranslate nohighlight">\((1,1)^T\)</span> に2回かけ、第2成分／第1成分の比を比べよ。初期値が <span class="math notranslate nohighlight">\((0,1)^T\)</span> なら、厳密演算ではどちらの固有値が得られるか。</p></li>
+<li><p><strong>近い値を選ぶ</strong>：固有値が1、3、5の行列で、シフト2.8の逆反復が狙う固有値はどれか。分解を再利用できる理由と、結果を確かめる残差を説明せよ。</p></li>
+<li><p><strong>特性方程式</strong>：<span class="math notranslate nohighlight">\(A=\begin{bmatrix}3&amp;1\\1&amp;3\end{bmatrix}\)</span> の固有値と固有ベクトルを手で求め、<code class="docutils literal notranslate"><span class="pre">eigen</span></code> の結果と比べよ。本文の <span class="math notranslate nohighlight">\(\begin{bmatrix}2&amp;1\\1&amp;2\end{bmatrix}\)</span> と比べて、固有ベクトルが変わらず固有値だけが1ずつ増える理由を、<span class="math notranslate nohighlight">\(A=\begin{bmatrix}2&amp;1\\1&amp;2\end{bmatrix}+I\)</span> と見て説明せよ。</p></li>
+<li><p><strong>探究：乗り換えと収束の速さ</strong>：ブランドの例で、初期シェアを <span class="math notranslate nohighlight">\((1,0,0)\)</span> にすると、前月からの変化の縮み方はどうなるか。まず本文の説明から予想し、次に計算で確かめよ。さらに、各ブランドの「来月も同じブランドを買う確率」（対角成分）をすべて0.95に近づける（列の和が1になるよう他の成分も調整する）と、定常状態へ近づく速さはどう変わるか。固有値を計算して説明し、「顧客の乗り換えが少ない市場で、キャンペーンの効果が定常状態に現れるまでの期間」をどう見積もるかを考察せよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id13">
+<h2><span class="section-number">11.16. </span>参考文献と関連する節<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Driscoll and Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/krylov/power.html">Power iteration</a>.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_IterativeLinearSystems.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">10. </span>連立一次方程式の反復法</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_SVDLowRankApproximation.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">12. </span>特異値分解と低ランク近似</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">11.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">11.2. 固有値と固有ベクトルを小さな例で確認する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">11.2.1. 対角でない行列の固有値を手で求める</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">11.3. 対称・エルミート固有値問題は特別に扱いやすい</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#rayleigh">11.4. Rayleigh商と固有対残差：答えをどう検証するか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">11.5. 全固有値を求めるか、少数だけ求めるか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">11.6. べき乗法：最大絶対値固有値を取り出す</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">11.7. シフト付き逆反復：指定値に近い固有値を選ぶ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">11.8. 応用例：ブランドのシェアはどこへ落ち着くか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-rayleigh">11.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> Rayleigh商反復</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#krylov">11.10. Krylov部分空間：反復中の情報を捨てない</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-arnoldilanczos">11.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> Arnoldi法とLanczos法</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">11.12. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 非正規行列では何が難しくなるか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">11.13. 解法を選ぶ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">11.14. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">11.15. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">11.16. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

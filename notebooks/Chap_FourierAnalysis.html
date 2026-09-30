@@ -1,0 +1,788 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>13. Fourier解析とFourier回帰 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_FourierAnalysis';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="14. 動的モード分解" href="Chap_DMD.html" />
+    <link rel="prev" title="12. 特異値分解と低ランク近似" href="Chap_SVDLowRankApproximation.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_FourierAnalysis.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>Fourier解析とFourier回帰</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">13.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fourier">13.2. Fourier級数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">13.3. 離散Fourier変換</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">13.3.1. 添字と周波数を対応させる</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">13.4. 標本化とエイリアシング</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">13.5. Fourier回帰</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">13.6. 係数の読み方と検証</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">13.7. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">13.8. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">13.9. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_FourierAnalysis.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="fourierfourier">
+<h1><span class="section-number">13. </span>Fourier解析とFourier回帰<a class="headerlink" href="#fourierfourier" title="Link to this heading">#</a></h1>
+<p>第12章のSVDはデータに適した方向を求めた。本章では、あらかじめ決めた波を使って時間信号を表す。例えば毎日の気温の変化に、1日周期とその半分の周期がどの程度含まれるかを調べたい。</p>
+<p>Fourier解析は、周期的な関数やデータを正弦波・余弦波の重ね合わせとして表す。本章では、連続関数のFourier級数、離散Fourier変換（DFT）、ノイズを含むデータに対するFourier回帰を区別して扱う。</p>
+<section id="id1">
+<h2><span class="section-number">13.1. </span>この章の目標<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>三角関数の直交性からFourier係数を説明できる。</p></li>
+<li><p>Fourier級数とDFTの対象の違いを説明できる。</p></li>
+<li><p>DFT係数の添字と周波数を対応させ、逆変換で元のデータを確認できる。</p></li>
+<li><p>標本化により異なる波を区別できなくなる現象を説明できる。</p></li>
+<li><p>Fourier回帰を線形最小二乗問題として実装できる。</p></li>
+</ul>
+</section>
+<section id="fourier">
+<h2><span class="section-number">13.2. </span>Fourier級数<a class="headerlink" href="#fourier" title="Link to this heading">#</a></h2>
+<p>まず <span class="math notranslate nohighlight">\(f(t)=1+2\cos t-0.5\sin3t\)</span> を考える。平均1の上に、1周期の余弦波と3周期の正弦波が重なる。係数2と <span class="math notranslate nohighlight">\(-0.5\)</span> は、それぞれの波の重みである。</p>
+<figure class="align-default" id="fig-learning-fourier-sum">
+<a class="reference internal image-reference" href="../_images/learning_fourier_sum.svg"><img alt="上段は2cos tとマイナス0.5sin 3t、下段は両者に平均1を加えた波形。同じ横軸で波の重ね合わせを示す。" src="../_images/learning_fourier_sum.svg" style="width: 85%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 13.1 </span><span class="caption-text">上段の青い実線は1周期、橙色の破線は3周期の波である。同じ時刻の二つの高さに1を足すと、下段の高さになる。例えば <span class="math notranslate nohighlight">\(t=0\)</span> では <span class="math notranslate nohighlight">\(2+0+1=3\)</span>、<span class="math notranslate nohighlight">\(t=\pi\)</span> では <span class="math notranslate nohighlight">\(-2+0+1=-1\)</span>。係数は各部品の重みを決める。</span><a class="headerlink" href="#fig-learning-fourier-sum" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<p>周期 <span class="math notranslate nohighlight">\(2\pi\)</span> の区分的に滑らかな関数は、三角関数の級数</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+f(t)\sim \frac{a_0}{2}+
+\sum_{k=1}^{\infty}\left(a_k\cos kt+b_k\sin kt\right)
+\end{align}
+\]</div>
+<p>と表すことを考える。異なる整数周波数の波の積を <span class="math notranslate nohighlight">\([0,2\pi]\)</span> で積分すると0になり、同じ波の二乗の積分は <span class="math notranslate nohighlight">\(\pi\)</span> になる（定数項は別扱い）。例えば級数に <span class="math notranslate nohighlight">\(\cos(\ell t)\)</span> を掛けて積分すれば、<span class="math notranslate nohighlight">\(a_\ell\)</span> の項だけが残る。この直交性から</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+a_k=\frac{1}{\pi}\int_0^{2\pi}f(t)\cos(kt)\,dt,
+\qquad
+b_k=\frac{1}{\pi}\int_0^{2\pi}f(t)\sin(kt)\,dt
+\end{align}
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(a_0/2\)</span> が平均なので、最初の例では <span class="math notranslate nohighlight">\(a_0=2\)</span> である。不連続点での級数の収束先は左右の極限の平均となり、有限項では跳びの近くに振動が残ることがある。有限個の項で止めれば、三角多項式による近似である。滑らかな周期関数ほど係数が速く減衰し、少数の周波数でよく近似できる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">fourier_coefficients</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">K</span><span class="p">;</span><span class="w"> </span><span class="n">nquad</span><span class="o">=</span><span class="mi">4000</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nquad</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="n">K</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">K</span><span class="w"> </span><span class="o">≥</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;項数に対して十分な評価点を用意してください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="nb">π</span><span class="o">/</span><span class="n">nquad</span>
+<span class="w">    </span><span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">nquad</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.*</span><span class="n">h</span>
+<span class="w">    </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="o">.</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="w">    </span><span class="n">a0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="n">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span><span class="o">/</span><span class="n">nquad</span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="n">sum</span><span class="p">(</span><span class="n">values</span><span class="o">.*</span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="n">k</span><span class="o">.*</span><span class="n">t</span><span class="p">))</span><span class="o">/</span><span class="n">nquad</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">K</span><span class="p">]</span>
+<span class="w">    </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="n">sum</span><span class="p">(</span><span class="n">values</span><span class="o">.*</span><span class="n">sin</span><span class="o">.</span><span class="p">(</span><span class="n">k</span><span class="o">.*</span><span class="n">t</span><span class="p">))</span><span class="o">/</span><span class="n">nquad</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">K</span><span class="p">]</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a0</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span>
+<span class="k">end</span>
+
+<span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="n">sin</span><span class="p">(</span><span class="mi">3</span><span class="n">t</span><span class="p">)</span>
+<span class="n">a0</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fourier_coefficients</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;a0 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">a0</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;a = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;b = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">b</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>a0 = 2.0000000000000004
+a = [2.0, 0.0, -0.0, 0.0]
+b = [-0.0, 0.0, -0.5, 0.0]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id2">
+<h2><span class="section-number">13.3. </span>離散Fourier変換<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>前節では関数式を数値積分して係数を求めた。測定済みの有限個の値しかない場合は、有限の変換でそれらを表す。</p>
+<p>複素数 <span class="math notranslate nohighlight">\(i\)</span> は <span class="math notranslate nohighlight">\(i^2=-1\)</span> を満たし、Eulerの公式 <span class="math notranslate nohighlight">\(e^{i\theta}=\cos\theta+i\sin\theta\)</span> により、余弦と正弦を一つの指数にまとめられる。以下の <code class="docutils literal notranslate"><span class="pre">cis(θ)</span></code> はこの複素指数で、時間積分のEuler法とは別の話である。</p>
+<p><span class="math notranslate nohighlight">\(N\)</span> 個の等間隔データ <span class="math notranslate nohighlight">\(x_0,\ldots,x_{N-1}\)</span> のDFTを</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+X_k=\sum_{n=0}^{N-1}x_n e^{-2\pi i kn/N},
+\qquad k=0,\ldots,N-1
+\end{align}
+\]</div>
+<p>と定義する。逆変換は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+x_n=\frac1N\sum_{k=0}^{N-1}X_k e^{2\pi i kn/N}
+\end{align}
+\]</div>
+<p>である。和が有限なので、これは <span class="math notranslate nohighlight">\(N\)</span> 個のデータの別の表現であり、逆変換すれば丸めを除いて元へ戻る。<span class="math notranslate nohighlight">\(k=0\)</span> の係数はデータの総和なので、<span class="math notranslate nohighlight">\(X_0/N\)</span> が平均となる。数学の添字は0始まり、Juliaは1始まりなので、コードでは <span class="math notranslate nohighlight">\(X_k\)</span> を <code class="docutils literal notranslate"><span class="pre">X[k+1]</span></code> と書く。</p>
+<p>係数の正規化や指数の符号には複数の流儀があるため、変換と逆変換を対で確認する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">dft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">cis</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="nb">π</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">end</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">idft</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="w">    </span><span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="n">sum</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">cis</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="n">N</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="n">N</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">end</span>
+
+<span class="n">N</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">16</span>
+<span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="nb">π</span><span class="o">.*</span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="n">N</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">./</span><span class="n">N</span>
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nd">@.</span><span class="w"> </span><span class="mi">1</span><span class="o">+</span><span class="mi">2</span><span class="n">cos</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="o">-</span><span class="mf">0.5</span><span class="n">sin</span><span class="p">(</span><span class="mi">3</span><span class="n">t</span><span class="p">)</span>
+<span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dft</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">xrec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">real</span><span class="o">.</span><span class="p">(</span><span class="n">idft</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;再構成誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">maximum</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">xrec</span><span class="p">)))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;大きいDFT係数の周波数index k = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">findall</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.&gt;</span><span class="mf">1e-10</span><span class="p">)</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>再構成誤差 = 9.658940314238862e-15
+大きいDFT係数の周波数index k = [0, 1, 3, 13, 15]
+</pre></div>
+</div>
+</div>
+</div>
+<p>直接計算は <span class="math notranslate nohighlight">\(O(N^2)\)</span> だが、高速Fourier変換（FFT）は同じDFTを <span class="math notranslate nohighlight">\(O(N\log N)\)</span> で計算するアルゴリズムである。</p>
+<p>DFTの再構成が正確でも、測定点の間の連続信号まで一意に分かるわけではない。</p>
+<section id="id3">
+<h3><span class="section-number">13.3.1. </span>添字と周波数を対応させる<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<p>標本間隔を <span class="math notranslate nohighlight">\(\Delta t\)</span> とすると、記録の長さは <span class="math notranslate nohighlight">\(T=N\Delta t\)</span> で、周波数の間隔は <span class="math notranslate nohighlight">\(1/T\)</span> である。<span class="math notranslate nohighlight">\(k/T\)</span> が対応する周波数だが、<span class="math notranslate nohighlight">\(k&gt;N/2\)</span> は <span class="math notranslate nohighlight">\((k-N)/T\)</span> という負の周波数として読める。実数データでは正負の係数が複素共役になる。本文の <span class="math notranslate nohighlight">\(N=16\)</span> の例で現れる <span class="math notranslate nohighlight">\(k=0,1,3,13,15\)</span> は、平均と、正負の1周期・3周期の波に対応する。</p>
+</section>
+</section>
+<section id="id4">
+<h2><span class="section-number">13.4. </span>標本化とエイリアシング<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>標本化周波数は <span class="math notranslate nohighlight">\(f_s=1/\Delta t\)</span> である。<span class="math notranslate nohighlight">\(f_s/2\)</span> を超える波は、標本点上では区間 <span class="math notranslate nohighlight">\([-f_s/2,f_s/2]\)</span> 内の別の周波数と区別できなくなる。これが<strong>エイリアシング</strong>である。帯域が <span class="math notranslate nohighlight">\(f_s/2\)</span> 未満に制限されているという仮定が、連続信号を復元する際に必要になる。</p>
+<p>DFTは観測区間を周期的に繰り返したデータとして扱う。区間の両端が滑らかにつながらない、または信号の周期が観測区間に整数個入らない場合、エネルギーが近隣の周波数へ広がるspectral leakageが起こる。window関数はleakageを抑えるが、周波数分解能との交換を伴う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">sampling_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0</span>
+<span class="n">sample_times</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="mi">7</span><span class="p">)</span><span class="o">./</span><span class="n">sampling_rate</span>
+<span class="n">x_low</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">sample_times</span><span class="p">)</span>
+<span class="n">x_high</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">sample_times</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;周波数1と7の標本値の最大差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">maximum</span><span class="p">(</span><span class="n">abs</span><span class="o">.</span><span class="p">(</span><span class="n">x_low</span><span class="o">-</span><span class="n">x_high</span><span class="p">)))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;周波数1の標本値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">x_low</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>周波数1と7の標本値の最大差 = 3.1086244689504383e-15
+周波数1の標本値 = [1.0, 0.7071, 0.0, -0.7071, -1.0, -0.7071, -0.0, 0.7071]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="n">sampling_rate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">8.0</span>
+<span class="n">low_frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="n">high_frequency</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sampling_rate</span><span class="o">-</span><span class="n">low_frequency</span>
+<span class="n">sample_times</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="mi">7</span><span class="p">)</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">sampling_rate</span>
+<span class="n">sample_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">low_frequency</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">sample_times</span><span class="p">)</span>
+<span class="n">dense_time</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">1200</span><span class="p">)</span>
+
+<span class="n">N_alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">length</span><span class="p">(</span><span class="n">sample_times</span><span class="p">)</span>
+<span class="n">spectrum_alias</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">abs</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">sample_values</span><span class="p">[</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="nb">π</span><span class="o">*</span><span class="nb">im</span><span class="o">*</span><span class="n">k</span><span class="o">*</span><span class="n">n</span><span class="o">/</span><span class="n">N_alias</span><span class="p">)</span>
+<span class="w">                          </span><span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N_alias</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">/</span><span class="n">N_alias</span>
+<span class="w">                  </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N_alias</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">fig_aliasing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1050</span><span class="p">,</span><span class="w"> </span><span class="mi">430</span><span class="p">))</span>
+<span class="n">ax_signal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_aliasing</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;signal&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Different waves, identical samples&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_signal</span><span class="p">,</span><span class="w"> </span><span class="n">dense_time</span><span class="p">,</span><span class="w"> </span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">low_frequency</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">dense_time</span><span class="p">);</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;1 cycle / time&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_signal</span><span class="p">,</span><span class="w"> </span><span class="n">dense_time</span><span class="p">,</span><span class="w"> </span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">high_frequency</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">dense_time</span><span class="p">);</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;7 cycles / time&quot;</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_signal</span><span class="p">,</span><span class="w"> </span><span class="n">sample_times</span><span class="p">,</span><span class="w"> </span><span class="n">sample_values</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span>
+<span class="w">    </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;samples at 8 / time&quot;</span><span class="p">)</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax_signal</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:rb</span><span class="p">)</span>
+
+<span class="n">ax_spectrum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_aliasing</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;DFT index k&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;magnitude&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Spectrum of the sampled data&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xticks</span><span class="o">=</span><span class="mi">0</span><span class="o">:</span><span class="mi">7</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N_alias</span><span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax_spectrum</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">spectrum_alias</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:seagreen</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_spectrum</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">N_alias</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">spectrum_alias</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:seagreen</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;fourier_aliasing.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_aliasing</span><span class="p">)</span>
+<span class="n">fig_aliasing</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-fourier-aliasing">
+<a class="reference internal image-reference" href="../_images/fourier_aliasing.svg"><img alt="異なる周波数の連続信号が同じ標本値を与えるaliasingの例" src="../_images/fourier_aliasing.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 13.2 </span><span class="caption-text">標本化周波数が8のとき、周波数1と7の余弦波は黒点で完全に一致する。離散データだけから両者を区別できないことがエイリアシングの本質である。右の縦軸は <span class="math notranslate nohighlight">\(|X_k|/N\)</span> で、<span class="math notranslate nohighlight">\(k=1,7\)</span> は正負の周波数1に対応する。各棒が0.5になるのは、振幅1の余弦波が正負二つの複素指数へ半分ずつ分かれるためである。</span><a class="headerlink" href="#fig-fourier-aliasing" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id5">
+<h2><span class="section-number">13.5. </span>Fourier回帰<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>観測時刻が不等間隔、データに欠測やノイズがある、限られた周波数だけを使いたい場合は、DFTよりFourier回帰が自然である。</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+y_i\approx c_0+
+\sum_{k=1}^{K}\left(a_k\cos(k\omega_0t_i)+b_k\sin(k\omega_0t_i)\right)
+\end{align}
+\]</div>
+<p>は係数に関して線形なので、<a class="reference internal" href="Chap_QRLeastSquares.html"><span class="std std-doc">第6章</span></a>と同じ最小二乗問題 <span class="math notranslate nohighlight">\(Ac\approx y\)</span> として解ける。基本角周波数 <span class="math notranslate nohighlight">\(\omega_0=2\pi/T_0\)</span> と項数 <span class="math notranslate nohighlight">\(K\)</span> をモデルとして指定する。設計行列の列は、1、<span class="math notranslate nohighlight">\(\cos(\omega_0t)\)</span>、<span class="math notranslate nohighlight">\(\sin(\omega_0t)\)</span>、…の順に並ぶ。以下では <span class="math notranslate nohighlight">\(\omega_0=1\)</span>、<span class="math notranslate nohighlight">\(K=3\)</span> として、冒頭と同じ信号へ雑音を加えた80点から7個の係数を推定する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="p">,</span><span class="w"> </span><span class="n">Random</span>
+<span class="n">Random</span><span class="o">.</span><span class="n">seed!</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sort</span><span class="p">(</span><span class="mi">2</span><span class="nb">π</span><span class="o">.*</span><span class="n">rand</span><span class="p">(</span><span class="mi">80</span><span class="p">))</span><span class="w">  </span><span class="c"># 不等間隔</span>
+<span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="mi">2</span><span class="n">cos</span><span class="o">.</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="mf">0.5</span><span class="n">sin</span><span class="o">.</span><span class="p">(</span><span class="mi">3</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="mf">0.2</span><span class="n">randn</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+<span class="n">K</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
+<span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hcat</span><span class="p">(</span><span class="n">ones</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">t</span><span class="p">)),[</span><span class="n">g</span><span class="o">.</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">K</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">cos</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">t</span><span class="p">),</span><span class="n">t</span><span class="o">-&gt;</span><span class="n">sin</span><span class="p">(</span><span class="n">k</span><span class="o">*</span><span class="n">t</span><span class="p">))]</span><span class="o">...</span><span class="p">)</span>
+<span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">y</span>
+<span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="o">-</span><span class="n">A</span><span class="o">*</span><span class="n">c</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;推定係数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">c</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差RMS = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="n">sqrt</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">r</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>推定係数 = [1.006, 2.004, 0.014, 0.022, 0.006, 0.02, -0.484]
+残差RMS = 0.18446870712926705
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h2><span class="section-number">13.6. </span>係数の読み方と検証<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(a_k\cos(k\omega_0t)+b_k\sin(k\omega_0t)\)</span> は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+A_k\cos(k\omega_0t-\phi_k),
+\quad A_k=\sqrt{a_k^2+b_k^2},
+\quad \phi_k=\operatorname{atan}(b_k,a_k)
+\end{align}
+\]</div>
+<p>とまとめられる。振幅だけでなく位相にも情報がある。</p>
+<p>位相は波の横方向のずれを表す。振幅0の成分の位相は定まらない。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>方法</p></th>
+<th class="head"><p>入力</p></th>
+<th class="head"><p>得られるもの</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Fourier級数</p></td>
+<td><p>周期関数</p></td>
+<td><p>直交性から定まる波の係数</p></td>
+</tr>
+<tr class="row-odd"><td><p>DFT</p></td>
+<td><p>有限個の等間隔データ</p></td>
+<td><p>そのデータを再構成する有限の係数</p></td>
+</tr>
+<tr class="row-even"><td><p>Fourier回帰</p></td>
+<td><p>観測時刻と値</p></td>
+<td><p>指定した波の組合せによる最小二乗近似</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="id7">
+<h2><span class="section-number">13.7. </span>まとめ<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>Fourier解析では波の係数として信号を読む。FFTはDFTの高速な計算法であり、異なる変換ではない。係数の読み取りには、標本間隔、記録時間、正規化、正負の周波数の対応を確認する。逆変換でデータを再現できても、エイリアシングで失った情報は戻らない。</p>
+</div>
+<p>次の<a class="reference internal" href="Chap_DMD.html"><span class="std std-doc">第14章</span></a>では、時間変化の規則と空間パターンをデータから同時に推定する。</p>
+</section>
+<section id="id8">
+<h2><span class="section-number">13.8. </span>演習<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>波の係数</strong>：<span class="math notranslate nohighlight">\(f(t)=1+2\cos t-0.5\sin3t\)</span> の平均と、含まれる波を説明せよ。Fourier級数の定数係数 <span class="math notranslate nohighlight">\(a_0\)</span> が1ではなく2になる理由は何か。</p></li>
+<li><p><strong>同じ標本になる波</strong>：標本化周波数8で周波数1と7の余弦波を観測する。本文の図の黒点だけで両者を区別できるか。DFTを逆変換できることと、元の連続信号が分かることの違いを述べよ。</p></li>
+<li><p><strong>最小二乗との接続</strong>：<span class="math notranslate nohighlight">\(y\approx c_0+a_1\cos t+b_1\sin t\)</span> の設計行列の1行を書け。不等間隔の観測にもこの行を作れる理由を説明せよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id9">
+<h2><span class="section-number">13.9. </span>参考文献と関連する節<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Driscoll and Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/globalapprox/trig.html">Trigonometric interpolation</a>.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_SVDLowRankApproximation.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">12. </span>特異値分解と低ランク近似</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_DMD.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">14. </span>動的モード分解</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">13.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#fourier">13.2. Fourier級数</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">13.3. 離散Fourier変換</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">13.3.1. 添字と周波数を対応させる</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">13.4. 標本化とエイリアシング</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">13.5. Fourier回帰</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">13.6. 係数の読み方と検証</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">13.7. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">13.8. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">13.9. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

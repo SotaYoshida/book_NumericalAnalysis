@@ -1,0 +1,1170 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>7. 非線形方程式 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_NonlinearEquations';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="8. 補間・数値微分・数値積分" href="Chap_InterpolationDifferentiationIntegration.html" />
+    <link rel="prev" title="6. 最小二乗法とQR分解" href="Chap_QRLeastSquares.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_NonlinearEquations.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>非線形方程式</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">7.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">7.2. 計算を始める前に調べること</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">7.3. 二分法：根を挟む区間を縮める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">7.4. 不動点反復：方程式を更新式へ書き換える</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#newton">7.5. Newton法：曲線を接線で置き換える</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">7.6. 割線法：導関数を差分で置き換える</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#irr">7.7. 応用例：内部収益率（IRR）を求める</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">7.7.1. IRRが二つある場合</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">7.8. 停止条件と解法の安全装置</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-newton">7.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> Newton法の収束次数と重根</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">7.10. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 非線形連立方程式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">7.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 最適化とのつながり</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">7.12. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">7.13. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">7.14. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_NonlinearEquations.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">7. </span>非線形方程式<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p>これまでに扱った連立一次方程式では、係数行列を分解すれば有限回の演算で解を構成できた。一方、</p>
+<div class="math notranslate nohighlight">
+\[
+f(x)=0
+\]</div>
+<p>のような<strong>非線形方程式</strong>には、一般にそのような万能の公式はない。そこで、解がありそうな場所を探し、近似値を反復によって更新し、得られた値が信頼できるかを検証する。</p>
+<p>たとえば、落下速度が所定の値になる時刻、化学反応が平衡に達する濃度、観測値とモデル予測が一致するパラメータは、いずれも「ある量の差を <span class="math notranslate nohighlight">\(f(x)\)</span> と置き、<span class="math notranslate nohighlight">\(f(x)=0\)</span> を解く」問題になる。非線形方程式は単独の話題というより、数値解析のさまざまな場面に現れる基本部品である。</p>
+<p>本章では、次の共通手順を意識する。</p>
+<ol class="arabic simple">
+<li><p>方程式を定め、解の存在範囲や個数を調べる。</p></li>
+<li><p>問題の情報に応じて反復法を選ぶ。</p></li>
+<li><p>残差と更新量を記録して停止する。</p></li>
+<li><p>初期値や許容誤差を変えて結果を検証する。</p></li>
+</ol>
+<section id="id2">
+<h2><span class="section-number">7.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>根、近似解、残差、前進誤差を区別できる。</p></li>
+<li><p>二分法の前提を確認し、必要反復回数を事前に見積もれる。</p></li>
+<li><p>不動点反復とNewton法を局所的な近似から導出できる。</p></li>
+<li><p>収束の速さだけでなく、初期値依存性と停止条件を評価できる。</p></li>
+<li><p>導関数の有無と安全性の要請から解法を選べる。</p></li>
+<li><p>内部収益率（IRR）の計算のような応用で、解の個数や前提を確認してから解法を使える。</p></li>
+</ul>
+<div class="note admonition">
+<p class="admonition-title">この章で使う数学（復習）</p>
+<ul class="simple">
+<li><p><strong>中間値の定理</strong>：連続な関数が <span class="math notranslate nohighlight">\(f(a)&gt;0\)</span>、<span class="math notranslate nohighlight">\(f(b)&lt;0\)</span> なら、<span class="math notranslate nohighlight">\(a\)</span> と <span class="math notranslate nohighlight">\(b\)</span> の間のどこかで <span class="math notranslate nohighlight">\(f(x)=0\)</span> となる。グラフが途切れずに横軸をまたぐ、という直感でよい。</p></li>
+<li><p><strong>接線の式</strong>：点 <span class="math notranslate nohighlight">\(a\)</span> における <span class="math notranslate nohighlight">\(y=f(x)\)</span> の接線は <span class="math notranslate nohighlight">\(y=f(a)+f'(a)(x-a)\)</span> である。Newton法はこれを使う。</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(\log_2\)</span></strong>：<span class="math notranslate nohighlight">\(2^k=N\)</span> となる <span class="math notranslate nohighlight">\(k\)</span> が <span class="math notranslate nohighlight">\(\log_2N\)</span> である。例えば <span class="math notranslate nohighlight">\(\log_2 1024=10\)</span>。「半分にする操作を何回繰り返せば <span class="math notranslate nohighlight">\(1/N\)</span> になるか」を表す。</p></li>
+</ul>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">7.2. </span>計算を始める前に調べること<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>第5・6章では、未知数について1次の式を扱った。例えば <span class="math notranslate nohighlight">\(x=\cos x\)</span> では、<span class="math notranslate nohighlight">\(x\)</span> が関数の中にも現れ、同じ消去法では取り出せない。「候補を作り、式に代入し、候補を直す」という反復が必要になる。まずは解を挟む区間を探し、その後に更新を速める工夫を学ぶ。</p>
+<p><span class="math notranslate nohighlight">\(f(x_*)=0\)</span> を満たす <span class="math notranslate nohighlight">\(x_*\)</span> を<strong>根</strong>という。計算機が返すのは通常、真の根そのものではなく近似値 <span class="math notranslate nohighlight">\(\hat{x}\)</span> である。このとき</p>
+<div class="math notranslate nohighlight">
+\[
+|\hat{x}-x_*| \quad\text{と}\quad |f(\hat{x})|
+\]</div>
+<p>をそれぞれ<strong>前進誤差</strong>と<strong>残差</strong>という。前進誤差には未知の <span class="math notranslate nohighlight">\(x_*\)</span> が入るため、実際の計算中に直接評価できないことが多い。それに対し、残差は <span class="math notranslate nohighlight">\(\hat{x}\)</span> を <span class="math notranslate nohighlight">\(f\)</span> に代入すれば計算できる。</p>
+<p>ただし、残差が小さいだけで前進誤差も小さいとは限らない。根の近くで <span class="math notranslate nohighlight">\(f'(x_*)\neq0\)</span> なら、1次近似から</p>
+<div class="math notranslate nohighlight">
+\[
+f(\hat{x})\approx f'(x_*)(\hat{x}-x_*),\qquad
+|\hat{x}-x_*|\approx\frac{|f(\hat{x})|}{|f'(x_*)|}
+\]</div>
+<p>となる。傾きが小さい根では、同じ残差でも <span class="math notranslate nohighlight">\(x\)</span> の誤差が大きくなり得る。これは第4章で学んだ「問題の条件」と「計算結果の残差」を分ける考え方の非線形版である。</p>
+<p>数値解法を選ぶ前に、少なくとも次を確認する。</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(f\)</span> はどの区間で定義され、連続か。</p></li>
+<li><p>グラフ、符号、単調性から根の存在や個数を絞れるか。</p></li>
+<li><p><span class="math notranslate nohighlight">\(f'(x)\)</span> を計算できるか。また、根の近くで小さくならないか。</p></li>
+<li><p>求めたいのは一つの根か、指定区間内のすべての根か。</p></li>
+<li><p><span class="math notranslate nohighlight">\(x\)</span> と <span class="math notranslate nohighlight">\(f(x)\)</span> の典型的な大きさはどの程度か。</p></li>
+</ul>
+<p>本章では一貫して</p>
+<div class="math notranslate nohighlight">
+\[
+f(x)=\cos x-x
+\]</div>
+<p>を基本例に使う。<span class="math notranslate nohighlight">\(f(0)=1&gt;0\)</span>、<span class="math notranslate nohighlight">\(f(1)=\cos1-1&lt;0\)</span> であり、<span class="math notranslate nohighlight">\(f\)</span> は <span class="math notranslate nohighlight">\([0,1]\)</span> で連続なので、この区間に少なくとも一つ根がある。また <span class="math notranslate nohighlight">\(f'(x)=-\sin x-1&lt;0\)</span> なので、根は一つだけである。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span>
+
+<span class="c"># まず粗い点で符号を調べる。これは証明ではなく、探索区間を決めるための観察である。</span>
+<span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.2</span><span class="o">:</span><span class="mf">1.0</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;x = </span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="s">, f(x) = </span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x = 0.0, f(x) = 1.0
+x = 0.2, f(x) = 0.780067
+x = 0.4, f(x) = 0.521061
+x = 0.6, f(x) = 0.225336
+x = 0.8, f(x) = -0.103293
+x = 1.0, f(x) = -0.459698
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id4">
+<h2><span class="section-number">7.3. </span>二分法：根を挟む区間を縮める<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(f\)</span> が <span class="math notranslate nohighlight">\([a,b]\)</span> で連続であり、<span class="math notranslate nohighlight">\(f(a)f(b)&lt;0\)</span> なら、中間値の定理により区間内に根が少なくとも一つある。二分法は、この<strong>符号変化を保つ</strong>ことを不変条件として使う。</p>
+<ol class="arabic simple">
+<li><p>中点 <span class="math notranslate nohighlight">\(c=(a+b)/2\)</span> を計算する。</p></li>
+<li><p><span class="math notranslate nohighlight">\(f(c)\)</span> の符号を調べる。</p></li>
+<li><p><span class="math notranslate nohighlight">\([a,c]\)</span> と <span class="math notranslate nohighlight">\([c,b]\)</span> のうち、端点で符号が変わる方だけを残す。</p></li>
+<li><p>区間が十分狭くなるまで繰り返す。</p></li>
+</ol>
+<p>最初の区間幅を <span class="math notranslate nohighlight">\(b_0-a_0\)</span> とする。<span class="math notranslate nohighlight">\(k\)</span> 回目に評価する中点 <span class="math notranslate nohighlight">\(c_k\)</span> は、幅 <span class="math notranslate nohighlight">\((b_0-a_0)/2^{k-1}\)</span> の区間の中点なので、区間内のある根 <span class="math notranslate nohighlight">\(x_*\)</span> に対して</p>
+<div class="math notranslate nohighlight">
+\[
+|c_k-x_*|\leq\frac{b_0-a_0}{2^k}
+\]</div>
+<p>が成り立つ（ここでは厳密演算を考える）。例えば最初の区間が <span class="math notranslate nohighlight">\([0,1]\)</span> なら、最初の中点は0.5、誤差上界は0.5である。<span class="math notranslate nohighlight">\(f(0.5)&gt;0\)</span> なので次は <span class="math notranslate nohighlight">\([0.5,1]\)</span> を残し、中点0.75、上界0.25となる。</p>
+<p>したがって前進誤差を <span class="math notranslate nohighlight">\(\varepsilon_x\)</span> 以下に保証したければ、</p>
+<div class="math notranslate nohighlight">
+\[
+k\geq\left\lceil\log_2\frac{b_0-a_0}{\varepsilon_x}\right\rceil
+\]</div>
+<p>を満たす反復回数を用意すればよい。二分法の長所は、速さよりも「根を挟んでいる」という保証を計算中ずっと維持できる点にある。</p>
+<div class="admonition warning">
+<p class="admonition-title">警告</p>
+<p><span class="math notranslate nohighlight">\(f(a)f(b)&gt;0\)</span> でも根がないとは限らない。たとえば <span class="math notranslate nohighlight">\((x-1)^2\)</span> は根の両側で符号が変わらない。二分法の仮定は十分条件であって、根の存在に必要な条件ではない。</p>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">bisection</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">;</span><span class="w"> </span><span class="n">xtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">ftol</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="w">    </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">a</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">b</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;a &lt; b となる区間を指定してください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">fa</span><span class="p">,</span><span class="w"> </span><span class="n">fb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="w">    </span><span class="n">isfinite</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isfinite</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;端点で有限な関数値が必要です&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">abs</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="kt">NamedTuple</span><span class="p">[])</span>
+<span class="w">    </span><span class="n">abs</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="kt">NamedTuple</span><span class="p">[])</span>
+<span class="w">    </span><span class="n">signbit</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">signbit</span><span class="p">(</span><span class="n">fb</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;端点で符号が変わる区間を指定してください&quot;</span><span class="p">)</span>
+
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">NamedTuple</span><span class="p">[]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="w">                 </span><span class="c"># この例の有限な区間の中点</span>
+<span class="w">        </span><span class="n">fc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="w">        </span><span class="n">isfinite</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;区間内で有限な関数値が必要です&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="o">=</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="o">=</span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="o">=</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">fc</span><span class="o">=</span><span class="n">fc</span><span class="p">,</span><span class="w"> </span><span class="n">error_bound</span><span class="o">=</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">xtol</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">elseif</span><span class="w"> </span><span class="n">signbit</span><span class="p">(</span><span class="n">fa</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">signbit</span><span class="p">(</span><span class="n">fc</span><span class="p">)</span>
+<span class="w">            </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">fb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">fc</span>
+<span class="w">        </span><span class="k">else</span>
+<span class="w">            </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">fa</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">fc</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">a</span><span class="o">+</span><span class="p">(</span><span class="n">b</span><span class="o">-</span><span class="n">a</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">bis</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bisection</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">bis</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="k">end</span><span class="p">)]</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;k=</span><span class="si">$</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">k</span><span class="p">)</span><span class="s">: [</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">a</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="s">, </span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">b</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="s">], &quot;</span><span class="w"> </span><span class="o">*</span>
+<span class="w">            </span><span class="s">&quot;c=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">c</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span><span class="s">, f(c)=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">fc</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">6</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;根 ≈ </span><span class="si">$</span><span class="p">(</span><span class="n">bis</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="s">, 反復回数 = </span><span class="si">$</span><span class="p">(</span><span class="n">bis</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span><span class="s">, 残差 = </span><span class="si">$</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">bis</span><span class="o">.</span><span class="n">root</span><span class="p">)))</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k=1: [0.0, 1.0], c=0.5, f(c)=0.377583
+k=2: [0.5, 1.0], c=0.75, f(c)=-0.018311
+k=3: [0.5, 0.75], c=0.625, f(c)=0.185963
+k=4: [0.625, 0.75], c=0.6875, f(c)=0.085335
+k=5: [0.6875, 0.75], c=0.71875, f(c)=0.033879
+根 ≈ 0.7390851332456805, 反復回数 = 34, 残差 = 5.1078363760836965e-11
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id5">
+<h2><span class="section-number">7.4. </span>不動点反復：方程式を更新式へ書き換える<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(f(x)=0\)</span> を</p>
+<div class="math notranslate nohighlight">
+\[
+x=g(x)
+\]</div>
+<p>と書き換え、</p>
+<div class="math notranslate nohighlight">
+\[
+x_{k+1}=g(x_k)
+\]</div>
+<p>と更新する方法を<strong>不動点反復</strong>という。根は写像 <span class="math notranslate nohighlight">\(g\)</span> によって動かない点、すなわち不動点である。<span class="math notranslate nohighlight">\(\cos x-x=0\)</span> なら <span class="math notranslate nohighlight">\(g(x)=\cos x\)</span> とすればよい。</p>
+<p>例えば初期値0.5から <span class="math notranslate nohighlight">\(x_1=\cos(0.5)\approx0.8776\)</span>、<span class="math notranslate nohighlight">\(x_2=\cos(0.8776)\approx0.6390\)</span> と進む。値が上下に動くこと自体は失敗ではなく、その振れが縮まるかを見る。</p>
+<p>真の解を <span class="math notranslate nohighlight">\(x_*\)</span> とし、<span class="math notranslate nohighlight">\(g\)</span> がその近くで連続微分可能とする。局所的な1次近似により</p>
+<div class="math notranslate nohighlight">
+\[
+|x_{k+1}-x_*|=|g(x_k)-g(x_*)|
+\approx |g'(x_*)|\,|x_k-x_*|
+\]</div>
+<p>である。したがって <span class="math notranslate nohighlight">\(|g'(x_*)|&lt;1\)</span> なら十分近くから始めた誤差は縮み、<span class="math notranslate nohighlight">\(|g'(x_*)|&gt;1\)</span> なら一般に誤差は広がる。同じ方程式でも、書き換え方によって収束性が変わる点が重要である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">fixed_point</span><span class="p">(</span><span class="n">g</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">;</span><span class="w"> </span><span class="n">xtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">xnew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">g</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">isfinite</span><span class="p">(</span><span class="n">xnew</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="n">xnew</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">xnew</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">xtol</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">abs</span><span class="p">(</span><span class="n">xnew</span><span class="p">))</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">xnew</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xnew</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">fp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fixed_point</span><span class="p">(</span><span class="n">cos</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;最初の近似値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="mi">6</span><span class="p">],</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;根 ≈ </span><span class="si">$</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="s">, 反復回数 = </span><span class="si">$</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span><span class="s">, 残差 = </span><span class="si">$</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">root</span><span class="p">)))</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最初の近似値 = [0.5, 0.87758256, 0.63901249, 0.8026851, 0.69477803, 0.76819583]
+根 ≈ 0.7390851331630651, 反復回数 = 56, 残差 = 8.71877015029554e-11
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="newton">
+<h2><span class="section-number">7.5. </span>Newton法：曲線を接線で置き換える<a class="headerlink" href="#newton" title="Link to this heading">#</a></h2>
+<p>現在の近似値 <span class="math notranslate nohighlight">\(x_k\)</span> の近くで <span class="math notranslate nohighlight">\(f\)</span> を1次式に近似する。</p>
+<div class="math notranslate nohighlight">
+\[
+f(x_k+s)\approx f(x_k)+f'(x_k)s
+\]</div>
+<p>右辺が0になる修正量 <span class="math notranslate nohighlight">\(s_k\)</span> を選ぶと、</p>
+<div class="math notranslate nohighlight">
+\[
+f'(x_k)s_k=-f(x_k),\qquad
+x_{k+1}=x_k+s_k=x_k-\frac{f(x_k)}{f'(x_k)}
+\]</div>
+<p>を得る。幾何学的には、<span class="math notranslate nohighlight">\((x_k,f(x_k))\)</span> における接線と <span class="math notranslate nohighlight">\(x\)</span> 軸の交点を次の近似値にする操作である。</p>
+<p>単根 <span class="math notranslate nohighlight">\(x_*\)</span> に十分近く、<span class="math notranslate nohighlight">\(f'(x_*)\neq0\)</span> で、<span class="math notranslate nohighlight">\(f\)</span> が十分滑らかなら、Newton法は<strong>2次収束</strong>する。これは大まかに</p>
+<div class="math notranslate nohighlight">
+\[
+|x_{k+1}-x_*|\approx C|x_k-x_*|^2
+\]</div>
+<p>を意味する。収束域に入った後は正しい桁数が反復ごとにほぼ倍増する。一方、初期値が根から遠い、導関数が0に近い、途中に定義できない点がある、といった場合には失敗し得る。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">newton</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">;</span><span class="w"> </span><span class="n">xtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">ftol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">NamedTuple</span><span class="p">[]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">fx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">isfinite</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="o">=</span><span class="s">&quot;nonfinite residual&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="o">=</span><span class="s">&quot;residual&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+
+<span class="w">        </span><span class="n">dfx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">df</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">isfinite</span><span class="p">(</span><span class="n">dfx</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">iszero</span><span class="p">(</span><span class="n">dfx</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="o">=</span><span class="s">&quot;zero or nonfinite derivative&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+
+<span class="w">        </span><span class="n">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">fx</span><span class="o">/</span><span class="n">dfx</span>
+<span class="w">        </span><span class="n">xnew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">step</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">fx</span><span class="o">=</span><span class="n">fx</span><span class="p">,</span><span class="w"> </span><span class="n">dfx</span><span class="o">=</span><span class="n">dfx</span><span class="p">,</span><span class="w"> </span><span class="n">step</span><span class="o">=</span><span class="n">step</span><span class="p">,</span><span class="w"> </span><span class="n">xnew</span><span class="o">=</span><span class="n">xnew</span><span class="p">))</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">isfinite</span><span class="p">(</span><span class="n">xnew</span><span class="p">)</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="o">=</span><span class="s">&quot;nonfinite iterate&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">elseif</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">step</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">xtol</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">abs</span><span class="p">(</span><span class="n">xnew</span><span class="p">))</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">xnew</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="n">abs</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">xnew</span><span class="p">))</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="mi">10</span><span class="n">ftol</span><span class="p">,</span>
+<span class="w">                    </span><span class="n">reason</span><span class="o">=</span><span class="s">&quot;small step&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xnew</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">reason</span><span class="o">=</span><span class="s">&quot;maxiter&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">df</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span>
+<span class="n">nt</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newton</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">nt</span><span class="o">.</span><span class="n">history</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;k=</span><span class="si">$</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">k</span><span class="p">)</span><span class="s">: x=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">x</span><span class="p">,</span><span class="n">digits</span><span class="o">=</span><span class="mi">12</span><span class="p">))</span><span class="s">, |f(x)|=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">fx</span><span class="p">),</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span><span class="s">, &quot;</span><span class="w"> </span><span class="o">*</span>
+<span class="w">            </span><span class="s">&quot;step=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">step</span><span class="p">,</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;根 ≈ </span><span class="si">$</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="s">, 反復回数 = </span><span class="si">$</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span><span class="s">, 収束 = </span><span class="si">$</span><span class="p">(</span><span class="n">nt</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k=1: x=0.5, |f(x)|=0.3776, step=0.2552
+k=2: x=0.755222417106, |f(x)|=0.0271, step=-0.01608
+k=3: x=0.73914166615, |f(x)|=9.462e-5, step=-5.653e-5
+k=4: x=0.739085133921, |f(x)|=1.181e-9, step=-7.056e-10
+根 ≈ 0.7390851332151607, 反復回数 = 4, 収束 = true
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="n">f_plot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="n">x</span>
+<span class="n">df_plot</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+<span class="n">xgrid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.5</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+<span class="n">a_plot</span><span class="p">,</span><span class="w"> </span><span class="n">b_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="n">m_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">a_plot</span><span class="o">+</span><span class="n">b_plot</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span>
+<span class="n">x0_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5</span>
+<span class="n">x1_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x0_plot</span><span class="o">-</span><span class="n">f_plot</span><span class="p">(</span><span class="n">x0_plot</span><span class="p">)</span><span class="o">/</span><span class="n">df_plot</span><span class="p">(</span><span class="n">x0_plot</span><span class="p">)</span>
+<span class="n">tangent</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f_plot</span><span class="p">(</span><span class="n">x0_plot</span><span class="p">)</span><span class="o">+</span><span class="n">df_plot</span><span class="p">(</span><span class="n">x0_plot</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">x0_plot</span><span class="p">)</span>
+
+<span class="n">fig_roots</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="w"> </span><span class="mi">430</span><span class="p">))</span>
+<span class="n">ax_bisect</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_roots</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;f(x)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Bisection: preserve a bracket&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_bisect</span><span class="p">,</span><span class="w"> </span><span class="n">xgrid</span><span class="p">,</span><span class="w"> </span><span class="n">f_plot</span><span class="o">.</span><span class="p">(</span><span class="n">xgrid</span><span class="p">);</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:black</span><span class="p">)</span>
+<span class="n">hlines!</span><span class="p">(</span><span class="n">ax_bisect</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray50</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="n">a_plot</span><span class="p">,</span><span class="w"> </span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;a&quot;</span><span class="p">),</span>
+<span class="w">                           </span><span class="p">(</span><span class="n">m_plot</span><span class="p">,</span><span class="w"> </span><span class="ss">:orange</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;m&quot;</span><span class="p">),</span>
+<span class="w">                           </span><span class="p">(</span><span class="n">b_plot</span><span class="p">,</span><span class="w"> </span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;b&quot;</span><span class="p">))</span>
+<span class="w">    </span><span class="n">scatter!</span><span class="p">(</span><span class="n">ax_bisect</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">f_plot</span><span class="p">(</span><span class="n">x</span><span class="p">)];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="w">    </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax_bisect</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">f_plot</span><span class="p">(</span><span class="n">x</span><span class="p">)];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">)</span>
+<span class="w">    </span><span class="n">text!</span><span class="p">(</span><span class="n">ax_bisect</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="mf">0.04</span><span class="p">;</span><span class="w"> </span><span class="n">text</span><span class="o">=</span><span class="n">label</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">align</span><span class="o">=</span><span class="p">(</span><span class="ss">:center</span><span class="p">,</span><span class="w"> </span><span class="ss">:bottom</span><span class="p">))</span>
+<span class="k">end</span>
+
+<span class="n">ax_newton</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_roots</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;x&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;f(x)&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Newton: follow the tangent&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="n">xgrid</span><span class="p">,</span><span class="w"> </span><span class="n">f_plot</span><span class="o">.</span><span class="p">(</span><span class="n">xgrid</span><span class="p">);</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;f(x)&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="n">xgrid</span><span class="p">,</span><span class="w"> </span><span class="n">tangent</span><span class="o">.</span><span class="p">(</span><span class="n">xgrid</span><span class="p">);</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">,</span>
+<span class="w">    </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;tangent at x0&quot;</span><span class="p">)</span>
+<span class="n">hlines!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:gray50</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">x0_plot</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">f_plot</span><span class="p">(</span><span class="n">x0_plot</span><span class="p">)];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">x1_plot</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:seagreen</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">text!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="n">x0_plot</span><span class="p">,</span><span class="w"> </span><span class="n">f_plot</span><span class="p">(</span><span class="n">x0_plot</span><span class="p">);</span><span class="w"> </span><span class="n">text</span><span class="o">=</span><span class="s">&quot;  x0&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">align</span><span class="o">=</span><span class="p">(</span><span class="ss">:left</span><span class="p">,</span><span class="w"> </span><span class="ss">:bottom</span><span class="p">))</span>
+<span class="n">text!</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">,</span><span class="w"> </span><span class="n">x1_plot</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="n">text</span><span class="o">=</span><span class="s">&quot;  x1&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">align</span><span class="o">=</span><span class="p">(</span><span class="ss">:left</span><span class="p">,</span><span class="w"> </span><span class="ss">:bottom</span><span class="p">))</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax_newton</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:rt</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;nonlinear_iteration_geometry.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_roots</span><span class="p">)</span>
+<span class="n">fig_roots</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-nonlinear-iteration-geometry">
+<a class="reference internal image-reference" href="../_images/nonlinear_iteration_geometry.svg"><img alt="二分法の区間縮小とNewton法の接線による更新" src="../_images/nonlinear_iteration_geometry.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 7.1 </span><span class="caption-text">二分法は根を挟むという安全性を保って区間を縮める。Newton法は現在点の接線と横軸の交点へ進むため速いが、初期値によっては根から離れる。</span><a class="headerlink" href="#fig-nonlinear-iteration-geometry" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id6">
+<h2><span class="section-number">7.6. </span>割線法：導関数を差分で置き換える<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>導関数を解析的に求めにくいときは、Newton法の <span class="math notranslate nohighlight">\(f'(x_k)\)</span> を直近2点の傾き</p>
+<div class="math notranslate nohighlight">
+\[
+f'(x_k)\approx\frac{f(x_k)-f(x_{k-1})}{x_k-x_{k-1}}
+\]</div>
+<p>で置き換える。これが<strong>割線法</strong>であり、更新式は</p>
+<div class="math notranslate nohighlight">
+\[
+x_{k+1}=x_k-f(x_k)\frac{x_k-x_{k-1}}{f(x_k)-f(x_{k-1})}
+\]</div>
+<p>となる。関数評価は通常1反復につき1回で済み、微分も不要である。収束は単根の近くでNewton法より遅いが、二分法より速いことが多い。ただし、二分法のように根を挟み続ける保証はない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">secant</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">,</span><span class="w"> </span><span class="n">x1</span><span class="p">;</span><span class="w"> </span><span class="n">xtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">ftol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="w">    </span><span class="n">xprev</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">fprev</span><span class="p">,</span><span class="w"> </span><span class="n">fx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">xprev</span><span class="p">),</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">isfinite</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isfinite</span><span class="p">(</span><span class="n">fprev</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span>
+<span class="w">        </span><span class="n">abs</span><span class="p">(</span><span class="n">fx</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
+<span class="w">        </span><span class="n">denominator</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">fx</span><span class="o">-</span><span class="n">fprev</span>
+<span class="w">        </span><span class="n">iszero</span><span class="p">(</span><span class="n">denominator</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span>
+<span class="w">        </span><span class="n">xnew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="o">-</span><span class="n">fx</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="n">xprev</span><span class="p">)</span><span class="o">/</span><span class="n">denominator</span>
+<span class="w">        </span><span class="n">isfinite</span><span class="p">(</span><span class="n">xnew</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span>
+<span class="w">        </span><span class="n">fnew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">(</span><span class="n">xnew</span><span class="p">)</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">fnew</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">xnew</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">)</span>
+<span class="w">        </span><span class="k">elseif</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">xnew</span><span class="o">-</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">xtol</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">abs</span><span class="p">(</span><span class="n">xnew</span><span class="p">))</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">xnew</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span><span class="w"> </span><span class="c"># 小さな更新だけでは成功としない</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">xprev</span><span class="p">,</span><span class="w"> </span><span class="n">fprev</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">fx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">fx</span><span class="p">,</span><span class="w"> </span><span class="n">xnew</span><span class="p">,</span><span class="w"> </span><span class="n">fnew</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">sc</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">secant</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;割線法: 根 ≈ </span><span class="si">$</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="s">, 反復回数 = </span><span class="si">$</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span><span class="s">, 残差 = </span><span class="si">$</span><span class="p">(</span><span class="n">abs</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">root</span><span class="p">)))</span><span class="s">, 判定 = </span><span class="si">$</span><span class="p">(</span><span class="n">sc</span><span class="o">.</span><span class="n">converged</span><span class="p">)</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>割線法: 根 ≈ 0.7390851332150012, 反復回数 = 5, 残差 = 2.667865928174251e-13, 判定 = true
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="irr">
+<h2><span class="section-number">7.7. </span>応用例：内部収益率（IRR）を求める<a class="headerlink" href="#irr" title="Link to this heading">#</a></h2>
+<p>投資の評価に使われる<strong>正味現在価値</strong>（NPV）は、将来の収入を割引率 <span class="math notranslate nohighlight">\(r\)</span> で現在の価値に換算して合計したものである。0年目の投資額を <span class="math notranslate nohighlight">\(C_0&lt;0\)</span>、<span class="math notranslate nohighlight">\(k\)</span> 年目の収入を <span class="math notranslate nohighlight">\(C_k\)</span> とすると</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{NPV}(r)=\sum_{k=0}^{n}\frac{C_k}{(1+r)^k}
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(\mathrm{NPV}(r)=0\)</span> となる割引率を<strong>内部収益率</strong>（IRR）という。「この投資は年利何%の運用に相当するか」を表す指標で、表計算ソフトの <code class="docutils literal notranslate"><span class="pre">IRR</span></code> 関数も、内部で本章のような反復法を使っている。</p>
+<p><span class="math notranslate nohighlight">\(\mathrm{NPV}(r)\)</span> は <span class="math notranslate nohighlight">\(r\)</span> の <span class="math notranslate nohighlight">\(n\)</span> 次の分数式なので、一般には解の公式がなく、非線形方程式として数値的に解く。Newton法に使う導関数は</p>
+<div class="math notranslate nohighlight">
+\[
+\mathrm{NPV}'(r)=-\sum_{k=1}^{n}\frac{kC_k}{(1+r)^{k+1}}
+\]</div>
+<p>である。1000万円を投資し、その後4年間に300、400、500、200万円の収入がある例を計算しよう。まず表で符号の変化を探し、本章の <code class="docutils literal notranslate"><span class="pre">bisection</span></code> と <code class="docutils literal notranslate"><span class="pre">newton</span></code> を使う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">cashflow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">1000.0</span><span class="p">,</span><span class="w"> </span><span class="mf">300.0</span><span class="p">,</span><span class="w"> </span><span class="mf">400.0</span><span class="p">,</span><span class="w"> </span><span class="mf">500.0</span><span class="p">,</span><span class="w"> </span><span class="mf">200.0</span><span class="p">]</span><span class="w">   </span><span class="c"># 0年目（投資）〜4年目の収入</span>
+<span class="n">npv</span><span class="p">(</span><span class="n">r</span><span class="p">;</span><span class="w"> </span><span class="n">C</span><span class="o">=</span><span class="n">cashflow</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">C</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">r</span><span class="p">)</span><span class="o">^</span><span class="n">k</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">length</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">dnpv</span><span class="p">(</span><span class="n">r</span><span class="p">;</span><span class="w"> </span><span class="n">C</span><span class="o">=</span><span class="n">cashflow</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="n">k</span><span class="o">*</span><span class="n">C</span><span class="p">[</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">r</span><span class="p">)</span><span class="o">^</span><span class="p">(</span><span class="n">k</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">length</span><span class="p">(</span><span class="n">C</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;r = </span><span class="si">$r</span><span class="s">: NPV = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">npv</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span>
+<span class="k">end</span>
+<span class="n">irr_bisection</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bisection</span><span class="p">(</span><span class="n">npv</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">irr_newton</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newton</span><span class="p">(</span><span class="n">npv</span><span class="p">,</span><span class="w"> </span><span class="n">dnpv</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;二分法: IRR ≈ &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">irr_bisection</span><span class="o">.</span><span class="n">root</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;（反復 &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">irr_bisection</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; 回）&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Newton法: IRR ≈ &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">irr_newton</span><span class="o">.</span><span class="n">root</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">8</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;（反復 &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">irr_newton</span><span class="o">.</span><span class="n">iterations</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; 回）&quot;</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 NPV(IRR) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">npv</span><span class="p">(</span><span class="n">irr_newton</span><span class="o">.</span><span class="n">root</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>r = 0.0: NPV = 400.0
+r = 0.1: NPV = 115.57
+r = 0.2: NPV = -86.42
+r = 0.3: NPV = -234.94
+二分法: IRR ≈ 0.15322138（反復 33 回）
+Newton法: IRR ≈ 0.15322138（反復 4 回）
+残差 NPV(IRR) = -3.126388037344441e-13
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\(r=0.1\)</span> でNPVは正、<span class="math notranslate nohighlight">\(r=0.2\)</span> で負なので、IRRはその間にある。二分法とNewton法は同じ約15.32%を与え、反復回数はそれぞれ33回と4回である。この例のように「最初に投資し、その後は収入だけ」というキャッシュフローでは、NPVは <span class="math notranslate nohighlight">\(r&gt;-1\)</span> で単調減少し、IRRは一つに定まる。</p>
+<section id="id7">
+<h3><span class="section-number">7.7.1. </span>IRRが二つある場合<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<p>では、最後に撤去費用などの支出がある場合はどうだろうか。<span class="math notranslate nohighlight">\(C=(-100,230,-132)\)</span> とすると、符号が2回変わる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">C_two</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="o">-</span><span class="mf">100.0</span><span class="p">,</span><span class="w"> </span><span class="mf">230.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">132.0</span><span class="p">]</span><span class="w">   </span><span class="c"># 投資 → 収入 → 撤去費用</span>
+<span class="n">npv_two</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">npv</span><span class="p">(</span><span class="n">r</span><span class="p">;</span><span class="w"> </span><span class="n">C</span><span class="o">=</span><span class="n">C_two</span><span class="p">)</span>
+<span class="n">dnpv_two</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dnpv</span><span class="p">(</span><span class="n">r</span><span class="p">;</span><span class="w"> </span><span class="n">C</span><span class="o">=</span><span class="n">C_two</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">0.0</span><span class="o">:</span><span class="mf">0.05</span><span class="o">:</span><span class="mf">0.3</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;r = </span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="s">: NPV = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">npv_two</span><span class="p">(</span><span class="n">r</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="k">end</span>
+<span class="k">for</span><span class="w"> </span><span class="n">r0</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">result</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newton</span><span class="p">(</span><span class="n">npv_two</span><span class="p">,</span><span class="w"> </span><span class="n">dnpv_two</span><span class="p">,</span><span class="w"> </span><span class="n">r0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;初期値 </span><span class="si">$r0</span><span class="s"> からのNewton法: IRR ≈ &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">root</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">8</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>r = 0.0: NPV = -2.0
+r = 0.05: NPV = -0.6803
+r = 0.1: NPV = -0.0
+r = 0.15: NPV = 0.189
+r = 0.2: NPV = 0.0
+r = 0.25: NPV = -0.48
+r = 0.3: NPV = -1.1834
+初期値 0.0 からのNewton法: IRR ≈ 0.1
+初期値 0.3 からのNewton法: IRR ≈ 0.2
+</pre></div>
+</div>
+</div>
+</div>
+<p>（<code class="docutils literal notranslate"><span class="pre">-0.0</span></code> は、負のごく小さな値を小数点以下4桁に丸めた表示である。）</p>
+<p>NPVは <span class="math notranslate nohighlight">\(r=0.1\)</span> と <span class="math notranslate nohighlight">\(r=0.2\)</span> の両方で0になる。実際、<span class="math notranslate nohighlight">\(x=1/(1+r)\)</span> と置くと <span class="math notranslate nohighlight">\(-132x^2+230x-100=0\)</span> という2次方程式になり、解は <span class="math notranslate nohighlight">\(x=10/11\)</span> と <span class="math notranslate nohighlight">\(x=5/6\)</span>、すなわち <span class="math notranslate nohighlight">\(r=0.1\)</span> と <span class="math notranslate nohighlight">\(r=0.2\)</span> である。Newton法は初期値によって異なるIRRへ収束し、どちらも「正しく」収束している。</p>
+<p>この例から、次のことが分かる。</p>
+<ul class="simple">
+<li><p>反復法が収束したことは、<strong>解が一つしかないこと</strong>を保証しない。解の個数は、計算の前に問題の性質（ここではキャッシュフローの符号変化）から調べる必要がある。</p></li>
+<li><p>区間 <span class="math notranslate nohighlight">\([0,0.3]\)</span> では両端のNPVがともに負なので、二分法は使えない。符号が変わらないことは、根がないことを意味しない（本章の最初の注意）。</p></li>
+<li><p>IRRが二つあるとき、「この投資の利回りは10%」と一つだけ報告するのは誤解を招く。数値計算の結果を、元の問題の意味に照らして解釈することも検証の一部である。</p></li>
+</ul>
+</section>
+</section>
+<section id="id8">
+<h2><span class="section-number">7.8. </span>停止条件と解法の安全装置<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>反復法は「真の誤差が0になったら」停止することはできない。実用上は、異なる失敗を検出する複数の条件を併用する。</p>
+<ul class="simple">
+<li><p><strong>残差</strong>：<span class="math notranslate nohighlight">\(|f(x_k)|\leq f_{\mathrm{tol}}\)</span>。方程式をどの程度満たすかを測る。</p></li>
+<li><p><strong>相対的な更新量</strong>：<span class="math notranslate nohighlight">\(|x_{k+1}-x_k|\leq x_{\mathrm{tol}}(1+|x_{k+1}|)\)</span>。反復が動かなくなったことを測る。</p></li>
+<li><p><strong>最大反復回数</strong>：収束しない計算を必ず終了させる。</p></li>
+<li><p><strong>異常値</strong>：<code class="docutils literal notranslate"><span class="pre">Inf</span></code> や <code class="docutils literal notranslate"><span class="pre">NaN</span></code>、0の導関数などを検出する。小さいかどうかは関数の尺度にもよる。</p></li>
+</ul>
+<p>更新量が小さくても、丸めによる停滞などで残差が大きいままの場合がある。反対に残差が小さくても、傾きが小さければ前進誤差は大きいかもしれない。少なくとも残差と更新量の両方を報告する習慣をつける。</p>
+<p>Newton法と二分法を組み合わせる<strong>混合法</strong>もある。符号変化区間を維持し、Newton法の候補が区間外に出る場合や、十分な進展が得られない場合に二分法へ戻す。区間内に入ることだけで速い縮小が保証されるわけではないため、進展の確認も必要になる。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>利用できる情報・状況</p></th>
+<th class="head"><p>第一候補</p></th>
+<th class="head"><p>主な確認事項</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>連続性と符号変化区間が分かる</p></td>
+<td><p>二分法</p></td>
+<td><p>区間幅と残差</p></td>
+</tr>
+<tr class="row-odd"><td><p>良い初期値と導関数がある</p></td>
+<td><p>Newton法</p></td>
+<td><p>導関数、更新量、残差</p></td>
+</tr>
+<tr class="row-even"><td><p>導関数がないが初期値を2点選べる</p></td>
+<td><p>割線法</p></td>
+<td><p>分母、更新量、残差</p></td>
+</tr>
+<tr class="row-odd"><td><p>確実性と速さを両方重視する</p></td>
+<td><p>混合法</p></td>
+<td><p>符号変化区間を維持したか</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="clubsuit-newton">
+<h2><span class="section-number">7.9. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> Newton法の収束次数と重根<a class="headerlink" href="#clubsuit-newton" title="Link to this heading">#</a></h2>
+<p>ここまでは <span class="math notranslate nohighlight">\(f'(x_*)\neq0\)</span> を満たす単根を暗黙に考えた。Taylor展開を用いると、単根の近くでは</p>
+<div class="math notranslate nohighlight">
+\[
+e_{k+1}=x_{k+1}-x_*
+\approx \frac{f''(x_*)}{2f'(x_*)}e_k^2
+\]</div>
+<p>となり、2次収束が得られる。</p>
+<p>一方、<span class="math notranslate nohighlight">\(f(x)=(x-x_*)^m q(x)\)</span>、<span class="math notranslate nohighlight">\(q(x_*)\neq0\)</span> のような重複度 <span class="math notranslate nohighlight">\(m\)</span> の根では、通常のNewton法は</p>
+<div class="math notranslate nohighlight">
+\[
+e_{k+1}\approx\left(1-\frac1m\right)e_k
+\]</div>
+<p>となり、1次収束まで遅くなる。重複度 <span class="math notranslate nohighlight">\(m\)</span> が既知なら</p>
+<div class="math notranslate nohighlight">
+\[
+x_{k+1}=x_k-m\frac{f(x_k)}{f'(x_k)}
+\]</div>
+<p>と修正すれば2次収束を回復できる。この例は「アルゴリズムの性能は公式だけでなく、問題が満たす仮定に依存する」ことをよく示している。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">h</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">^</span><span class="mi">2</span>
+<span class="n">dh</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ordinary</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newton</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">dh</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">;</span><span class="w"> </span><span class="n">xtol</span><span class="o">=</span><span class="mf">1e-14</span><span class="p">,</span><span class="w"> </span><span class="n">ftol</span><span class="o">=</span><span class="mf">1e-28</span><span class="p">)</span>
+<span class="n">errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">abs</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">xnew</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">ordinary</span><span class="o">.</span><span class="n">history</span><span class="p">[</span><span class="mi">1</span><span class="o">:</span><span class="n">min</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="k">end</span><span class="p">)]]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;通常のNewton法の誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">errors</span><span class="p">)</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">modified_newton</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">df</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">,</span><span class="w"> </span><span class="n">multiplicity</span><span class="p">;</span><span class="w"> </span><span class="n">nsteps</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+<span class="w">    </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nsteps</span>
+<span class="w">        </span><span class="n">iszero</span><span class="p">(</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">break</span>
+<span class="w">        </span><span class="n">iszero</span><span class="p">(</span><span class="n">df</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;導関数が0です&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">multiplicity</span><span class="o">*</span><span class="n">f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">/</span><span class="n">df</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">values</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">values</span>
+<span class="k">end</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;重複度を使った更新値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">modified_newton</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="w"> </span><span class="n">dh</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>通常のNewton法の誤差 = [0.5, 0.25, 0.125, 0.0625, 0.03125, 0.015625]
+重複度を使った更新値 = [2.0, 1.0]
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">7.10. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 非線形連立方程式<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(F:\mathbb{R}^n\to\mathbb{R}^n\)</span> に対する</p>
+<div class="math notranslate nohighlight">
+\[
+F(x)=0
+\]</div>
+<p>を考える。スカラーの導関数に相当するのがJacobian（ヤコビ）行列</p>
+<div class="math notranslate nohighlight">
+\[
+J_{ij}(x)=\frac{\partial F_i}{\partial x_j}(x)
+\]</div>
+<p>である。<span class="math notranslate nohighlight">\(x_k\)</span> の周りで <span class="math notranslate nohighlight">\(F(x_k+s)\approx F(x_k)+J(x_k)s\)</span> と線形化し、</p>
+<div class="math notranslate nohighlight">
+\[
+J(x_k)s_k=-F(x_k),\qquad x_{k+1}=x_k+s_k
+\]</div>
+<p>と更新する。ここで重要なのは、Newton法の1反復が<strong>線形方程式を解く問題</strong>になることである。第5章と同じく <code class="docutils literal notranslate"><span class="pre">inv(J)*(-F)</span></code> と逆行列を陽に作らず、<code class="docutils literal notranslate"><span class="pre">J</span> <span class="pre">\</span> <span class="pre">(-F)</span></code> と解く。同じJacobianを何度か使える近似法では、分解の再利用が計算量削減につながる。</p>
+<p>例として、単位円 <span class="math notranslate nohighlight">\(x_1^2+x_2^2=1\)</span> と直線 <span class="math notranslate nohighlight">\(x_1=x_2\)</span> の交点を求める。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="o">+</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">^</span><span class="mi">2</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+<span class="n">J</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mi">2</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="mi">2</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span><span class="p">]</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">newton_system</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="n">x0</span><span class="p">;</span><span class="w"> </span><span class="n">xtol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span><span class="w"> </span><span class="n">ftol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">,</span><span class="w"> </span><span class="n">maxiter</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">float</span><span class="o">.</span><span class="p">(</span><span class="n">copy</span><span class="p">(</span><span class="n">x0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">history</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">NamedTuple</span><span class="p">[]</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">maxiter</span>
+<span class="w">        </span><span class="n">residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">norm</span><span class="p">(</span><span class="n">residual</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">ftol</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">true</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="n">step</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">J</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="n">residual</span><span class="p">)</span>
+<span class="w">        </span><span class="n">push!</span><span class="p">(</span><span class="n">history</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">residual_norm</span><span class="o">=</span><span class="n">norm</span><span class="p">(</span><span class="n">residual</span><span class="p">),</span><span class="w"> </span><span class="n">step_norm</span><span class="o">=</span><span class="n">norm</span><span class="p">(</span><span class="n">step</span><span class="p">)))</span>
+<span class="w">        </span><span class="n">xnew</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="o">+</span><span class="n">step</span>
+<span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">step</span><span class="p">)</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="n">xtol</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">norm</span><span class="p">(</span><span class="n">xnew</span><span class="p">))</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">xnew</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="n">norm</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">xnew</span><span class="p">))</span><span class="w"> </span><span class="o">≤</span><span class="w"> </span><span class="mi">10</span><span class="n">ftol</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xnew</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">iterations</span><span class="o">=</span><span class="n">maxiter</span><span class="p">,</span><span class="w"> </span><span class="n">converged</span><span class="o">=</span><span class="nb">false</span><span class="p">,</span><span class="w"> </span><span class="n">history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">solution</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">newton_system</span><span class="p">(</span><span class="n">F</span><span class="p">,</span><span class="w"> </span><span class="n">J</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mf">0.8</span><span class="p">,</span><span class="w"> </span><span class="mf">0.6</span><span class="p">])</span>
+<span class="k">for</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">solution</span><span class="o">.</span><span class="n">history</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;k=</span><span class="si">$</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">k</span><span class="p">)</span><span class="s">: ||F||=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">residual_norm</span><span class="p">,</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span><span class="s">, &quot;</span><span class="w"> </span><span class="o">*</span>
+<span class="w">            </span><span class="s">&quot;||step||=</span><span class="si">$</span><span class="p">(</span><span class="n">round</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">step_norm</span><span class="p">,</span><span class="n">sigdigits</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解 = </span><span class="si">$</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">root</span><span class="p">)</span><span class="s">, 残差ノルム = </span><span class="si">$</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">F</span><span class="p">(</span><span class="n">solution</span><span class="o">.</span><span class="n">root</span><span class="p">)))</span><span class="s">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>k=1: ||F||=0.2, ||step||=0.1429
+k=2: ||F||=0.02041, ||step||=0.0101
+k=3: ||F||=0.000102, ||step||=5.102e-5
+k=4: ||F||=2.603e-9, ||step||=1.301e-9
+解 = [0.7071067811865476, 0.7071067811865476], 残差ノルム = 2.220446049250313e-16
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id9">
+<h2><span class="section-number">7.11. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 最適化とのつながり<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<p>利益を最大にする価格、誤差を最小にするパラメータなど、「ある量を最大・最小にする」問題を<strong>最適化</strong>という。滑らかな関数 <span class="math notranslate nohighlight">\(\pi(p)\)</span> が内部で最大・最小になる点では <span class="math notranslate nohighlight">\(\pi'(p)=0\)</span> が成り立つので、最適化は「導関数の根を探す」非線形方程式の問題に帰着できる。この方程式にNewton法を使うと</p>
+<div class="math notranslate nohighlight">
+\[
+p_{k+1}=p_k-\frac{\pi'(p_k)}{\pi''(p_k)}
+\]</div>
+<p>となり、2階導関数（曲がり具合）を使って極値へ近づく方法になる。ただし <span class="math notranslate nohighlight">\(\pi'(p)=0\)</span> は最大点だけでなく最小点や、どちらでもない点でも成り立つ。得られた点で <span class="math notranslate nohighlight">\(\pi''(p)&lt;0\)</span>（上に凸）かを確かめ、区間の端点での値とも比べる必要がある。</p>
+<p>機械学習で使われる勾配降下法も、多変数の最適化を反復で解く方法である。本章で学んだ「初期値への依存」「停止条件」「収束の速さと安全性の交換」は、そのまま最適化の反復法にも当てはまる。</p>
+</section>
+<section id="id10">
+<h2><span class="section-number">7.12. </span>まとめ<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>二分法は根を挟む区間、Newton法は接線、割線法は2点の傾きを利用する。不動点反復では式の書き換え方が収束性を変える。速い方法ほど、初期値や途中の振る舞いを確認する必要がある。</p>
+<p>本文の二分法は既定で <code class="docutils literal notranslate"><span class="pre">ftol=0</span></code> とし、区間幅による停止を基本にしている。正の <code class="docutils literal notranslate"><span class="pre">ftol</span></code> を指定して残差だけで止めた場合は、指定した <code class="docutils literal notranslate"><span class="pre">xtol</span></code> の誤差保証とは別の判定になる。また、不動点反復の小さな更新量は真の誤差そのものではない。関数の戻り値にある <code class="docutils literal notranslate"><span class="pre">converged</span></code> は実装した停止条件の判定であり、根の一意性や要求精度をすべて保証する印ではない。</p>
+</div>
+<p>次の<a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html"><span class="std std-doc">第8章</span></a>では、関数を近くの値から近似し、微分や積分の計算へ使う。</p>
+</section>
+<section id="id11">
+<h2><span class="section-number">7.13. </span>演習<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>区間を縮める</strong>：<span class="math notranslate nohighlight">\(f(x)=\cos x-x\)</span> について、本文の値を使い <span class="math notranslate nohighlight">\([0,1]\)</span> から最初の2回の中点と、残す区間を書け。なぜその側を残すのか。</p></li>
+<li><p><strong>接線で更新する</strong>：<span class="math notranslate nohighlight">\(f(x)=x^2-2\)</span>、<span class="math notranslate nohighlight">\(f'(x)=2x\)</span> とし、<span class="math notranslate nohighlight">\(x_0=1.5\)</span> からNewton法を1回だけ手計算せよ。接線の式と、次の候補がどこにあるかを説明せよ。</p></li>
+<li><p><strong>停止の読み方</strong>：「前回からほとんど値が動かない」「式への代入値が小さい」「根を挟む区間が狭い」は、それぞれ何を確認しているか。真の根を知らなくても前進誤差の上界が分かるのは、どの方法のどの条件か。</p></li>
+<li><p><strong>IRRを手と計算機で求める</strong>：キャッシュフロー <span class="math notranslate nohighlight">\((-100,60,60)\)</span> のIRRを、<span class="math notranslate nohighlight">\(x=1/(1+r)\)</span> と置いて2次方程式の解の公式で求めよ。次に <code class="docutils literal notranslate"><span class="pre">bisection</span></code> で同じ値が得られるか確かめ、区間 <span class="math notranslate nohighlight">\([0,1]\)</span> から誤差 <span class="math notranslate nohighlight">\(10^{-4}\)</span> を保証するのに必要な反復回数を本文の式で見積もって、実際の反復回数と比べよ。</p></li>
+<li><p><strong>探究：解が複数ある問題の報告</strong>：本文の <span class="math notranslate nohighlight">\(C=(-100,230,-132)\)</span> について、Newton法の初期値を <span class="math notranslate nohighlight">\(-0.5\)</span> から <span class="math notranslate nohighlight">\(1.0\)</span> まで0.05刻みで変え、どの初期値からどちらのIRRへ収束するか（または失敗するか）を表にせよ。境目はどこにあり、それは <span class="math notranslate nohighlight">\(\mathrm{NPV}'(r)=0\)</span> となる点とどう関係するか。最後に、この投資の「利回り」を上司に報告するとしたら、どのように説明するのが誠実かを、数値計算の結果を根拠に述べよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id12">
+<h2><span class="section-number">7.14. </span>参考文献と関連する節<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Driscoll and Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/nonlineqn/newton.html">Newton’s method</a>.</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_QRLeastSquares.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">6. </span>最小二乗法とQR分解</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_InterpolationDifferentiationIntegration.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">8. </span>補間・数値微分・数値積分</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">7.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">7.2. 計算を始める前に調べること</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">7.3. 二分法：根を挟む区間を縮める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">7.4. 不動点反復：方程式を更新式へ書き換える</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#newton">7.5. Newton法：曲線を接線で置き換える</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">7.6. 割線法：導関数を差分で置き換える</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#irr">7.7. 応用例：内部収益率（IRR）を求める</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">7.7.1. IRRが二つある場合</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">7.8. 停止条件と解法の安全装置</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-newton">7.9. <span class="math notranslate nohighlight">\(\clubsuit\)</span> Newton法の収束次数と重根</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">7.10. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 非線形連立方程式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">7.11. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 最適化とのつながり</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">7.12. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">7.13. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">7.14. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

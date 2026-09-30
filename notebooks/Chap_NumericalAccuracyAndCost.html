@@ -1,0 +1,1305 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>4. 誤差・条件数・計算量 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_NumericalAccuracyAndCost';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="5. 連立一次方程式： Gauss消去法とLU分解" href="Chap_LUFactorization.html" />
+    <link rel="prev" title="3. Juliaと線形代数" href="Chap_Julia_LinearAlgebra.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_NumericalAccuracyAndCost.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>誤差・条件数・計算量</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">4.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">4.2. 同じずれでも、元の大きさで意味が変わる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4.3. ベクトルの誤差を一つの大きさにまとめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">4.4. 残差と解の誤差は何が違うか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4.4.1. 小さい残差でも、解が大きく違う例</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">4.5. 入力を少し変えると、解はどう動くか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">4.6. 行列ノルム：ベクトルの長さを最大何倍にするか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julianormopnorm">4.6.1. Juliaのnormとopnorm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">4.7. 条件数で入力への敏感さを評価する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">4.7.1. 残差と前進誤差を結ぶ</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">4.7.2. 同じ残差でも、条件数によって見え方が変わる</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">4.8. 丸めは計算の途中でも起こる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">4.9. 計算手順の安定性：同じ式をどう計算するか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">4.10. 後退誤差：どの近い問題なら正確に解けているか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">4.10.1. 後退安定性の意味</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">4.11. 問題サイズを倍にすると、計算は何倍になるか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">4.11.1. 内積から数えてみる</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#big-o">4.11.2. Big-Oは増え方を表す</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">4.12. 保存する量も見積もる：密行列と疎行列</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">4.12.1. 0が多い行列では、必要な成分だけを持つ</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">4.13. <span class="math notranslate nohighlight">\(\clubsuit\)</span> ノルムの性質と他の行列ノルム</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">4.14. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 計算を再利用するという考え方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">4.15. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">4.16. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">4.17. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_NumericalAccuracyAndCost.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="id1">
+<h1><span class="section-number">4. </span>誤差・条件数・計算量<a class="headerlink" href="#id1" title="Link to this heading">#</a></h1>
+<p><a class="reference internal" href="Chap_Julia_LinearAlgebra.html"><span class="std std-doc">第3章</span></a>では、連立方程式の解を求め、元の式に代入して残差を確かめた。では、「残差が <span class="math notranslate nohighlight">\(10^{-8}\)</span> だった」と聞けば、その答えは十分正確だと判断できるだろうか。</p>
+<p>判断するには、まず問題の数値がどの程度の大きさかを知る必要がある。さらに、方程式を少し満たさないだけで解が大きく違う場合もある。本章では、<strong>ずれをどう測るか、問題がずれをどれほど増幅するか、計算手順がどのようなずれを生むか</strong>を順に考える。最後に、問題が大きくなったときの計算回数とメモリ量を見積もる。</p>
+<section id="id2">
+<h2><span class="section-number">4.1. </span>この章の目標<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p>本章は内容が多いため、講義では2回に分けて扱うことを想定している。</p>
+</aside>
+<ul class="simple">
+<li><p>絶対誤差と相対誤差を、数値の尺度に応じて使い分けられる。</p></li>
+<li><p>残差と解の誤差の違いを、小さな例で説明できる。</p></li>
+<li><p>条件数を入力への敏感さとして読み、計算手順の安定性と区別できる。</p></li>
+<li><p>問題サイズを増やしたときの演算回数と保存量の増え方を見積もれる。</p></li>
+</ul>
+<p>基本部分の計算はJulia本体と標準ライブラリ <code class="docutils literal notranslate"><span class="pre">LinearAlgebra</span></code>、<code class="docutils literal notranslate"><span class="pre">SparseArrays</span></code> で実行できる。掲載図の再作成には追加パッケージ <code class="docutils literal notranslate"><span class="pre">CairoMakie</span></code> が必要だが、図はコードを実行せずに読める。第1章で扱った浮動小数点数のビット構成は繰り返さず、丸めの影響をどう評価するかに進む。</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p><strong>桁で読む習慣をつけよう。</strong> Juliaの出力 <code class="docutils literal notranslate"><span class="pre">1.0e-6</span></code> は <span class="math notranslate nohighlight">\(1.0\times10^{-6}=0.000001\)</span> を表す。本章では、<span class="math notranslate nohighlight">\(10^{-6}\)</span> と <span class="math notranslate nohighlight">\(10^{-8}\)</span> のような値を「差が <span class="math notranslate nohighlight">\(0.00000099\)</span>」とは読まず、「100分の1、つまり2桁小さい」と読む。誤差は何桁正しいかが大切であり、図でも縦軸・横軸に<strong>対数目盛</strong>（1目盛ごとに10倍）を使う。両軸が対数目盛の図では、<span class="math notranslate nohighlight">\(y=Cx\)</span> の関係は傾き1の直線、<span class="math notranslate nohighlight">\(y=Cx^2\)</span> は傾き2の直線に見える。</p>
+</div>
+</section>
+<section id="id3">
+<h2><span class="section-number">4.2. </span>同じずれでも、元の大きさで意味が変わる<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p>真の値が1000のときに1001と計算した場合と、真の値が2のときに3と計算した場合を比べよう。どちらも差は1だが、前者では0.1%、後者では50%のずれである。</p>
+<p>真の値を <span class="math notranslate nohighlight">\(x\)</span>、近似値を <span class="math notranslate nohighlight">\(\hat{x}\)</span> とすると、<strong>絶対誤差</strong>と<strong>相対誤差</strong>を</p>
+<div class="math notranslate nohighlight">
+\[
+E_{\mathrm{abs}}=|\hat{x}-x|,\qquad
+E_{\mathrm{rel}}=\frac{|\hat{x}-x|}{|x|}\quad(x\ne0)
+\]</div>
+<p>で定める。絶対誤差は元の量と同じ単位を持ち、相対誤差は単位を持たない比である。例えばメートルをセンチメートルへ換算すると絶対誤差の数値は100倍になるが、相対誤差は変わらない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">xtrue</span><span class="p">,</span><span class="w"> </span><span class="n">xhat</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">((</span><span class="mf">1000.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1001.0</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">))</span>
+<span class="w">    </span><span class="n">absolute_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">abs</span><span class="p">(</span><span class="n">xhat</span><span class="o">-</span><span class="n">xtrue</span><span class="p">)</span>
+<span class="w">    </span><span class="n">relative_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">absolute_error</span><span class="o">/</span><span class="n">abs</span><span class="p">(</span><span class="n">xtrue</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;真の値=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xtrue</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 近似値=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xhat</span><span class="p">,</span>
+<span class="w">        </span><span class="s">&quot;: 絶対誤差=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">absolute_error</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 相対誤差=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">relative_error</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>真の値=1000.0, 近似値=1001.0: 絶対誤差=1.0, 相対誤差=0.001
+真の値=2.0, 近似値=3.0: 絶対誤差=1.0, 相対誤差=0.5
+</pre></div>
+</div>
+</div>
+</div>
+<p>相対誤差は便利だが、真の値が0なら定義できない。0に近い場合にも、ごく小さな絶対誤差が大きな相対誤差になる。例えば <span class="math notranslate nohighlight">\(x=10^{-12}\)</span>、<span class="math notranslate nohighlight">\(\hat{x}=2\times10^{-12}\)</span> なら、絶対誤差は <span class="math notranslate nohighlight">\(10^{-12}\)</span> だが相対誤差は1である。これを許せるかどうかは、目的や量の尺度による。</p>
+<p>実際の判定では、「絶対誤差をこの程度まで許す」という基準と、「基準値の何割まで許す」という基準を組み合わせることが多い。例えば <span class="math notranslate nohighlight">\(a\ge0\)</span> を絶対許容誤差、<span class="math notranslate nohighlight">\(r\ge0\)</span> を相対許容誤差として、</p>
+<div class="math notranslate nohighlight">
+\[
+|\hat{x}-x|\le a+r|x|
+\]</div>
+<p>という判定が考えられる。これは許容誤差を組み合わせる一例であり、ライブラリごとの判定式や既定値は確認して使う。<code class="docutils literal notranslate"><span class="pre">isapprox</span></code> が <code class="docutils literal notranslate"><span class="pre">true</span></code> になることだけで、その問題で必要な精度を満たすとは限らない。</p>
+</section>
+<section id="id4">
+<h2><span class="section-number">4.3. </span>ベクトルの誤差を一つの大きさにまとめる<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>第3章では、ベクトルの長さを2ノルムで測った。複数の成分に誤差がある場合にも、差のベクトルにノルムを使える。例えば誤差が <span class="math notranslate nohighlight">\((3,-4)^\mathsf{T}\)</span> なら、長さは5である。</p>
+<p>用途に応じて、成分の絶対値を足す測り方や、一番大きい成分だけを見る測り方も使う。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>測り方</p></th>
+<th class="head"><p>定義</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\((3,-4)^\mathsf{T}\)</span> の場合</p></th>
+<th class="head"><p>読み方</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>1ノルム</p></td>
+<td><p><span class="math notranslate nohighlight">\(\lVert\mathbf{x}\rVert_1=\sum_i \lvert x_i\rvert\)</span></p></td>
+<td><p>7</p></td>
+<td><p>成分の大きさの合計</p></td>
+</tr>
+<tr class="row-odd"><td><p>2ノルム</p></td>
+<td><p><span class="math notranslate nohighlight">\(\lVert\mathbf{x}\rVert_2=\sqrt{\sum_i \lvert x_i\rvert^2}\)</span></p></td>
+<td><p>5</p></td>
+<td><p>通常の幾何学的な長さ</p></td>
+</tr>
+<tr class="row-even"><td><p>∞ノルム</p></td>
+<td><p><span class="math notranslate nohighlight">\(\lVert\mathbf{x}\rVert_\infty=\max_i \lvert x_i\rvert\)</span></p></td>
+<td><p>4</p></td>
+<td><p>成分の大きさの最大値</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>どれか一つだけが正しい測り方というわけではない。例えば、すべての地点の誤差を一定以下にしたいなら最大値を見るのが自然である。同じ問題を比較するときは、どのノルムを使うかをそろえる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="n">error_vector</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mf">4.0</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;1ノルム = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">error_vector</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;2ノルム = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">error_vector</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;∞ノルム = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">error_vector</span><span class="p">,</span><span class="w"> </span><span class="nb">Inf</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>1ノルム = 7.0
+2ノルム = 5.0
+∞ノルム = 4.0
+</pre></div>
+</div>
+</div>
+</div>
+<p>ベクトルの相対誤差も、<span class="math notranslate nohighlight">\(\mathbf{x}\ne\mathbf{0}\)</span> のとき</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|\hat{\mathbf{x}}-\mathbf{x}\|}{\|\mathbf{x}\|}
+\]</div>
+<p>と表せる。本章では、添字を省いたノルムは基本的に<strong>ベクトルの2ノルムと、それに対応する行列の作用素ノルム</strong>を意味する。量の単位や尺度が成分ごとに大きく違う場合には、そのまま一緒に測ってよいかも考える必要がある。</p>
+</section>
+<section id="id5">
+<h2><span class="section-number">4.4. </span>残差と解の誤差は何が違うか<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>第3章の連立方程式</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{A}\mathbf{x}=\mathbf{b},\qquad
+\mathbf{A}=\begin{bmatrix}2&amp;1\\1&amp;3\end{bmatrix},\quad
+\mathbf{b}=\begin{bmatrix}5\\5\end{bmatrix}
+\end{split}\]</div>
+<p>を思い出そう。真の解は <span class="math notranslate nohighlight">\(\mathbf{x}=(2,1)^\mathsf{T}\)</span> である。候補 <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}=(2.1,0.9)^\mathsf{T}\)</span> には、二つの異なるずれがある。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\underbrace{\hat{\mathbf{x}}-\mathbf{x}}_{\text{解そのもののずれ}}
+=\begin{bmatrix}0.1\\-0.1\end{bmatrix},\qquad
+\underbrace{\mathbf{r}=\mathbf{b}-\mathbf{A}\hat{\mathbf{x}}}_{\text{方程式に代入したときの残差}}
+=\begin{bmatrix}-0.1\\0.2\end{bmatrix}.
+\end{split}\]</div>
+<p>解そのもののずれを<strong>前進誤差</strong>という。これは本当に知りたい量だが、真の解が分からなければ直接計算できない。一方、残差は <span class="math notranslate nohighlight">\(\mathbf{A}\)</span>、<span class="math notranslate nohighlight">\(\mathbf{b}\)</span>、<span class="math notranslate nohighlight">\(\hat{\mathbf{x}}\)</span> があれば計算できる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">5.0</span><span class="p">,</span><span class="w"> </span><span class="mf">5.0</span><span class="p">]</span>
+<span class="n">xtrue</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">xhat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">2.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.9</span><span class="p">]</span>
+<span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b</span><span class="o">-</span><span class="n">A</span><span class="o">*</span><span class="n">xhat</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解の誤差の大きさ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">xhat</span><span class="o">-</span><span class="n">xtrue</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差の大きさ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対前進誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">xhat</span><span class="o">-</span><span class="n">xtrue</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">xtrue</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>解の誤差の大きさ = 0.14142135623730953
+残差の大きさ = 0.22360679774997935
+相対前進誤差 = 0.0632455532033676
+相対残差 = 0.03162277660168385
+</pre></div>
+</div>
+</div>
+</div>
+<p>前進誤差の大きさは約0.1414、残差の大きさは約0.2236であり、別の量になっている。右辺が0でない場合、残差を右辺の大きさで割った</p>
+<div class="math notranslate nohighlight">
+\[
+\rho=\frac{\|\mathbf{r}\|}{\|\mathbf{b}\|}
+\]</div>
+<p>を<strong>相対残差</strong>と呼ぶ。上の例では相対前進誤差が約0.06325、相対残差が約0.03162である。</p>
+<section id="id6">
+<h3><span class="section-number">4.4.1. </span>小さい残差でも、解が大きく違う例<a class="headerlink" href="#id6" title="Link to this heading">#</a></h3>
+<p>では、残差を小さくすれば必ず解も近づくのだろうか。次の方程式を考える。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{A}_\delta=\begin{bmatrix}1&amp;0\\0&amp;\delta\end{bmatrix},\qquad
+\mathbf{b}_\delta=\begin{bmatrix}1\\\delta\end{bmatrix},\qquad
+\delta=10^{-6}.
+\end{split}\]</div>
+<p>これは <span class="math notranslate nohighlight">\(x_1=1\)</span>、<span class="math notranslate nohighlight">\(\delta x_2=\delta\)</span> という二つの式なので、解は <span class="math notranslate nohighlight">\(\mathbf{x}=(1,1)^\mathsf{T}\)</span> である。ところが <span class="math notranslate nohighlight">\(\hat{\mathbf{x}}=(1,0)^\mathsf{T}\)</span> という候補を代入すると、</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{r}=\begin{bmatrix}0\\\delta\end{bmatrix},\qquad
+\rho=\frac{\delta}{\sqrt{1+\delta^2}}\approx10^{-6}
+\end{split}\]</div>
+<p>と小さな相対残差が得られる。一方、第2成分を1だけ間違えているので、相対前進誤差は <span class="math notranslate nohighlight">\(1/\sqrt{2}\approx0.7071\)</span> である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-6</span>
+<span class="n">A_delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="n">delta</span><span class="p">]</span>
+<span class="n">b_delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">delta</span><span class="p">]</span>
+<span class="n">xtrue_delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">xhat_delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]</span>
+<span class="n">r_delta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">b_delta</span><span class="o">-</span><span class="n">A_delta</span><span class="o">*</span><span class="n">xhat_delta</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">r_delta</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r_delta</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">b_delta</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対前進誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">xhat_delta</span><span class="o">-</span><span class="n">xtrue_delta</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">xtrue_delta</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>残差 = [0.0, 1.0e-6]
+相対残差 = 9.999999999995e-7
+相対前進誤差 = 0.7071067811865475
+</pre></div>
+</div>
+</div>
+</div>
+<p>ここでは、解法を実行して失敗させたのではなく、<strong>あえて誤った候補を作って残差を測った</strong>。第2成分のずれが、行列をかけると <span class="math notranslate nohighlight">\(10^{-6}\)</span> 倍に縮められるため、残差の大きさだけを見ると目立たなくなる。</p>
+<p>また、第2式だけを見れば「右辺 <span class="math notranslate nohighlight">\(10^{-6}\)</span> に対して残差 <span class="math notranslate nohighlight">\(10^{-6}\)</span>」なので、大きな相対的ずれだと分かる。ベクトル全体のノルムで測る相対残差は、各方程式を個別の尺度で調べることと同じではない。単位や成分の尺度をそろえる意味も、この例から見えてくる。</p>
+</section>
+</section>
+<section id="id7">
+<h2><span class="section-number">4.5. </span>入力を少し変えると、解はどう動くか<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<p>同じ行列で、右辺の第2成分だけを <span class="math notranslate nohighlight">\(\varepsilon\)</span> 増やしてみよう。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{b}_\delta+\Delta\mathbf{b}
+=\begin{bmatrix}1\\\delta+\varepsilon\end{bmatrix},\qquad
+\Delta\mathbf{b}=\begin{bmatrix}0\\\varepsilon\end{bmatrix}.
+\end{split}\]</div>
+<p>新しい解は</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\tilde{\mathbf{x}}=\begin{bmatrix}1\\1+\varepsilon/\delta\end{bmatrix}
+\end{split}\]</div>
+<p>なので、第2成分の変化は入力の変化の <span class="math notranslate nohighlight">\(1/\delta\)</span> 倍になる。<span class="math notranslate nohighlight">\(\delta=10^{-6}\)</span> では <span class="math notranslate nohighlight">\(\varepsilon=10^{-6}\)</span> だけ右辺を変えると、解の第2成分が1から2に変わる。</p>
+<p>この現象は、計算機の丸めや特定の解法が原因ではない。方程式を厳密に解いても起こる、<strong>問題そのものの入力への敏感さ</strong>である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">epsilon</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-6</span>
+<span class="n">delta_b</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">epsilon</span><span class="p">]</span>
+<span class="n">xchanged</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_delta</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="n">b_delta</span><span class="o">+</span><span class="n">delta_b</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;元の解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xtrue_delta</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;右辺を変えた問題の解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">xchanged</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;入力の相対変化 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">delta_b</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">b_delta</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;解の相対変化 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">xchanged</span><span class="o">-</span><span class="n">xtrue_delta</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">xtrue_delta</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>元の解 = [1.0, 1.0]
+右辺を変えた問題の解 = [1.0, 2.0]
+入力の相対変化 = 9.999999999995e-7
+解の相対変化 = 0.7071067811865475
+</pre></div>
+</div>
+</div>
+</div>
+<p>同じ大きさの変化でも、第1成分に加えれば解の変化はそのままである。影響は入力の変化の<strong>方向</strong>にもよる。感度を評価するには、最も大きく影響する方向も考えておく必要がある。</p>
+</section>
+<section id="id8">
+<h2><span class="section-number">4.6. </span>行列ノルム：ベクトルの長さを最大何倍にするか<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>第3章では行列を、ベクトルから別のベクトルを作る操作として見た。行列の大きさを測る一つの方法は、「その操作がベクトルの長さを最大何倍にするか」である。</p>
+<p>例えば <span class="math notranslate nohighlight">\(\mathbf{D}=\operatorname{diag}(1,\delta)\)</span>、<span class="math notranslate nohighlight">\(0&lt;\delta\le1\)</span> は第1成分をそのまま、第2成分を <span class="math notranslate nohighlight">\(\delta\)</span> 倍にする。どんなベクトルの長さも増やさず、<span class="math notranslate nohighlight">\((1,0)^\mathsf{T}\)</span> の長さは変えないので、最大の倍率は1である。</p>
+<p>逆行列 <span class="math notranslate nohighlight">\(\mathbf{D}^{-1}=\operatorname{diag}(1,1/\delta)\)</span> は、第2成分を <span class="math notranslate nohighlight">\(1/\delta\)</span> 倍にするので、最大の倍率は <span class="math notranslate nohighlight">\(1/\delta\)</span> になる。</p>
+<p>一般の行列に対して、この最大倍率を</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{A}\|_2
+=\max_{\mathbf{v}\ne\mathbf{0}}
+\frac{\|\mathbf{A}\mathbf{v}\|_2}{\|\mathbf{v}\|_2}
+=\max_{\|\mathbf{v}\|_2=1}\|\mathbf{A}\mathbf{v}\|_2
+\]</div>
+<p>と定義する。これを2ノルムからの**誘導行列ノルム（作用素ノルム）**という。ベクトルを何倍しても比は同じなので、長さ1のベクトルに限って最大値を探してもよい。</p>
+<p>定義から、任意の <span class="math notranslate nohighlight">\(\mathbf{v}\)</span> について</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{A}\mathbf{v}\|_2\le\|\mathbf{A}\|_2\|\mathbf{v}\|_2
+\]</div>
+<p>が成り立つ。実際の倍率は最大倍率以下、という意味である。一般の <span class="math notranslate nohighlight">\(p\)</span> ノルムでも同じ定義ができる。誤差の評価では、ベクトルと行列で対応するノルムを使う。</p>
+<section id="julianormopnorm">
+<h3><span class="section-number">4.6.1. </span>Juliaのnormとopnorm<a class="headerlink" href="#julianormopnorm" title="Link to this heading">#</a></h3>
+<p>Juliaでは <code class="docutils literal notranslate"><span class="pre">opnorm(A,</span> <span class="pre">2)</span></code> がこの最大倍率を計算する。一方、行列に対する <code class="docutils literal notranslate"><span class="pre">norm(A)</span></code> は、全成分の絶対値の二乗和の平方根、すなわち<strong>Frobeniusノルム</strong>を返す。</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{A}\|_{\mathrm F}=\sqrt{\sum_{i,j}|a_{ij}|^2}.
+\]</div>
+<p>こちらも行列の大きさを測る量だが、最大倍率とは異なる。例えば <span class="math notranslate nohighlight">\(\operatorname{diag}(1,0.5)\)</span> では、最大倍率は1、Frobeniusノルムは <span class="math notranslate nohighlight">\(\sqrt{1+0.5^2}\approx1.118\)</span> となる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">D</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="mf">0.5</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;最大倍率 opnorm(D, 2) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">opnorm</span><span class="p">(</span><span class="n">D</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;全成分から測る norm(D) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">D</span><span class="p">))</span>
+<span class="k">for</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">])</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;v=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">v</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;: 実際の倍率=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">D</span><span class="o">*</span><span class="n">v</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>最大倍率 opnorm(D, 2) = 1.0
+全成分から測る norm(D) = 1.118033988749895
+v=[1.0, 0.0]: 実際の倍率=1.0
+v=[0.0, 1.0]: 実際の倍率=0.5
+v=[1.0, 1.0]: 実際の倍率=0.7905694150420948
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="id9">
+<h2><span class="section-number">4.7. </span>条件数で入力への敏感さを評価する<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<p>正則な行列に対し、</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(\mathbf{A})=\|\mathbf{A}\|_2\|\mathbf{A}^{-1}\|_2
+\]</div>
+<p>を<strong>2ノルム条件数</strong>という。<span class="math notranslate nohighlight">\(\kappa\)</span> はギリシャ文字のカッパである。<span class="math notranslate nohighlight">\(\mathbf{A}\)</span> による最大倍率と、逆に解を求める操作による最大倍率を掛けて、相対的な変化の増幅を評価する。</p>
+<p>この数は1以上となり、1に近ければ<strong>良条件</strong>、非常に大きければ<strong>悪条件</strong>という。どの程度の大きさが問題になるかは、入力誤差と必要な出力精度による。先ほどの対角行列では、</p>
+<div class="math notranslate nohighlight">
+\[
+\kappa_2(\mathbf{A}_\delta)=1\times\frac1\delta=10^6
+\]</div>
+<p>である。特異な行列には逆行列がなく、ここでの条件数は無限大とみなす。</p>
+<p>Juliaでは <code class="docutils literal notranslate"><span class="pre">cond(A)</span></code> が2ノルム条件数を計算する。この関数を使うために <code class="docutils literal notranslate"><span class="pre">inv(A)</span></code> を自分で作る必要はない。また、定義中の2ノルムはFrobeniusノルムではないので、<code class="docutils literal notranslate"><span class="pre">norm(A)*norm(inv(A))</span></code> として代用しない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0e-6</span><span class="p">)</span>
+<span class="w">    </span><span class="n">A_d</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="n">d</span><span class="p">]</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;第2対角成分=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;: 条件数=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cond</span><span class="p">(</span><span class="n">A_d</span><span class="p">))</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>第2対角成分=1.0: 条件数=1.0
+第2対角成分=0.01: 条件数=100.0
+第2対角成分=1.0e-6: 条件数=1.0e6
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id10">
+<h3><span class="section-number">4.7.1. </span>残差と前進誤差を結ぶ<a class="headerlink" href="#id10" title="Link to this heading">#</a></h3>
+<p>条件数が何を保証するか、残差との関係から確かめよう。<span class="math notranslate nohighlight">\(\mathbf{A}\mathbf{x}=\mathbf{b}\)</span> と <span class="math notranslate nohighlight">\(\mathbf{r}=\mathbf{b}-\mathbf{A}\hat{\mathbf{x}}\)</span> から</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{A}(\mathbf{x}-\hat{\mathbf{x}})=\mathbf{r},\qquad
+\mathbf{x}-\hat{\mathbf{x}}=\mathbf{A}^{-1}\mathbf{r}
+\]</div>
+<p>を得る。作用素ノルムの不等式を使うと、</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{x}-\hat{\mathbf{x}}\|_2\le\|\mathbf{A}^{-1}\|_2\|\mathbf{r}\|_2.
+\]</div>
+<p>さらに <span class="math notranslate nohighlight">\(\|\mathbf{b}\|_2=\|\mathbf{A}\mathbf{x}\|_2\le\|\mathbf{A}\|_2\|\mathbf{x}\|_2\)</span> より、<span class="math notranslate nohighlight">\(\mathbf{b}\ne\mathbf{0}\)</span> の場合には</p>
+<div class="math notranslate nohighlight">
+\[
+\boxed{
+\frac{\|\mathbf{x}-\hat{\mathbf{x}}\|_2}{\|\mathbf{x}\|_2}
+\le\kappa_2(\mathbf{A})\frac{\|\mathbf{r}\|_2}{\|\mathbf{b}\|_2}}
+\]</div>
+<p>となる。すなわち、<strong>相対前進誤差は「条件数×相対残差」以下</strong>である。この式は厳密な演算で定義した残差に対する関係であり、実際に計算した残差や条件数にも丸めがある。とても小さい残差を精密に評価したい場合には、残差の計算精度にも注意する。</p>
+<p>例えば、相対残差が <span class="math notranslate nohighlight">\(10^{-8}\)</span> でも条件数が <span class="math notranslate nohighlight">\(10^2\)</span> なら上界は <span class="math notranslate nohighlight">\(10^{-6}\)</span>、条件数が <span class="math notranslate nohighlight">\(10^8\)</span> なら上界は1になる。後者は、実際の誤差が必ず1になるという意味ではない。<strong>条件数は最大の増幅に基づく上界であり、すべての誤差がその倍率で増えるわけではない</strong>。</p>
+<p>同じ議論は、右辺を変えた二つの問題にも適用できる。行列を固定し、<span class="math notranslate nohighlight">\(\mathbf{A}\tilde{\mathbf{x}}=\mathbf{b}+\Delta\mathbf{b}\)</span> とすれば、</p>
+<div class="math notranslate nohighlight">
+\[
+\frac{\|\tilde{\mathbf{x}}-\mathbf{x}\|_2}{\|\mathbf{x}\|_2}
+\le\kappa_2(\mathbf{A})\frac{\|\Delta\mathbf{b}\|_2}{\|\mathbf{b}\|_2}.
+\]</div>
+<p>ここでは、行列自体の変化は含めていない。また、条件数は採用する単位・尺度やノルムにも依存する。測定誤差の大きさや方向について情報があるなら、それも併せて判断する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">relative_residual</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r_delta</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">b_delta</span><span class="p">)</span>
+<span class="n">relative_forward_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">xhat_delta</span><span class="o">-</span><span class="n">xtrue_delta</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">xtrue_delta</span><span class="p">)</span>
+<span class="n">error_bound</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cond</span><span class="p">(</span><span class="n">A_delta</span><span class="p">)</span><span class="o">*</span><span class="n">relative_residual</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">relative_residual</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;相対前進誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">relative_forward_error</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;条件数×相対残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">error_bound</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>相対残差 = 9.999999999995e-7
+相対前進誤差 = 0.7071067811865475
+条件数×相対残差 = 0.9999999999995
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id11">
+<h3><span class="section-number">4.7.2. </span>同じ残差でも、条件数によって見え方が変わる<a class="headerlink" href="#id11" title="Link to this heading">#</a></h3>
+<p>図では、<span class="math notranslate nohighlight">\(\mathbf{A}=\operatorname{diag}(1,1/\kappa)\)</span>、<span class="math notranslate nohighlight">\(\mathbf{b}=(1,0)^\mathsf{T}\)</span>、真の解 <span class="math notranslate nohighlight">\(\mathbf{x}=(1,0)^\mathsf{T}\)</span> として比較する。前の例から右辺を変え、増幅の最大倍率がそのまま現れるように選んだ例である。</p>
+<p>右辺の第2成分に <span class="math notranslate nohighlight">\(\varepsilon\)</span> を加えた問題の解は、<span class="math notranslate nohighlight">\(\hat{\mathbf{x}}=(1,\kappa\varepsilon)^\mathsf{T}\)</span> になる。これを<strong>元の方程式</strong>に代入すると、残差は <span class="math notranslate nohighlight">\((0,-\varepsilon)^\mathsf{T}\)</span> である。したがって、相対残差は <span class="math notranslate nohighlight">\(|\varepsilon|\)</span>、相対前進誤差は <span class="math notranslate nohighlight">\(\kappa|\varepsilon|\)</span> になる。この例では上界に等しい増幅が起こるが、一般には上界より小さくなる。</p>
+<p>両軸は対数目盛で、等間隔の目盛が等しい倍率に対応する。同じ横軸の値で縦軸を比べると、条件数が大きいほど大きな前進誤差が生じ得ることが読める。作図コードは図を再作成する場合だけ実行する。</p>
+<div class="cell tag_understanding-plot tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 図を再作成する場合のみ実行する。</span>
+<span class="c"># 未導入なら一度だけ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+
+<span class="k">let</span>
+<span class="w">    </span><span class="n">fig</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">860</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">),</span><span class="w"> </span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+<span class="w">    </span><span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;relative residual&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;relative forward error&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">xscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span><span class="w"> </span><span class="n">yscale</span><span class="o">=</span><span class="n">log10</span><span class="p">,</span>
+<span class="w">        </span><span class="n">xticks</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="o">:</span><span class="mi">2</span><span class="o">:-</span><span class="mi">2</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;10⁻¹²&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻¹⁰&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻⁸&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻⁶&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻⁴&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻²&quot;</span><span class="p">]),</span>
+<span class="w">        </span><span class="n">yticks</span><span class="o">=</span><span class="p">(</span><span class="mf">10.0</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="o">:</span><span class="mi">4</span><span class="o">:</span><span class="mi">4</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;10⁻¹²&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻⁸&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁻⁴&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁰&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;10⁴&quot;</span><span class="p">]),</span>
+<span class="w">        </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Conditioning and forward error&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">kappa</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">zip</span><span class="p">((</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0e3</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0e6</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="ss">:seagreen</span><span class="p">,</span><span class="w"> </span><span class="ss">:orange</span><span class="p">,</span><span class="w"> </span><span class="ss">:tomato</span><span class="p">))</span>
+<span class="w">        </span><span class="n">A_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="n">kappa</span><span class="p">]</span>
+<span class="w">        </span><span class="n">b_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]</span>
+<span class="w">        </span><span class="n">x_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.0</span><span class="p">]</span>
+<span class="w">        </span><span class="n">residuals</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">[]</span>
+<span class="w">        </span><span class="n">errors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">[]</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">epsilon</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mf">10.0</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="o">-</span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+<span class="w">            </span><span class="n">candidate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_plot</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="n">b_plot</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="n">epsilon</span><span class="p">])</span>
+<span class="w">            </span><span class="n">push!</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">b_plot</span><span class="o">-</span><span class="n">A_plot</span><span class="o">*</span><span class="n">candidate</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">b_plot</span><span class="p">))</span>
+<span class="w">            </span><span class="n">push!</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">candidate</span><span class="o">-</span><span class="n">x_plot</span><span class="p">)</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">x_plot</span><span class="p">))</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">residuals</span><span class="p">,</span><span class="w"> </span><span class="n">errors</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+<span class="w">            </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;kappa = </span><span class="si">$</span><span class="p">(</span><span class="kt">Int</span><span class="p">(</span><span class="n">kappa</span><span class="p">))</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">axislegend</span><span class="p">(</span><span class="n">ax</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:lt</span><span class="p">)</span>
+<span class="w">    </span><span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;conditioning_error_amplification.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-conditioning-error-amplification">
+<a class="reference internal image-reference" href="../_images/conditioning_error_amplification.svg"><img alt="条件数1、1000、1000000の対角行列について、相対残差に対する相対前進誤差を対数目盛で比較する図" src="../_images/conditioning_error_amplification.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 4.1 </span><span class="caption-text">この例では相対前進誤差が条件数と相対残差の積に等しくなる。図は問題の感度を示しており、右辺を変えた問題を解いた計算自体が不正確だったという意味ではない。</span><a class="headerlink" href="#fig-conditioning-error-amplification" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+</section>
+<section id="id12">
+<h2><span class="section-number">4.8. </span>丸めは計算の途中でも起こる<a class="headerlink" href="#id12" title="Link to this heading">#</a></h2>
+<p>ここまでは主に、入力や候補解を変えたときの関係を考えた。実際の計算では、第1章で見たように、数を有限桁で保存する丸めも加わる。</p>
+<p><code class="docutils literal notranslate"><span class="pre">eps(Float64)</span></code> は1とその次に大きい倍精度数との間隔で、約 <span class="math notranslate nohighlight">\(2.22\times10^{-16}\)</span> である。最も近い表現可能数へ丸める方式では、1回の丸めの相対誤差を評価する基準として</p>
+<div class="math notranslate nohighlight">
+\[
+u=\frac{\operatorname{eps}(\mathrm{Float64})}{2}\approx1.11\times10^{-16}
+\]</div>
+<p>を用い、<strong>単位丸め誤差</strong>と呼ぶ。これは第1章で定義したマシンイプシロンの半分である。</p>
+<p>実数 <span class="math notranslate nohighlight">\(z\)</span> を丸めた結果を <span class="math notranslate nohighlight">\(\operatorname{fl}(z)\)</span> と書くと、通常の正規化数の範囲では</p>
+<div class="math notranslate nohighlight">
+\[
+\operatorname{fl}(z)=z(1+\delta),\qquad |\delta|\le u
+\]</div>
+<p>というモデルで表せる。ここでの <span class="math notranslate nohighlight">\(\delta\)</span> は1回の丸めを表す相対的なずれであり、前の対角行列の小さな成分とは別の量である。四則演算の厳密な結果を <span class="math notranslate nohighlight">\(z\)</span> とすれば、演算結果を保存するときの丸めにもこの見方を使える。オーバーフローや非正規化数の領域などでは、この相対誤差モデルをそのまま使えない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">println</span><span class="p">(</span><span class="s">&quot;マシンイプシロン = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">(</span><span class="kt">Float64</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;単位丸め誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">eps</span><span class="p">(</span><span class="kt">Float64</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;0.1 + 0.2 - 0.3 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">0.3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>マシンイプシロン = 2.220446049250313e-16
+単位丸め誤差 = 1.1102230246251565e-16
+0.1 + 0.2 - 0.3 = 5.551115123125783e-17
+</pre></div>
+</div>
+</div>
+</div>
+<p>このモデルは、計算全体の誤差が <span class="math notranslate nohighlight">\(u\)</span> 以下だという意味ではない。途中で生じた小さな誤差が、その後の演算で目立つようになる場合がある。</p>
+</section>
+<section id="id13">
+<h2><span class="section-number">4.9. </span>計算手順の安定性：同じ式をどう計算するか<a class="headerlink" href="#id13" title="Link to this heading">#</a></h2>
+<p>小さい正の <span class="math notranslate nohighlight">\(x\)</span> に対して</p>
+<div class="math notranslate nohighlight">
+\[
+f(x)=\sqrt{1+x}-1
+\]</div>
+<p>を計算しよう。<span class="math notranslate nohighlight">\(\sqrt{1+x}\)</span> と1はほぼ等しい。平方根の値に含まれるわずかな誤差も、小さな差を求めた後では、答えに対して大きな割合を占めることがある。このように、近い値の差で有効数字が失われる現象を<strong>桁落ち</strong>という。引き算の丸めだけでなく、引かれる値がすでに持っている誤差にも注目する。</p>
+<p>分子・分母に <span class="math notranslate nohighlight">\(\sqrt{1+x}+1\)</span> を掛けると、</p>
+<div class="math notranslate nohighlight">
+\[
+\sqrt{1+x}-1
+=\frac{(\sqrt{1+x}-1)(\sqrt{1+x}+1)}{\sqrt{1+x}+1}
+=\frac{x}{\sqrt{1+x}+1}
+\]</div>
+<p>となる。小さい <span class="math notranslate nohighlight">\(x&gt;0\)</span> では分母は約2なので、答えは約 <span class="math notranslate nohighlight">\(x/2\)</span> である。この書き方なら、ほぼ等しい二つの数を引く必要がない。</p>
+<p>次のコードでは、二つの計算結果と相対誤差を比べる。比較の基準には、同じ入力を多くの桁で計算する <code class="docutils literal notranslate"><span class="pre">BigFloat</span></code> を使う。<code class="docutils literal notranslate"><span class="pre">BigFloat(x)</span></code> は、すでに保存された入力 <code class="docutils literal notranslate"><span class="pre">x</span></code> を高精度の型へ移す操作であり、入力時に失った情報を復元するものではない。ここでは<strong>同じ入力に対する計算手順の違い</strong>を調べるために使う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">1.0e-8</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0e-12</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0e-16</span><span class="p">)</span>
+<span class="w">    </span><span class="n">direct</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">x</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="n">rationalized</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="o">/</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="n">reference</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">setprecision</span><span class="p">(</span><span class="kt">BigFloat</span><span class="p">,</span><span class="w"> </span><span class="mi">256</span><span class="p">)</span><span class="w"> </span><span class="k">do</span>
+<span class="w">        </span><span class="n">xb</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">BigFloat</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">xb</span><span class="o">/</span><span class="p">(</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">xb</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">direct_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">(</span><span class="n">abs</span><span class="p">((</span><span class="kt">BigFloat</span><span class="p">(</span><span class="n">direct</span><span class="p">)</span><span class="o">-</span><span class="n">reference</span><span class="p">)</span><span class="o">/</span><span class="n">reference</span><span class="p">))</span>
+<span class="w">    </span><span class="n">rationalized_error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Float64</span><span class="p">(</span><span class="n">abs</span><span class="p">((</span><span class="kt">BigFloat</span><span class="p">(</span><span class="n">rationalized</span><span class="p">)</span><span class="o">-</span><span class="n">reference</span><span class="p">)</span><span class="o">/</span><span class="n">reference</span><span class="p">))</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;x=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;: 直接=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">direct</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 有理化=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rationalized</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;  相対誤差: 直接=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">direct_error</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 有理化=&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">rationalized_error</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>x=1.0e-8: 直接=4.999999969612645e-9, 有理化=4.9999999875e-9
+  相対誤差: 直接=3.5774710132883877e-9, 有理化=5.4655958769870005e-17
+x=1.0e-12: 直接=5.000444502911705e-13, 有理化=4.99999999999875e-13
+  相対誤差: 直接=8.890058259105395e-5, 有理化=1.210897000984255e-17
+x=1.0e-16: 直接=0.0, 有理化=5.0e-17
+  相対誤差: 直接=1.0, 有理化=2.5e-17
+</pre></div>
+</div>
+</div>
+</div>
+<p><span class="math notranslate nohighlight">\(x=10^{-16}\)</span> では直接計算の値は0となり、相対誤差は1になる。一方、有理化した式では約 <span class="math notranslate nohighlight">\(5\times10^{-17}\)</span> が得られる。高精度での比較値も厳密値そのものではないが、この例の差を調べるには十分な精度を持つ。</p>
+<p>ここでは、求めたい関数も入力も同じで、変えたのは計算手順だけである。小さな正の <span class="math notranslate nohighlight">\(x\)</span> で <span class="math notranslate nohighlight">\(f(x)\approx x/2\)</span> だから、入力が相対的に少し変われば、答えもおおむね同じ割合だけ変わる。この問題自体が入力の相対誤差を極端に増幅するために、0が出たわけではない。</p>
+<p>丸めの影響を、問題が本来持つ敏感さに見合う程度に抑える計算手順を、安定性の観点から評価する。この例では、小さい正の <span class="math notranslate nohighlight">\(x\)</span> に対する有理化した式の方が安定に評価できる。もちろん、どの式が適切かは入力の範囲にもよる。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>観点</p></th>
+<th class="head"><p>何の性質か</p></th>
+<th class="head"><p>この章の例</p></th>
+<th class="head"><p>対応を考える方向</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>条件の良し悪し</p></td>
+<td><p>入力から答えを定める問題の性質</p></td>
+<td><p>小さい対角成分の方程式が、入力の変化を増幅する</p></td>
+<td><p>入力の精度、尺度、求めたい量を確認する</p></td>
+</tr>
+<tr class="row-odd"><td><p>計算手順の安定性</p></td>
+<td><p>問題を解くアルゴリズムの性質</p></td>
+<td><p>平方根の差の直接計算で丸めの影響が大きくなる</p></td>
+<td><p>式の変形や解法の選択を検討する</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>安定な方法でも、入力データに含まれる不確かさを消せるわけではない。また、ある入力で正解が出たことだけでは、アルゴリズムが一般に安定だとは言えない。</p>
+</section>
+<section id="id14">
+<h2><span class="section-number">4.10. </span>後退誤差：どの近い問題なら正確に解けているか<a class="headerlink" href="#id14" title="Link to this heading">#</a></h2>
+<p>安定性を考えるために、計算結果を別の向きから見る。解の方を真の解へ近づける代わりに、<strong>計算結果が厳密解になるよう入力を少し変える</strong>のである。</p>
+<p>例えば <span class="math notranslate nohighlight">\(2x=1\)</span> に対して <span class="math notranslate nohighlight">\(\hat{x}=0.49\)</span> が得られたなら、<span class="math notranslate nohighlight">\(2\times0.49=0.98\)</span> なので、<span class="math notranslate nohighlight">\(\hat{x}\)</span> は <span class="math notranslate nohighlight">\(2x=0.98\)</span> の厳密解である。解の誤差は0.01だが、右辺を変えた量は <span class="math notranslate nohighlight">\(0.98-1=-0.02\)</span> である。</p>
+<p>連立方程式でも、<span class="math notranslate nohighlight">\(\mathbf{r}=\mathbf{b}-\mathbf{A}\hat{\mathbf{x}}\)</span> なら、</p>
+<div class="math notranslate nohighlight">
+\[
+\mathbf{A}\hat{\mathbf{x}}=\mathbf{b}-\mathbf{r}
+=\mathbf{b}+\Delta\mathbf{b},\qquad\Delta\mathbf{b}=-\mathbf{r}.
+\]</div>
+<p>つまり、行列を固定して右辺を <span class="math notranslate nohighlight">\(-\mathbf{r}\)</span> だけ変えれば、計算結果は厳密解になる。このように入力側で測るずれを<strong>後退誤差</strong>という。<strong>行列を固定して右辺だけを変える場合</strong>の相対後退誤差は、<span class="math notranslate nohighlight">\(\mathbf{b}\ne\mathbf{0}\)</span> のもとで相対残差 <span class="math notranslate nohighlight">\(\|\mathbf{r}\|/\|\mathbf{b}\|\)</span> に等しい。</p>
+<p>この見方なら、真の解を知らなくても、計算結果を近い問題の解として評価できる。ただし、近い問題の解でも、元の問題が悪条件なら解の前進誤差は大きくなり得る。先ほどの対角行列の例は、その具体例でもある。</p>
+<section id="id15">
+<h3><span class="section-number">4.10.1. </span>後退安定性の意味<a class="headerlink" href="#id15" title="Link to this heading">#</a></h3>
+<p>丸め精度と問題サイズに見合う小さな入力の変化で、計算結果を厳密解として説明できるアルゴリズムを<strong>後退安定</strong>という。入力の変化を何に許すか、どの尺度で測るかを指定して使う。</p>
+<p>例えば線形方程式の解法では、右辺だけでなく行列にも変化を許し、</p>
+<div class="math notranslate nohighlight">
+\[
+(\mathbf{A}+\Delta\mathbf{A})\hat{\mathbf{x}}
+=\mathbf{b}+\Delta\mathbf{b}
+\]</div>
+<p>と解釈して、<span class="math notranslate nohighlight">\(\Delta\mathbf{A}\)</span> と <span class="math notranslate nohighlight">\(\Delta\mathbf{b}\)</span> がそれぞれ元の入力に対して小さいかを調べることがある。右辺だけの後退誤差と、この場合の後退誤差は同じ定義ではない。</p>
+<p>本章では「前進は解のずれ、後退は入力のずれ」という方向の違いを押さえよう。良条件な問題を後退安定な方法で解けば、前進誤差も小さく抑えられると期待できる。数値解法の評価では、この二つを組み合わせて考える。</p>
+</section>
+</section>
+<section id="id16">
+<h2><span class="section-number">4.11. </span>問題サイズを倍にすると、計算は何倍になるか<a class="headerlink" href="#id16" title="Link to this heading">#</a></h2>
+<p>ここまでは答えの精度を見た。もう一つ重要なのが、答えを得るための仕事量である。第1章では、Euler法のステップ数を倍にすると更新回数も倍になった。行列を使う計算では、何が何個増えるかを考える。</p>
+<section id="id17">
+<h3><span class="section-number">4.11.1. </span>内積から数えてみる<a class="headerlink" href="#id17" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(n\)</span> 成分の内積 <span class="math notranslate nohighlight">\(\sum_{i=1}^n x_i y_i\)</span> を、各積を計算してから足す手順では、乗算が <span class="math notranslate nohighlight">\(n\)</span> 回、加算が <span class="math notranslate nohighlight">\(n-1\)</span> 回必要である。合計は <span class="math notranslate nohighlight">\(2n-1\)</span> 回で、<span class="math notranslate nohighlight">\(n\)</span> が大きければ約 <span class="math notranslate nohighlight">\(2n\)</span> 回となる。浮動小数点の加減乗除などを数える単位を <strong>flop</strong> と呼ぶ。</p>
+<p><span class="math notranslate nohighlight">\(n\times n\)</span> 行列とベクトルの積では、この内積を行ごとに <span class="math notranslate nohighlight">\(n\)</span> 回行う。行列同士の通常の積では、結果の各成分について内積を作り、それが <span class="math notranslate nohighlight">\(n^2\)</span> 個ある。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>計算</p></th>
+<th class="head"><p>通常の手順での演算回数</p></th>
+<th class="head"><p>主要な増え方</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(n\)</span> を倍にしたとき</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>ベクトルの内積</p></td>
+<td><p><span class="math notranslate nohighlight">\(2n-1\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n)\)</span></p></td>
+<td><p>約2倍</p></td>
+</tr>
+<tr class="row-odd"><td><p>行列とベクトルの積</p></td>
+<td><p><span class="math notranslate nohighlight">\(n(2n-1)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n^2)\)</span></p></td>
+<td><p>約4倍</p></td>
+</tr>
+<tr class="row-even"><td><p>行列と行列の積</p></td>
+<td><p><span class="math notranslate nohighlight">\(n^2(2n-1)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(O(n^3)\)</span></p></td>
+<td><p>約8倍</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>ここでの行列は、一般の密な正方行列である。<span class="math notranslate nohighlight">\(m\times n\)</span> の行列と <span class="math notranslate nohighlight">\(n\)</span> 成分のベクトルなら、同じ数え方で約 <span class="math notranslate nohighlight">\(2mn\)</span> 回、すなわち <span class="math notranslate nohighlight">\(O(mn)\)</span> となる。</p>
+<div class="admonition-strassen admonition">
+<p class="admonition-title">余談: Strassenのアルゴリズム</p>
+<p>行列行列積のアルゴリズムの演算回数は、通常の手順では <span class="math notranslate nohighlight">\(O(n^3)\)</span> であるが、それよりも少ないスケーリングで計算できる方法が知られている。1969年に Volker Strassen が発表した Strassenのアルゴリズムは、行列積の演算回数を <span class="math notranslate nohighlight">\(O(n^{\log_2 7})\approx O(n^{2.807})\)</span> に減らす方法である。60年代に発表されて以降、数多くの改良が提案されている。実際には、下で述べるように、スケーリングにひっつく定数倍の影響が大きく計算機上の高速化に必ずしも繋がらない。
+スケーリングの比較をしているのか、(定数も含めた)実際の演算回数や計算時間を比較しているのか、どちらを見ているかに注意する必要がある。</p>
+</div>
+</section>
+<section id="big-o">
+<h3><span class="section-number">4.11.2. </span>Big-Oは増え方を表す<a class="headerlink" href="#big-o" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(O(n^2)\)</span> などの <strong>Big-O記法</strong>は、大きな <span class="math notranslate nohighlight">\(n\)</span> に対する増え方を表す。本章の計算量の見積もりでは、主要な項の次数を使っている。例えば <span class="math notranslate nohighlight">\(3n^2+10n+7\)</span> なら、定数倍や低次の項を省いて <span class="math notranslate nohighlight">\(O(n^2)\)</span> と書く。</p>
+<p>これは実行時間そのものを表す式ではない。コンパイル、メモリへの読み書き、使う計算機なども時間に影響する。まず演算回数から規模の見通しを立て、その上で必要なら時間を測る。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">println</span><span class="p">(</span><span class="s">&quot;n | 内積の演算回数 | 行列ベクトル積 | 行列行列積&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="mi">400</span><span class="p">)</span>
+<span class="w">    </span><span class="n">inner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="o">*</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span>
+<span class="w">    </span><span class="n">matvec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="o">*</span><span class="n">inner</span>
+<span class="w">    </span><span class="n">matmul</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="o">^</span><span class="mi">2</span><span class="o">*</span><span class="n">inner</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">inner</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">matvec</span><span class="p">,</span><span class="w"> </span><span class="s">&quot; | &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">matmul</span><span class="p">)</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>n | 内積の演算回数 | 行列ベクトル積 | 行列行列積
+100 | 199 | 19900 | 1990000
+200 | 399 | 79800 | 15960000
+400 | 799 | 319600 | 127840000
+</pre></div>
+</div>
+</div>
+</div>
+<p>この表は、行列の積そのものを実行した時間ではなく、上で数えた回数を表示している。サイズを倍にしたとき、約2倍・4倍・8倍の増え方になることを確かめよう。</p>
+<p>参考までに、Big-O記法の定義を簡単に書いておこう。</p>
+<div class="admonition-big-o admonition">
+<p class="admonition-title">Big-O記法</p>
+<p>関数 <span class="math notranslate nohighlight">\(f(n)\)</span> が <span class="math notranslate nohighlight">\(g(n)\)</span> に比例するとき、<span class="math notranslate nohighlight">\(f(n) = O(g(n))\)</span> と書く。これは、ある定数 <span class="math notranslate nohighlight">\(c\)</span> と <span class="math notranslate nohighlight">\(n_0\)</span> が存在し、すべての <span class="math notranslate nohighlight">\(n \geq n_0\)</span> に対して <span class="math notranslate nohighlight">\(|f(n)| \leq c|g(n)|\)</span> が成り立つことを意味する。</p>
+</div>
+</section>
+</section>
+<section id="id18">
+<h2><span class="section-number">4.12. </span>保存する量も見積もる：密行列と疎行列<a class="headerlink" href="#id18" title="Link to this heading">#</a></h2>
+<p>計算回数とメモリ量は別の量である。<span class="math notranslate nohighlight">\(n\times n\)</span> の行列をすべて保存するなら、成分は <span class="math notranslate nohighlight">\(n^2\)</span> 個ある。<code class="docutils literal notranslate"><span class="pre">Float64</span></code> は1個8バイトなので、数値データだけで <span class="math notranslate nohighlight">\(8n^2\)</span> バイトを要する。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>行列の大きさ</p></th>
+<th class="head"><p>成分数</p></th>
+<th class="head"><p>数値データの量（概数）</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(1000\times1000\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^6\)</span></p></td>
+<td><p>8 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(10000\times10000\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(10^8\)</span></p></td>
+<td><p>800 MB</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>ここでは1 MBを <span class="math notranslate nohighlight">\(10^6\)</span> バイトとしている。行列を複数作ればその分が必要で、作業用の領域にもメモリを使う。成分数を数えるだけでも、気軽に全体を作ってよいかの判断材料になる。</p>
+<section id="id19">
+<h3><span class="section-number">4.12.1. </span>0が多い行列では、必要な成分だけを持つ<a class="headerlink" href="#id19" title="Link to this heading">#</a></h3>
+<p>例えば次の行列は、対角線とその上下以外が0である。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\mathbf{S}=\begin{bmatrix}
+2&amp;-1&amp;0&amp;0&amp;0\\
+-1&amp;2&amp;-1&amp;0&amp;0\\
+0&amp;-1&amp;2&amp;-1&amp;0\\
+0&amp;0&amp;-1&amp;2&amp;-1\\
+0&amp;0&amp;0&amp;-1&amp;2
+\end{bmatrix}.
+\end{split}\]</div>
+<p>このような三重対角行列は、隣接する点同士の関係を表す計算などに現れる。<span class="math notranslate nohighlight">\(n\times n\)</span> でも非零成分は <span class="math notranslate nohighlight">\(n+2(n-1)=3n-2\)</span> 個なので、0を含む <span class="math notranslate nohighlight">\(n^2\)</span> 個すべてに同じ記憶量を使う必要はない。</p>
+<p>非零成分が少ない行列を<strong>疎行列</strong>という。非零の値とその位置を記録する形式を使うと、保存量や演算を減らせる。位置の記録にもメモリが必要なため、「非零値の個数×8バイト」が全保存量になるわけではない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">SparseArrays</span>
+
+<span class="n">n_sparse</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+<span class="n">S</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">spdiagm</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">n_sparse</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+<span class="w">             </span><span class="mi">0</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="n">n_sparse</span><span class="p">),</span>
+<span class="w">             </span><span class="mi">1</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">fill</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="n">n_sparse</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;行列の形 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;非零成分数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">nnz</span><span class="p">(</span><span class="n">S</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;全成分数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n_sparse</span><span class="o">^</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;S*[1,1,1,1,1] = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">S</span><span class="o">*</span><span class="n">ones</span><span class="p">(</span><span class="n">n_sparse</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>行列の形 = (5, 5)
+非零成分数 = 13
+全成分数 = 25
+S*[1,1,1,1,1] = [1.0, 0.0, 0.0, 0.0, 1.0]
+</pre></div>
+</div>
+</div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">spdiagm</span></code> は、指定した対角線に値を並べて疎行列を作る関数である。<code class="docutils literal notranslate"><span class="pre">0</span></code> は主対角線、<code class="docutils literal notranslate"><span class="pre">-1</span></code> と <code class="docutils literal notranslate"><span class="pre">1</span></code> はその下と上の対角線を表す。<code class="docutils literal notranslate"><span class="pre">fill(値,</span> <span class="pre">個数)</span></code> は同じ値を並べ、<code class="docutils literal notranslate"><span class="pre">ones(n)</span></code> は1を <span class="math notranslate nohighlight">\(n\)</span> 個並べる。この例では非零成分数が13で、積は <span class="math notranslate nohighlight">\((1,0,0,0,1)^\mathsf{T}\)</span> となる。内部の行では <span class="math notranslate nohighlight">\(-1+2-1=0\)</span> になることを、表示した行列から確認できる。</p>
+<p>疎行列の行列ベクトル積では、主に非零成分に対して積和を行う。出力ベクトルの初期化なども含めると、<span class="math notranslate nohighlight">\(m\times n\)</span> 行列では一般に <span class="math notranslate nohighlight">\(O(\operatorname{nnz}(A)+m+n)\)</span> 程度の仕事を考える。ここでの三重対角行列は非零成分も行数・列数も <span class="math notranslate nohighlight">\(O(n)\)</span> なので、保存量も積の計算量も <span class="math notranslate nohighlight">\(O(n)\)</span> になる。密な表現で通常の積を行う <span class="math notranslate nohighlight">\(O(n^2)\)</span> と比べ、構造を使う利点がある。</p>
+<p>ただし、疎行列の連立方程式を解く途中では、もともと0だった位置に非零成分が現れる <strong>fill-in</strong> が起こることがある。疎行列だから、どの計算も必ず非零成分数に比例するとは限らない。計算の種類と行列の構造を一緒に見ることが大切である。</p>
+</section>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">4.13. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> ノルムの性質と他の行列ノルム<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>本文のノルムを、一般の誤差評価に使うための性質をまとめる。この節は必要になったときに参照してよい。</p>
+<p>ノルムは、非負性と0になる条件、スカラー倍との関係、三角不等式を満たす。</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{x}\|\ge0,\quad
+\|\mathbf{x}\|=0\Longleftrightarrow\mathbf{x}=\mathbf{0},\qquad
+\|\alpha\mathbf{x}\|=|\alpha|\|\mathbf{x}\|,\qquad
+\|\mathbf{x}+\mathbf{y}\|\le\|\mathbf{x}\|+\|\mathbf{y}\|.
+\]</div>
+<p>最後の式は、二つの誤差を足した大きさを、それぞれの大きさの和で抑えられることを意味する。行列全体もベクトル空間なので、同じ性質を満たす尺度を行列ノルムと呼ぶ。</p>
+<p>ベクトルの <span class="math notranslate nohighlight">\(p\)</span> ノルムから誘導する作用素ノルムは</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{A}\|_p=\max_{\mathbf{x}\ne\mathbf{0}}\frac{\|\mathbf{A}\mathbf{x}\|_p}{\|\mathbf{x}\|_p}
+\]</div>
+<p>であり、1ノルムは各列の絶対値和の最大値、∞ノルムは各行の絶対値和の最大値で計算できる。</p>
+<div class="math notranslate nohighlight">
+\[
+\|\mathbf{A}\|_1=\max_j\sum_i|a_{ij}|,\qquad
+\|\mathbf{A}\|_\infty=\max_i\sum_j|a_{ij}|.
+\]</div>
+<p>例えば <span class="math notranslate nohighlight">\(\begin{bmatrix}1&amp;-2\\3&amp;4\end{bmatrix}\)</span> では、列の和は4と6、行の和は3と7なので、1ノルムは6、∞ノルムは7となる。Juliaでは <code class="docutils literal notranslate"><span class="pre">opnorm(A,</span> <span class="pre">1)</span></code>、<code class="docutils literal notranslate"><span class="pre">opnorm(A,</span> <span class="pre">Inf)</span></code> と書く。</p>
+<p>対応するノルムでは <span class="math notranslate nohighlight">\(\|\mathbf{A}\mathbf{x}\|_p\le\|\mathbf{A}\|_p\|\mathbf{x}\|_p\)</span> が成り立ち、適合するサイズの行列同士にも <span class="math notranslate nohighlight">\(\|\mathbf{A}\mathbf{B}\|_p\le\|\mathbf{A}\|_p\|\mathbf{B}\|_p\)</span> が成り立つ。条件数も <span class="math notranslate nohighlight">\(\kappa_p(\mathbf{A})=\|\mathbf{A}\|_p\|\mathbf{A}^{-1}\|_p\)</span> と定義でき、本文の残差の上界を同じように導ける。</p>
+<p>一般の行列の2ノルムをどう計算するかは、特異値分解とも関係し、<a class="reference internal" href="Chap_SVDLowRankApproximation.html"><span class="std std-doc">第12章</span></a>で扱う。ここでは最大倍率としての定義を理解しておけばよい。</p>
+</section>
+<section id="id20">
+<h2><span class="section-number">4.14. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 計算を再利用するという考え方<a class="headerlink" href="#id20" title="Link to this heading">#</a></h2>
+<p>反復計算では、1回あたりの演算だけでなく、何を繰り返しているかを見ると改善の余地が分かる。例えば <code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">=</span> <span class="pre">A*x</span></code> は結果を入れる新しいベクトルを作る。出力用の <code class="docutils literal notranslate"><span class="pre">y</span></code> をあらかじめ用意すれば、<code class="docutils literal notranslate"><span class="pre">mul!(y,</span> <span class="pre">A,</span> <span class="pre">x)</span></code> でそこへ上書きできる。末尾の <code class="docutils literal notranslate"><span class="pre">!</span></code> は、引数の内容を変更する関数によく使われるJuliaの命名上の慣習である。</p>
+<p>連立方程式でも、同じ行列に対して右辺だけを何度も変える場合、解法の準備を再利用できる。<a class="reference internal" href="Chap_LUFactorization.html"><span class="std std-doc">第5章</span></a>で学ぶLU分解では、一般の密な <span class="math notranslate nohighlight">\(n\times n\)</span> 行列を分解する準備に <span class="math notranslate nohighlight">\(O(n^3)\)</span>、その結果を使って1本の右辺を解くのに <span class="math notranslate nohighlight">\(O(n^2)\)</span> の計算を要する。右辺が増えるたびに準備からやり直す必要はない。</p>
+<p>これは「一度作った道具を何度も使う」という考え方である。具体的な実装は次章で学ぶので、ここでは計算のどの部分を再利用できるかに注目しよう。</p>
+</section>
+<section id="id21">
+<h2><span class="section-number">4.15. </span>まとめ<a class="headerlink" href="#id21" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<ul class="simple">
+<li><p>絶対誤差はずれそのもの、相対誤差は基準の大きさに対する割合を測る。</p></li>
+<li><p>残差は方程式への代入のずれであり、解そのものの前進誤差とは異なる。</p></li>
+<li><p>条件数は入力への敏感さを表す。相対前進誤差は、条件数と相対残差の積で上から評価できる。</p></li>
+<li><p>安定性は計算手順の性質である。後退誤差は、計算結果を厳密解とするための入力側のずれを測る。</p></li>
+<li><p>問題サイズが倍になると、通常の内積・密行列ベクトル積・密行列同士の積の主要な演算回数は約2倍・4倍・8倍になる。</p></li>
+<li><p>演算回数とメモリ量を分けて考え、疎性などの構造を利用する。</p></li>
+</ul>
+</div>
+<p>次の<a class="reference internal" href="Chap_LUFactorization.html"><span class="std std-doc">第5章「連立一次方程式：Gauss消去法とLU分解」</span></a>では、<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">b</span></code> の中で使われる基本的な解法を学ぶ。本章で区別した「問題の感度」「計算手順の安定性」「必要な仕事量」を意識しながら、解法の選び方を考えていこう。</p>
+</section>
+<section id="id22">
+<h2><span class="section-number">4.16. </span>演習<a class="headerlink" href="#id22" title="Link to this heading">#</a></h2>
+<p>本文の表・式・出力を使って説明してよい。使う尺度と、比較している量を明らかにしよう。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>同じ誤差でも意味が違う</strong>：真の値1000に対して1001、真の値2に対して3という二つの近似がある。絶対誤差と相対誤差を求め、「相対誤差が1%以内」という基準を満たすのはどちらか説明せよ。真の値が0なら、どのような基準を考えたいか。</p></li>
+<li><p><strong>小さな残差をどう読むか</strong>：本文の対角行列の例で、候補 <span class="math notranslate nohighlight">\((1,0)^\mathsf{T}\)</span> は第2成分を1だけ間違えている。それでも残差が小さい理由を、第2式に代入して説明せよ。条件数について何が分かれば、残差から解の精度を判断しやすくなるか。</p></li>
+<li><p><strong>問題と手順を区別する</strong>：「右辺を少し変えただけで厳密解も大きく変わる」場合と、「同じ入力でも平方根の差を有理化すると計算結果が改善する」場合では、何が問題になっているか。本文の例を使って違いを説明せよ。</p></li>
+<li><p><strong>計算の規模を予想する</strong>：密な正方行列の行数・列数をそれぞれ倍にすると、成分を保存するメモリ量と、通常の行列同士の積の演算回数は、それぞれおよそ何倍になるか。三重対角行列で0以外の値と位置だけを保存する場合は、保存量の増え方がどう変わるか考えよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id23">
+<h2><span class="section-number">4.17. </span>参考文献と関連する節<a class="headerlink" href="#id23" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>T. A. Driscoll and R. J. Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/intro/conditioning.html">§1.2 Problems and conditioning</a>、<a class="reference external" href="https://tobydriscoll.net/fnc-julia/intro/stability.html">§1.4 Stability</a>、<a class="reference external" href="https://tobydriscoll.net/fnc-julia/linsys/condition-number.html">§2.8 Conditioning of linear systems</a>。問題の感度、アルゴリズムの安定性、線形方程式の誤差評価。</p></li>
+<li><p>Julia公式：<a class="reference external" href="https://docs.julialang.org/en/v1/stdlib/LinearAlgebra/">LinearAlgebra</a>、<a class="reference external" href="https://docs.julialang.org/en/v1/stdlib/SparseArrays/">SparseArrays</a>。ノルム・条件数・疎行列を扱う関数の説明。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_Julia_LinearAlgebra.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">3. </span>Juliaと線形代数</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_LUFactorization.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>連立一次方程式： Gauss消去法とLU分解</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">4.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">4.2. 同じずれでも、元の大きさで意味が変わる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">4.3. ベクトルの誤差を一つの大きさにまとめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">4.4. 残差と解の誤差は何が違うか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">4.4.1. 小さい残差でも、解が大きく違う例</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">4.5. 入力を少し変えると、解はどう動くか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">4.6. 行列ノルム：ベクトルの長さを最大何倍にするか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#julianormopnorm">4.6.1. Juliaのnormとopnorm</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">4.7. 条件数で入力への敏感さを評価する</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">4.7.1. 残差と前進誤差を結ぶ</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">4.7.2. 同じ残差でも、条件数によって見え方が変わる</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id12">4.8. 丸めは計算の途中でも起こる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id13">4.9. 計算手順の安定性：同じ式をどう計算するか</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id14">4.10. 後退誤差：どの近い問題なら正確に解けているか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id15">4.10.1. 後退安定性の意味</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id16">4.11. 問題サイズを倍にすると、計算は何倍になるか</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id17">4.11.1. 内積から数えてみる</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#big-o">4.11.2. Big-Oは増え方を表す</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id18">4.12. 保存する量も見積もる：密行列と疎行列</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id19">4.12.1. 0が多い行列では、必要な成分だけを持つ</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">4.13. <span class="math notranslate nohighlight">\(\clubsuit\)</span> ノルムの性質と他の行列ノルム</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id20">4.14. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 計算を再利用するという考え方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id21">4.15. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id22">4.16. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id23">4.17. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

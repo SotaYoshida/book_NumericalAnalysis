@@ -1,0 +1,821 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>16. 並列計算とGPU &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_ParallelComputation';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="prev" title="15. マルコフ連鎖モンテカルロ法" href="Chap_MCMC.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_QRLeastSquares.html">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_ParallelComputation.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>並列計算とGPU</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">16.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">16.2. 並列化できる部分を見極める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cpu">16.3. CPUコア、プロセス、スレッド</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">16.3.1. スレッドが共有するメモリと競合状態</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">16.4. 仕事量の偏りと分け方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">16.5. 行列計算の内部の並列化とGPU</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">16.6. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 実行時間を測る場合</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">16.7. <span class="math notranslate nohighlight">\(\clubsuit\)</span> プロセスで独立した計算を配る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">16.8. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">16.9. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">16.10. 参考資料</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_ParallelComputation.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="gpu">
+<h1><span class="section-number">16. </span>並列計算とGPU<a class="headerlink" href="#gpu" title="Link to this heading">#</a></h1>
+<p>これまでの数値実験では、初期値・刻み幅・乱数の種などを変えて結果を比較した。例えば独立に走らせる複数のMCMC連鎖は同時に進められるが、1本の連鎖の次の状態は現在の状態を待つ必要がある。</p>
+<p>並列計算は、一つの仕事をいくつかの小さな仕事に分け、複数の計算資源で同時に進める方法である。ただし、計算資源を2倍にしても実行時間が必ず半分になるわけではない。仕事を分ける時間、結果を集める時間、データを受け渡す時間も必要になるからである。本章では、まずCPUコア、プロセス、スレッドの違いを整理し、次に「仕事をどう分配するか」と「どのメモリを共有するか」という二つの観点から並列計算を学ぶ。</p>
+<section id="id1">
+<h2><span class="section-number">16.1. </span>この章の目標<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>CPUコア、プロセス、スレッドの役割を区別できる。</p></li>
+<li><p>スレッド間ではメモリが共有され、プロセス間では原則として共有されないことを説明できる。</p></li>
+<li><p>処理時間が均一な場合と不均一な場合で、適切なスケジューリングが異なることを説明できる。</p></li>
+<li><p>Amdahlの法則から高速化の上限を見積もれる。</p></li>
+<li><p>仕事を分割する際に、依存関係と共有書込みを確認できる。</p></li>
+<li><p>BLASが内部で並列化される場合を説明できる。</p></li>
+<li><p>GPUでデータ転送と計算量の比が重要な理由を説明できる。</p></li>
+</ul>
+</section>
+<section id="id2">
+<h2><span class="section-number">16.2. </span>並列化できる部分を見極める<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>最初に、各仕事が何を入力として待つかを見る。例えば次の違いがある。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>計算</p></th>
+<th class="head"><p>同時に進められる範囲</p></th>
+<th class="head"><p>待つ必要がある範囲</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>複数の初期値でODEを解く</p></td>
+<td><p>初期値ごとの計算</p></td>
+<td><p>各計算内の次の時刻</p></td>
+</tr>
+<tr class="row-odd"><td><p>陽解法でPDEを1ステップ進める</p></td>
+<td><p>古い配列から各格子点を更新する計算</p></td>
+<td><p>全点の更新完了から次のステップへの移行</p></td>
+</tr>
+<tr class="row-even"><td><p>独立なMCMC連鎖</p></td>
+<td><p>各連鎖</p></td>
+<td><p>連鎖内の次の提案</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>古い配列と新しい配列を分けることも、この依存関係を保つために役立つ。</p>
+<p>逐次実行に要する時間を <span class="math notranslate nohighlight">\(T_1\)</span>、<span class="math notranslate nohighlight">\(p\)</span> 個の計算資源で並列実行した時間を <span class="math notranslate nohighlight">\(T_p\)</span> とする。高速化率（speedup）<span class="math notranslate nohighlight">\(S(p)\)</span> と並列効率（efficiency）<span class="math notranslate nohighlight">\(E(p)\)</span> を</p>
+<div class="math notranslate nohighlight">
+\[
+S(p)=\frac{T_1}{T_p},\qquad E(p)=\frac{S(p)}{p}
+\]</div>
+<p>と定義する。例えば4 コアで <span class="math notranslate nohighlight">\(S(4)=3\)</span> なら、実行時間は3分の1になり、並列効率は <span class="math notranslate nohighlight">\(E(4)=0.75\)</span> である。</p>
+<p>ここで、全実行時間のうち並列化できず逐次実行する部分の割合を <span class="math notranslate nohighlight">\(s\)</span>、残りを <span class="math notranslate nohighlight">\(p\)</span> 個の資源で理想的に並列化できるとする。Amdahlの法則によるspeedupの上限は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+S(p)\leq\frac{1}{s+(1-s)/p}
+\end{align}
+\]</div>
+<p>である。これは問題サイズを固定し、並列部分が理想的に分担されるとしたモデルである。例えば逐次部分が1秒、並列化できる部分が9秒なら、4資源では <span class="math notranslate nohighlight">\(1+9/4=3.25\)</span> 秒、約3.08倍となる。<span class="math notranslate nohighlight">\(s=0.1\)</span> なら、資源を無限に増やしても10倍を超えない。しかも実際には、タスクの生成、データの通信、処理終了を待つ同期などのオーバーヘッド（計算以外の余分な手間）が加わる。この式は「並列化すれば必ず速くなる」のではなく、逐次部分とオーバーヘッドを減らすことが重要だと教えている。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">speedup</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">s</span><span class="p">)</span><span class="o">/</span><span class="n">p</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span><span class="mf">0.1</span><span class="p">,</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;逐次割合=</span><span class="si">$s</span><span class="s">: &quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[(</span><span class="n">p</span><span class="p">,</span><span class="n">round</span><span class="p">(</span><span class="n">speedup</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">p</span><span class="p">),</span><span class="n">digits</span><span class="o">=</span><span class="mi">2</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">32</span><span class="p">)])</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>逐次割合=0.01: [(2, 1.98), (4, 3.88), (8, 7.48), (32, 24.43)]
+逐次割合=0.1: [(2, 1.82), (4, 3.08), (8, 4.71), (32, 7.8)]
+逐次割合=0.3: [(2, 1.54), (4, 2.11), (8, 2.58), (32, 3.11)]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="n">processor_counts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2.0</span><span class="w"> </span><span class="o">.^</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">:</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">serial_fractions</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mf">0.01</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">,</span><span class="w"> </span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="n">fig_amdahl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">850</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">))</span>
+<span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_amdahl</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;number of workers p&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;speedup&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">xscale</span><span class="o">=</span><span class="n">log2</span><span class="p">,</span><span class="w"> </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Amdahl&#39;s law&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">serial_fraction</span><span class="p">,</span><span class="w"> </span><span class="n">color</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">zip</span><span class="p">(</span><span class="n">serial_fractions</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="ss">:seagreen</span><span class="p">,</span><span class="w"> </span><span class="ss">:orange</span><span class="p">,</span><span class="w"> </span><span class="ss">:tomato</span><span class="p">))</span>
+<span class="w">    </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="p">(</span><span class="n">serial_fraction</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">serial_fraction</span><span class="p">)</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">processor_counts</span><span class="p">)</span>
+<span class="w">    </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">processor_counts</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span>
+<span class="w">        </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;serial fraction = </span><span class="si">$serial_fraction</span><span class="s">&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">scatter!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">processor_counts</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="w">    </span><span class="n">hlines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="n">serial_fraction</span><span class="p">];</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="n">color</span><span class="p">,</span><span class="w"> </span><span class="mf">0.35</span><span class="p">),</span><span class="w"> </span><span class="n">linestyle</span><span class="o">=</span><span class="ss">:dash</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:lt</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;parallel_amdahl_law.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_amdahl</span><span class="p">)</span>
+<span class="n">fig_amdahl</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-parallel-amdahl-law">
+<a class="reference internal image-reference" href="../_images/parallel_amdahl_law.svg"><img alt="逐次実行部分の割合が並列化による高速化を制限するAmdahl則" src="../_images/parallel_amdahl_law.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 16.1 </span><span class="caption-text">計算資源数 <span class="math notranslate nohighlight">\(p\)</span> を増やしても、逐次部分は短縮されない。各破線は <span class="math notranslate nohighlight">\(p\to\infty\)</span> における上限 <span class="math notranslate nohighlight">\(1/s\)</span> を表す。逐次割合 <span class="math notranslate nohighlight">\(s\)</span> が大きい曲線ほど早く頭打ちになるため、計算資源を追加する前に、どの処理が逐次部分として残るかを調べる必要がある。</span><a class="headerlink" href="#fig-parallel-amdahl-law" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="cpu">
+<h2><span class="section-number">16.3. </span>CPUコア、プロセス、スレッド<a class="headerlink" href="#cpu" title="Link to this heading">#</a></h2>
+<p>最初に、よく似た三つの用語を区別する。</p>
+<ul class="simple">
+<li><p><strong>CPUコア（CPU core）</strong>：命令を実際に処理するハードウェア上の計算資源である。複数のコアがあれば、複数の処理を物理的に同時実行できる。</p></li>
+<li><p><strong>プロセス（process）</strong>：実行中のプログラムの単位であり、原則としてプロセスごとに独立したメモリ空間を持つ。同じ変数名 <code class="docutils literal notranslate"><span class="pre">A</span></code> が二つのプロセスにあっても、それらは別のデータである。</p></li>
+<li><p><strong>スレッド（thread）</strong>：一つのプロセス内にある命令実行の流れである。各スレッドは命令をどこまで実行したかという状態や局所的な作業領域を持つ一方、同じプロセスのスレッドはヒープ上の配列やグローバル変数などを共有する。</p></li>
+</ul>
+<p>プログラムを料理店にたとえると、プロセスは厨房、スレッドはその厨房内で働く料理人、CPUコアは料理人が実際に使える作業台に対応する。料理人を増やしても作業台が少なければ全員が同時には働けず、作業台を交代で使うことになる。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head text-left"><p>観点</p></th>
+<th class="head text-left"><p>スレッド並列</p></th>
+<th class="head text-left"><p>プロセス並列</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-left"><p>メモリ</p></td>
+<td class="text-left"><p>同じプロセス内で共有する</p></td>
+<td class="text-left"><p>プロセスごとに分離される</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>データの受渡し</p></td>
+<td class="text-left"><p>同じ配列を直接参照できる</p></td>
+<td class="text-left"><p>通信時にデータを直列化（serialize）して送るのが基本</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>主な利点</p></td>
+<td class="text-left"><p>データ共有が軽い</p></td>
+<td class="text-left"><p>分離されているため互いの状態を壊しにくく、複数の計算機にも拡張できる</p></td>
+</tr>
+<tr class="row-odd"><td class="text-left"><p>主な注意点</p></td>
+<td class="text-left"><p>競合状態、同期</p></td>
+<td class="text-left"><p>通信量、データの複製、プロセス起動時間</p></td>
+</tr>
+<tr class="row-even"><td class="text-left"><p>Juliaの主な機能</p></td>
+<td class="text-left"><p><code class="docutils literal notranslate"><span class="pre">Base.Threads</span></code></p></td>
+<td class="text-left"><p>標準ライブラリ <code class="docutils literal notranslate"><span class="pre">Distributed</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>スレッド数は通常、Juliaの起動時に <code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">--threads=auto</span></code> や <code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">--threads=4</span></code> のように指定する。Notebookではカーネルを起動した後にスレッド数を増やすことはできないため、次のセルで <code class="docutils literal notranslate"><span class="pre">nthreads()</span></code> が1なら、複数スレッドを有効にしてカーネルを起動し直す必要がある。</p>
+<section id="id3">
+<h3><span class="section-number">16.3.1. </span>スレッドが共有するメモリと競合状態<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
+<p>スレッドは同じ配列を直接読み書きできる。これはデータをコピーせずに済むという利点だが、複数スレッドが同じ要素を同時に更新すると問題になる。例えば <code class="docutils literal notranslate"><span class="pre">s</span> <span class="pre">+=</span> <span class="pre">x[i]^2</span></code> は、概念的には (1) <code class="docutils literal notranslate"><span class="pre">s</span></code> を読む、(2) 和を計算する、(3) <code class="docutils literal notranslate"><span class="pre">s</span></code> へ書き戻す、という三つの操作からなる。二つのスレッドの操作が途中で交差すると、一方の加算結果が失われることがある。これを <strong>競合状態（race condition）</strong> という。</p>
+<p>次の実装では、配列をいくつかの区間に分け、各区間の担当が自分の部分和だけを計算する。区間番号ごとに異なる保存先を用意し、並列ループ終了後に一度だけ合計する。保存先はスレッド番号ではなく仕事の番号に対応する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Base</span><span class="o">.</span><span class="n">Threads</span>
+<span class="n">serial_sum_of_squares</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">abs2</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">function</span><span class="w"> </span><span class="n">threaded_sum_of_squares</span><span class="p">(</span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="n">nblocks</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="w">    </span><span class="n">nblocks</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;区間数は正にしてください&quot;</span><span class="p">)</span>
+<span class="w">    </span><span class="n">edges</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">fld</span><span class="p">(</span><span class="n">j</span><span class="o">*</span><span class="n">length</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">nblocks</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">0</span><span class="o">:</span><span class="n">nblocks</span><span class="p">]</span>
+<span class="w">    </span><span class="n">partial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="kt">Float64</span><span class="p">,</span><span class="n">nblocks</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Threads</span><span class="o">.</span><span class="nd">@threads</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">block</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">nblocks</span>
+<span class="w">        </span><span class="n">subtotal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">edges</span><span class="p">[</span><span class="n">block</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="n">edges</span><span class="p">[</span><span class="n">block</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+<span class="w">            </span><span class="n">subtotal</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">abs2</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">        </span><span class="n">partial</span><span class="p">[</span><span class="n">block</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">subtotal</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">partial</span><span class="p">)</span>
+<span class="k">end</span>
+
+<span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="mf">1.0</span><span class="o">:</span><span class="mf">8.0</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;スレッド数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Threads</span><span class="o">.</span><span class="n">nthreads</span><span class="p">())</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;逐次版 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">serial_sum_of_squares</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;分割した版 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">threaded_sum_of_squares</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;一致の確認 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">isapprox</span><span class="p">(</span><span class="n">serial_sum_of_squares</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="n">threaded_sum_of_squares</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>スレッド数 = 4
+逐次版 = 204.0
+分割した版 = 204.0
+一致の確認 = true
+</pre></div>
+</div>
+</div>
+</div>
+<p>上の8個の値を4区間に分けると、区間は1〜2、3〜4、5〜6、7〜8である。各部分和は5、25、61、113となり、合計は204になる。複数の仕事が同じ <code class="docutils literal notranslate"><span class="pre">partial[block]</span></code> を書き換えないことが、正しさの要点である。スレッドが1個の環境でも同じコードで値を確認できる。</p>
+<p>浮動小数点数では、加算順序が変わると末尾の桁が変わる場合がある。大きな計算では、第4章で学んだ尺度に合う許容誤差で比較する。</p>
+</section>
+</section>
+<section id="id4">
+<h2><span class="section-number">16.4. </span>仕事量の偏りと分け方<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>各仕事の所要時間が同じなら、開始前に同じ個数ずつ分ける静的な割当てでよい。一方、収束するまでの反復回数が初期値ごとに違う場合は、先に終わった担当へ次の仕事を渡す方法が有効になる。</p>
+<p>例えば仕事が8個で所要時間が <span class="math notranslate nohighlight">\([8,7,6,5,4,3,2,1]\)</span> 秒なら、先頭から2個ずつ4担当へ分けると最長15秒である。空いた担当へ次の仕事を渡せば、この例では各担当9秒で終わる。ただし、仕事を細かく分けるほど、割当てと通信の手間が増える。この一つの仕事の大きさを<strong>粒度</strong>という。</p>
+<p>Juliaにも <code class="docutils literal notranslate"><span class="pre">:static</span></code>、<code class="docutils literal notranslate"><span class="pre">:dynamic</span></code>、<code class="docutils literal notranslate"><span class="pre">:greedy</span></code> などの割当て方式がある。</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">:static</span></code>：仕事を均等に分ける。各担当の仕事量が同じ場合に有効。スケジューリングのoverheadは小さいが、待ちが発生する可能性がある。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:dynamic</span></code>：仕事を順番に割り当てる。各担当の仕事量が不均一な場合に有効。ある程度のchunkを動的に割り当てる。</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">:greedy</span></code>：仕事を1個ずつ割り当てる。各担当の仕事量が不均一な場合に有効。スケジューリングのoverheadは大きい。</p></li>
+</ul>
+</section>
+<section id="id5">
+<h2><span class="section-number">16.5. </span>行列計算の内部の並列化とGPU<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<p>密な行列積や分解は、BLAS/LAPACKという数値計算ライブラリを通じて実行され、内部ですでに並列化される場合がある。外側のスレッド並列と重ねると、同じコアを取り合って遅くなることもある。現在のBLASスレッド数は <code class="docutils literal notranslate"><span class="pre">BLAS.get_num_threads()</span></code> で確認できる。</p>
+<p>GPUは、行列積など多数の同種の演算をまとめて行うときに力を発揮する。CPUとGPUの間の転送や初期化にも費用がかかるので、データをGPU上に保って何度も計算する方が有利になりやすい。共有メモリ型の機器でも、配置や同期に関する費用は残る。</p>
+<p>以下はNVIDIA GPUと追加パッケージ <code class="docutils literal notranslate"><span class="pre">CUDA.jl</span></code> がある環境での例である。GPUを持たない環境では、この処理の流れを読めればよい。</p>
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">CUDA</span>
+<span class="n">A_gpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CuArray</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w">       </span><span class="c"># 入力をGPUへ置く</span>
+<span class="n">B_gpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">CuArray</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">CUDA</span><span class="o">.</span><span class="nd">@sync</span><span class="w"> </span><span class="n">C_gpu</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_gpu</span><span class="o">*</span><span class="n">B_gpu</span>
+<span class="n">C</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Array</span><span class="p">(</span><span class="n">C_gpu</span><span class="p">)</span><span class="w">         </span><span class="c"># 結果をCPUへ戻す</span>
+</pre></div>
+</div>
+<p>GPUの処理はCPUに対して非同期で進む場合がある。時間を測るなら、処理完了を待つ同期も必要である。「計算だけの時間」と「転送も含む全体の時間」を分け、目的に合う方で比較する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;BLASのスレッド数 = &quot;</span><span class="p">,</span><span class="n">BLAS</span><span class="o">.</span><span class="n">get_num_threads</span><span class="p">())</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>BLASのスレッド数 = 4
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="clubsuit">
+<h2><span class="section-number">16.6. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 実行時間を測る場合<a class="headerlink" href="#clubsuit" title="Link to this heading">#</a></h2>
+<p>初回のコンパイルを先に済ませ、同じ入力で複数回測る。以下は最小値を使う簡単な測定であり、環境によっては逐次版の方が速い。スレッド数、問題サイズ、計算結果の一致を測定値と一緒に記録する。問題サイズを固定して資源数を変える比較を強スケーリング（strong scaling）、1資源当たりの仕事量を保って全体を増やす比較を弱スケーリング（weak scaling）という。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">best_elapsed</span><span class="p">(</span><span class="n">f</span><span class="p">;</span><span class="w"> </span><span class="n">samples</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="w">    </span><span class="n">f</span><span class="p">()</span><span class="w"> </span><span class="c"># 初回のコンパイルを先に済ませる</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">minimum</span><span class="p">([</span><span class="nd">@elapsed</span><span class="w"> </span><span class="n">f</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">samples</span><span class="p">])</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">x_timing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">collect</span><span class="p">(</span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="n">length</span><span class="o">=</span><span class="mi">100_000</span><span class="p">))</span>
+<span class="n">serial_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">serial_sum_of_squares</span><span class="p">(</span><span class="n">x_timing</span><span class="p">)</span>
+<span class="n">parallel_value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">threaded_sum_of_squares</span><span class="p">(</span><span class="n">x_timing</span><span class="p">)</span>
+<span class="nd">@assert</span><span class="w"> </span><span class="n">isapprox</span><span class="p">(</span><span class="n">serial_value</span><span class="p">,</span><span class="n">parallel_value</span><span class="p">;</span><span class="n">rtol</span><span class="o">=</span><span class="mf">1e-12</span><span class="p">)</span>
+<span class="n">t_serial</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">best_elapsed</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">serial_sum_of_squares</span><span class="p">(</span><span class="n">x_timing</span><span class="p">))</span>
+<span class="n">t_parallel</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">best_elapsed</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">threaded_sum_of_squares</span><span class="p">(</span><span class="n">x_timing</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;スレッド数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Threads</span><span class="o">.</span><span class="n">nthreads</span><span class="p">())</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;逐次版（秒） = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_serial</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 分割した版（秒） = &quot;</span><span class="p">,</span><span class="n">t_parallel</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;高速化率 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_serial</span><span class="o">/</span><span class="n">t_parallel</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>スレッド数 = 4
+逐次版（秒） = 9.541e-6, 分割した版（秒） = 3.9708e-5
+高速化率 = 0.24027903696988015
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id6">
+<h2><span class="section-number">16.7. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> プロセスで独立した計算を配る<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>プロセスは原則としてメモリを共有しないので、同じ配列名を書いても自動的に同じデータが見えるわけではない。計算に使う関数やデータを別のJuliaプロセスへ渡す必要がある。これは複数の計算機へ広げる方法にもつながる。</p>
+<p>次の例は、減衰係数の異なる4個の独立なEuler計算を配る。<code class="docutils literal notranslate"><span class="pre">pmap</span></code> が結果を入力順に集める。プロセスを起動して通信する費用があるため、この小さな例が高速化するとは期待しない。共有メモリとの違いを確かめる例である。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">Distributed</span>
+
+<span class="c"># 小さな無名関数を、仕事と一緒に各プロセスへ送る。</span>
+<span class="n">decay_job</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rate</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">begin</span>
+<span class="w">    </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="n">h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.01</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="mi">100</span>
+<span class="w">        </span><span class="n">u</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">h</span><span class="o">*</span><span class="p">(</span><span class="o">-</span><span class="n">rate</span><span class="o">*</span><span class="n">u</span><span class="p">)</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="n">u</span>
+<span class="k">end</span>
+
+<span class="n">added_workers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">addprocs</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">try</span>
+<span class="w">    </span><span class="n">rates</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.5</span><span class="p">,</span><span class="mf">1.0</span><span class="p">,</span><span class="mf">1.5</span><span class="p">,</span><span class="mf">2.0</span><span class="p">]</span>
+<span class="w">    </span><span class="n">pool</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">WorkerPool</span><span class="p">(</span><span class="n">added_workers</span><span class="p">)</span>
+<span class="w">    </span><span class="n">distributed_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">pmap</span><span class="p">(</span><span class="n">decay_job</span><span class="p">,</span><span class="n">pool</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
+<span class="w">    </span><span class="n">serial_values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">map</span><span class="p">(</span><span class="n">decay_job</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;減衰係数 = &quot;</span><span class="p">,</span><span class="n">rates</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;各係数での終点の値 = &quot;</span><span class="p">,</span><span class="n">distributed_values</span><span class="p">)</span>
+<span class="w">    </span><span class="n">println</span><span class="p">(</span><span class="s">&quot;逐次版との一致 = &quot;</span><span class="p">,</span><span class="n">isapprox</span><span class="p">(</span><span class="n">distributed_values</span><span class="p">,</span><span class="n">serial_values</span><span class="p">))</span>
+<span class="k">finally</span>
+<span class="w">    </span><span class="n">rmprocs</span><span class="p">(</span><span class="n">added_workers</span><span class="p">)</span><span class="w"> </span><span class="c"># 今回追加したプロセスだけを終了する。</span>
+<span class="k">end</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>減衰係数 = [0.5, 1.0, 1.5, 2.0]
+各係数での終点の値 = [0.605770436490728, 0.3660323412732296, 0.2206089104693876, 0.13261955589475316]
+逐次版との一致 = true
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="id7">
+<h2><span class="section-number">16.8. </span>まとめ<a class="headerlink" href="#id7" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>並列化の前に、どの入力を待つか、誰がどの結果を書き込むかを決める。スレッドはメモリを共有し、プロセスは原則として分離する。正しさを保てても、逐次部分・通信・割当ての費用により速くならない場合がある。GPUや行列計算ライブラリの内部の並列化でも、全体の費用を評価する考え方は同じである。</p>
+<p>講義全体を通して、数値計算では<strong>問題を有限の形で表す、構造を使って計算する、得られた値を検証する</strong>ことを繰り返してきた。高速化はその最後に加える工夫であり、速さとともに精度・再現性・必要な記憶量を確認する。</p>
+</div>
+</section>
+<section id="id8">
+<h2><span class="section-number">16.9. </span>演習<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>同時に進められるか</strong>：4種類の初期値でODEを解く計算と、1本のODEの連続する4ステップについて、どこに依存関係があるかを説明せよ。</p></li>
+<li><p><strong>速さの上限</strong>：逐次実行で10秒、そのうち1秒は並列化できない。残りを4資源に理想的に分けると何秒になるか。資源を無限に増やしても何倍までしか速くならないか。</p></li>
+<li><p><strong>部分和の保存先</strong>：本文の8個の値の二乗和について、4個の部分和と合計を確かめよ。全担当が同じ変数へ直接加算すると結果が失われ得る理由を、読込みと書戻しの順序で説明せよ。</p></li>
+<li><p><strong>探究：自分の計算機で高速化率を測る</strong>：<code class="docutils literal notranslate"><span class="pre">julia</span> <span class="pre">--threads=auto</span></code> などで複数スレッドを有効にし、<code class="docutils literal notranslate"><span class="pre">threaded_sum_of_squares</span></code> の配列の長さ（例えば <span class="math notranslate nohighlight">\(10^4\)</span> から <span class="math notranslate nohighlight">\(10^8\)</span>）と区間数 <code class="docutils literal notranslate"><span class="pre">nblocks</span></code> を変えて、逐次版に対する高速化率を測れ。まず「長さがどのくらいから並列版が速くなるか」を予想して書き、結果と比べよ。測定した高速化率からAmdahlの法則の逐次割合 <span class="math notranslate nohighlight">\(s\)</span> を逆算すると、配列の長さによって <span class="math notranslate nohighlight">\(s\)</span> はどう変わるか。<span class="math notranslate nohighlight">\(s\)</span> が一定でない理由を、オーバーヘッドの観点から説明せよ。測定条件（CPU、スレッド数、試行回数）も記録すること。</p></li>
+</ol>
+</div>
+</section>
+<section id="id9">
+<h2><span class="section-number">16.10. </span>参考資料<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Julia公式：<a class="reference external" href="https://docs.julialang.org/en/v1/base/multi-threading/">スレッド並列</a>、<a class="reference external" href="https://docs.julialang.org/en/v1/manual/distributed-computing/">プロセス並列</a>。</p></li>
+<li><p>CUDA.jl公式：<a class="reference external" href="https://cuda.juliagpu.org/stable/development/profiling/">GPUの実行時間測定と同期</a>。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_MCMC.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">15. </span>マルコフ連鎖モンテカルロ法</p>
+      </div>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">16.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">16.2. 並列化できる部分を見極める</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cpu">16.3. CPUコア、プロセス、スレッド</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">16.3.1. スレッドが共有するメモリと競合状態</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">16.4. 仕事量の偏りと分け方</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">16.5. 行列計算の内部の並列化とGPU</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit">16.6. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 実行時間を測る場合</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">16.7. <span class="math notranslate nohighlight">\(\clubsuit\)</span> プロセスで独立した計算を配る</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">16.8. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">16.9. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">16.10. 参考資料</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>

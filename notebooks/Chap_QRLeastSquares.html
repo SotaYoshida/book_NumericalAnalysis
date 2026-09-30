@@ -1,0 +1,1139 @@
+
+<!DOCTYPE html>
+
+
+<html lang="ja" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>6. 最小二乗法とQR分解 &#8212; 数値解析</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-thebe.css?v=4fa983c6" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?v=887ef09a"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="../_static/togglebutton.js?v=4a39c7ea"></script>
+    <script src="../_static/translations.js?v=91613774"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script async="async" src="../_static/sphinx-thebe.js?v=c100c467"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'notebooks/Chap_QRLeastSquares';</script>
+    <link rel="index" title="索引" href="../genindex.html" />
+    <link rel="search" title="検索" href="../search.html" />
+    <link rel="next" title="7. 非線形方程式" href="Chap_NonlinearEquations.html" />
+    <link rel="prev" title="5. 連立一次方程式： Gauss消去法とLU分解" href="Chap_LUFactorization.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="ja"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search..."
+         aria-label="Search..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+    
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../home.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
+    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+  
+  
+</a></div>
+        <div class="sidebar-primary-item">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">検索</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button></div>
+        <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item navbar-nav active">
+        <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_WhyItMatters.html">1. 数値解析とは</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_linux_env.html">2. Linux環境とコマンド</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_Julia_LinearAlgebra.html">3. Juliaと線形代数</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NumericalAccuracyAndCost.html">4. 誤差・条件数・計算量</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">基本アルゴリズム</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_LUFactorization.html">5. 連立一次方程式： Gauss消去法とLU分解</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">6. 最小二乗法とQR分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_NonlinearEquations.html">7. 非線形方程式</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">近似と微分方程式</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_InterpolationDifferentiationIntegration.html">8. 補間・数値微分・数値積分</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_InitialValueProblems.html">9. 常微分方程式の初期値問題</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">発展・応用</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="Chap_IterativeLinearSystems.html">10. 連立一次方程式の反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_EigenvalueProblems.html">11. 固有値問題と反復法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_SVDLowRankApproximation.html">12. 特異値分解と低ランク近似</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_FourierAnalysis.html">13. Fourier解析とFourier回帰</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_DMD.html">14. 動的モード分解</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_MCMC.html">15. マルコフ連鎖モンテカルロ法</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Chap_ParallelComputation.html">16. 並列計算とGPU</a></li>
+</ul>
+
+    </div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+
+<div class="sbt-scroll-pixel-helper"></div>
+
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item"><button class="sidebar-toggle primary-toggle btn btn-sm" title="Toggle primary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <span class="fa-solid fa-bars"></span>
+</button></div>
+      
+    </div>
+  
+  
+    <div class="header-article-items__end">
+      
+        <div class="header-article-item">
+
+<div class="article-header-buttons">
+
+
+
+
+
+<div class="dropdown dropdown-download-buttons">
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="このページをダウンロード">
+    <i class="fas fa-download"></i>
+  </button>
+  <ul class="dropdown-menu">
+      
+      
+      
+      <li><a href="../_sources/notebooks/Chap_QRLeastSquares.ipynb" target="_blank"
+   class="btn btn-sm btn-download-source-button dropdown-item"
+   title="ソースファイルをダウンロード"
+   data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="btn__text-container">.ipynb</span>
+</a>
+</li>
+      
+      
+      
+      
+      <li>
+<button onclick="window.print()"
+  class="btn btn-sm btn-download-pdf-button dropdown-item"
+  title="PDFに印刷"
+  data-bs-placement="left" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="btn__text-container">.pdf</span>
+</button>
+</li>
+      
+  </ul>
+</div>
+
+
+
+
+<button onclick="toggleFullScreen()"
+  class="btn btn-sm btn-fullscreen-button"
+  title="全画面モード"
+  data-bs-placement="bottom" data-bs-toggle="tooltip"
+>
+  
+
+<span class="btn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+
+
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button>
+
+
+<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass fa-lg"></i>
+</button>
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
+</div></div>
+      
+    </div>
+  
+</div>
+</div>
+              
+              
+
+<div id="jb-print-docs-body" class="onlyprint">
+    <h1>最小二乗法とQR分解</h1>
+    <!-- Table of contents -->
+    <div id="print-main-content">
+        <div id="jb-print-toc">
+            
+            <div>
+                <h2> 目次 </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">6.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">6.2. 直線をデータに当てはめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">6.3. 最小二乗解の幾何学</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">6.4. 正規方程式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">6.5. QR分解で解く</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">6.6. QR分解が威力を発揮する場面</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">6.6.1. QR分解を手で読む：直線近似の場合</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">6.7. 2次式へ拡張する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-qr">6.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 発展的な話題：QR分解の構成</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-schmidt">6.8.1. Gram-Schmidt直交化</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#householder">6.8.2. Householder変換</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#givens-2">6.8.3. Givens回転：2行だけを動かす</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">6.9. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">6.10. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">6.11. 参考文献と関連する節</a></li>
+</ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <p><a class="reference external" href="https://colab.research.google.com/github/SotaYoshida/book_NumericalAnalysis/blob/main/notebooks/Chap_QRLeastSquares.ipynb"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a></p>
+<section class="tex2jax_ignore mathjax_ignore" id="qr">
+<h1><span class="section-number">6. </span>最小二乗法とQR分解<a class="headerlink" href="#qr" title="Link to this heading">#</a></h1>
+<p>第5章では、正則な正方行列の方程式を解いた。では、未知数が2個なのに測定から5本の式が得られたらどうするか。実験や観測で得たデータは、普通は1本の直線上にぴったり並ばない。それでも、データ全体の傾向を表す直線を求めたい。この章では、直線近似から<strong>最小二乗法</strong>を導入し、その計算に使われるQR分解を学ぶ。</p>
+<section id="id1">
+<h2><span class="section-number">6.1. </span>この章の目標<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>データの直線近似を行列 <span class="math notranslate nohighlight">\(Ac\approx y\)</span> と書ける。</p></li>
+<li><p>残差の二乗和を最小にする、という考え方を説明できる。</p></li>
+<li><p>最小二乗解で残差が列ベクトルと直交することを確認できる。</p></li>
+<li><p>QR分解を使うと三角行列の方程式に帰着できることを理解する。</p></li>
+<li><p>列がよく似た問題や複数の右辺でQR分解が有効な理由を説明できる。</p></li>
+<li><p>Juliaの <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> で最小二乗問題を解ける。</p></li>
+</ul>
+<div class="note admonition">
+<p class="admonition-title">この章で使う線形代数（復習）</p>
+<ul class="simple">
+<li><p><strong>転置</strong> <span class="math notranslate nohighlight">\(A^T\)</span>：行と列を入れ替えた行列。Juliaでは実行列に対して <code class="docutils literal notranslate"><span class="pre">A'</span></code> と書ける（第3章）。</p></li>
+<li><p><strong>内積と直交</strong>：<span class="math notranslate nohighlight">\(u^Tv=\sum_iu_iv_i\)</span>。これが0のとき <span class="math notranslate nohighlight">\(u\)</span> と <span class="math notranslate nohighlight">\(v\)</span> は<strong>直交</strong>するという（第3章の <span class="math notranslate nohighlight">\((3,4)\)</span> と <span class="math notranslate nohighlight">\((-4,3)\)</span> の例）。</p></li>
+<li><p><strong>単位ベクトル</strong>：長さ（2ノルム）が1のベクトル。<span class="math notranslate nohighlight">\(v/\|v\|_2\)</span> で作れる。</p></li>
+<li><p><strong>線形結合</strong>：<span class="math notranslate nohighlight">\(c_0a_0+c_1a_1\)</span> のように、ベクトルを定数倍して足したもの。<span class="math notranslate nohighlight">\(Ac\)</span> は <span class="math notranslate nohighlight">\(A\)</span> の列の線形結合である。</p></li>
+</ul>
+<p>統計学の回帰分析で「傾き＝共分散／分散」という公式を学んだ人は、本章の後半でそれがQR分解から出てくることを確かめられる。</p>
+</div>
+</section>
+<section id="id2">
+<h2><span class="section-number">6.2. </span>直線をデータに当てはめる<a class="headerlink" href="#id2" title="Link to this heading">#</a></h2>
+<p>データ <span class="math notranslate nohighlight">\((t_i,y_i)\)</span> を</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+y\approx c_0+c_1t
+\end{align}
+\]</div>
+<p>という直線で近似する。すべてのデータについて式を並べると</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\begin{bmatrix}
+1&amp;t_1\\
+1&amp;t_2\\
+\vdots&amp;\vdots\\
+1&amp;t_m
+\end{bmatrix}
+\begin{bmatrix}c_0\\c_1\end{bmatrix}
+\approx
+\begin{bmatrix}y_1\\y_2\\\vdots\\y_m\end{bmatrix}
+\end{align}
+\end{split}\]</div>
+<p>となる。左の行列を<strong>設計行列</strong> <span class="math notranslate nohighlight">\(A\)</span>、係数を <span class="math notranslate nohighlight">\(c\)</span>、観測値を <span class="math notranslate nohighlight">\(y\)</span> とすれば <span class="math notranslate nohighlight">\(Ac\approx y\)</span> である。1行が1件の観測、1列がモデルに使う一つの項に対応する。切片も未知数なので、1を並べた列が必要になる。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span><span class="p">,</span><span class="w"> </span><span class="n">Statistics</span>
+
+<span class="n">t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span>
+<span class="n">y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mf">2.9</span><span class="p">,</span><span class="w"> </span><span class="mf">5.2</span><span class="p">,</span><span class="w"> </span><span class="mf">6.8</span><span class="p">,</span><span class="w"> </span><span class="mf">9.1</span><span class="p">]</span>
+<span class="n">A</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">ones</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">t</span><span class="p">))</span><span class="w"> </span><span class="n">t</span><span class="p">]</span>
+
+<span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">y</span>
+<span class="n">yhat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A</span><span class="o">*</span><span class="n">c</span>
+<span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">yhat</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;切片 c₀ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;傾き c₁ = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;予測値 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">yhat</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">r</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>切片 c₀ = 1.04
+傾き c₁ = 1.99
+予測値 = [1.04, 3.03, 5.02, 7.01, 9.0]
+残差 = [0.06, -0.13, 0.18, -0.21, 0.1]
+</pre></div>
+</div>
+</div>
+</div>
+<p>方程式が5本、未知数が2個なので、一般にはすべてを同時にぴったり満たせない。そこで、残差</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+r=y-Ac
+\end{align}
+\]</div>
+<p>の二乗和</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+\|r\|_2^2=\sum_{i=1}^m (y_i-\hat{y}_i)^2
+\end{align}
+\]</div>
+<p>が最小になる <span class="math notranslate nohighlight">\(c\)</span> を選ぶ。これが<strong>最小二乗法</strong>である。正と負のずれをそのまま足すと打ち消し合うため、二乗してから足す。</p>
+</section>
+<section id="id3">
+<h2><span class="section-number">6.3. </span>最小二乗解の幾何学<a class="headerlink" href="#id3" title="Link to this heading">#</a></h2>
+<p><span class="math notranslate nohighlight">\(Ac\)</span> は、<span class="math notranslate nohighlight">\(A\)</span> の2本の列の線形結合である。これらの線形結合全体が作る部分空間を <span class="math notranslate nohighlight">\(A\)</span> の<strong>列空間</strong>という。最小二乗法は、列空間の中から <span class="math notranslate nohighlight">\(y\)</span> に最も近いベクトル <span class="math notranslate nohighlight">\(A\hat{c}\)</span> を探す問題とみなせる。</p>
+<p>この「最も近い」という条件を調べよう。<span class="math notranslate nohighlight">\(A\hat{c}\)</span> における残差を <span class="math notranslate nohighlight">\(r=y-A\hat{c}\)</span> とする。また、<span class="math notranslate nohighlight">\(q\)</span> を <span class="math notranslate nohighlight">\(A\)</span> の列空間内の任意の単位ベクトルとする。<span class="math notranslate nohighlight">\(q\)</span> は、予測値 <span class="math notranslate nohighlight">\(A\hat{c}\)</span> が列空間内で動ける一つの方向を表す。</p>
+<p>予測値を <span class="math notranslate nohighlight">\(A\hat{c}+sq\)</span> へ動かすと、新しい残差は <span class="math notranslate nohighlight">\(r-sq\)</span> となる。その二乗ノルムは、<span class="math notranslate nohighlight">\(\|q\|_2=1\)</span> より</p>
+<div class="math notranslate nohighlight">
+\[
+\|r-sq\|_2^2=\|r\|_2^2-2s q^Tr+s^2
+\]</div>
+<p>となる。右辺は <span class="math notranslate nohighlight">\(s=q^Tr\)</span> のとき最小になる。しかし、<span class="math notranslate nohighlight">\(A\hat{c}\)</span> がすでに最も近い点なら、そこから動かない <span class="math notranslate nohighlight">\(s=0\)</span> が最小値を与えなければならない。したがって <span class="math notranslate nohighlight">\(q^Tr=0\)</span> である。</p>
+<p><span class="math notranslate nohighlight">\(q\)</span> は列空間内の任意の方向だったので、残差 <span class="math notranslate nohighlight">\(r\)</span> は列空間全体と直交する。特に <span class="math notranslate nohighlight">\(A\)</span> の各列とも直交するため</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+A^Tr=0
+\end{align}
+\]</div>
+<p>となる。これは求めた解を確認する方法の一つである。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">println</span><span class="p">(</span><span class="s">&quot;残差の大きさ ||r|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;A&#39; * r = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">A</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">r</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;直交条件の誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">r</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>残差の大きさ ||r|| = 0.3271085446759226
+A&#39; * r = [2.6645352591003757e-15, 8.881784197001252e-16]
+直交条件の誤差 = 2.808666774861361e-15
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell tag_hide-input tag_understanding-plot docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># 初回のみ: import Pkg; Pkg.add(&quot;CairoMakie&quot;)</span>
+<span class="k">using</span><span class="w"> </span><span class="n">CairoMakie</span>
+<span class="n">CairoMakie</span><span class="o">.</span><span class="n">activate!</span><span class="p">(</span><span class="n">type</span><span class="o">=</span><span class="s">&quot;svg&quot;</span><span class="p">)</span>
+<span class="n">set_theme!</span><span class="p">(</span><span class="n">Theme</span><span class="p">(</span><span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">figure_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">isdir</span><span class="p">(</span><span class="s">&quot;pic&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">joinpath</span><span class="p">(</span><span class="s">&quot;..&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pic&quot;</span><span class="p">)</span>
+
+<span class="k">using</span><span class="w"> </span><span class="n">LinearAlgebra</span>
+
+<span class="n">t_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span><span class="w"> </span><span class="mf">1.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2.0</span><span class="p">,</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span><span class="p">]</span>
+<span class="n">y_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.1</span><span class="p">,</span><span class="w"> </span><span class="mf">2.9</span><span class="p">,</span><span class="w"> </span><span class="mf">5.2</span><span class="p">,</span><span class="w"> </span><span class="mf">6.8</span><span class="p">,</span><span class="w"> </span><span class="mf">9.1</span><span class="p">]</span>
+<span class="n">A_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">ones</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">t_plot</span><span class="p">))</span><span class="w"> </span><span class="n">t_plot</span><span class="p">]</span>
+<span class="n">c_plot</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_plot</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">y_plot</span>
+<span class="n">fitted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_plot</span><span class="o">*</span><span class="n">c_plot</span>
+<span class="n">dense_t</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="o">-</span><span class="mf">0.2</span><span class="p">,</span><span class="w"> </span><span class="mf">4.2</span><span class="p">,</span><span class="w"> </span><span class="n">length</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+<span class="n">fig_least_squares</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Figure</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">850</span><span class="p">,</span><span class="w"> </span><span class="mi">500</span><span class="p">))</span>
+<span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Axis</span><span class="p">(</span><span class="n">fig_least_squares</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">];</span>
+<span class="w">    </span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;t&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;observation y&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="n">title</span><span class="o">=</span><span class="s">&quot;Least-squares line and residuals&quot;</span><span class="p">)</span>
+<span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">dense_t</span><span class="p">,</span><span class="w"> </span><span class="n">c_plot</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">c_plot</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.*</span><span class="n">dense_t</span><span class="p">;</span>
+<span class="w">    </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;least-squares fit&quot;</span><span class="p">)</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">t_plot</span><span class="p">,</span><span class="w"> </span><span class="n">y_plot</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:black</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;data&quot;</span><span class="p">)</span>
+<span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">eachindex</span><span class="p">(</span><span class="n">t_plot</span><span class="p">)</span>
+<span class="w">    </span><span class="n">lines!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">t_plot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">t_plot</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="w"> </span><span class="p">[</span><span class="n">fitted</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">y_plot</span><span class="p">[</span><span class="n">i</span><span class="p">]];</span>
+<span class="w">        </span><span class="n">color</span><span class="o">=</span><span class="ss">:tomato</span><span class="p">,</span><span class="w"> </span><span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">end</span>
+<span class="n">scatter!</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span><span class="w"> </span><span class="n">t_plot</span><span class="p">,</span><span class="w"> </span><span class="n">fitted</span><span class="p">;</span><span class="w"> </span><span class="n">color</span><span class="o">=</span><span class="ss">:dodgerblue</span><span class="p">,</span><span class="w"> </span><span class="n">markersize</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">axislegend</span><span class="p">(</span><span class="n">ax</span><span class="p">;</span><span class="w"> </span><span class="n">position</span><span class="o">=</span><span class="ss">:lt</span><span class="p">)</span>
+<span class="n">save</span><span class="p">(</span><span class="n">joinpath</span><span class="p">(</span><span class="n">figure_dir</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;least_squares_residuals.svg&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">fig_least_squares</span><span class="p">)</span>
+<span class="n">fig_least_squares</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<figure class="align-default" id="fig-least-squares-residuals">
+<a class="reference internal image-reference" href="../_images/least_squares_residuals.svg"><img alt="観測点と最小二乗直線および各点の残差" src="../_images/least_squares_residuals.svg" style="width: 90%;" /></a>
+<figcaption>
+<p><span class="caption-number">図 6.1 </span><span class="caption-text">赤い線分が残差である。最小二乗法は各点を必ず通る直線ではなく、これらの残差の二乗和を最小にする直線を選ぶ。</span><a class="headerlink" href="#fig-least-squares-residuals" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+</section>
+<section id="id4">
+<h2><span class="section-number">6.4. </span>正規方程式<a class="headerlink" href="#id4" title="Link to this heading">#</a></h2>
+<p>直交条件へ <span class="math notranslate nohighlight">\(r=y-Ac\)</span> を代入すると</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+A^T(y-Ac)=0
+\end{align}
+\]</div>
+<p>すなわち</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+A^TAc=A^Ty
+\end{align}
+\]</div>
+<p>が得られる。これを<strong>正規方程式</strong>という。未知数が2個なら、<span class="math notranslate nohighlight">\(A^TA\)</span> は2行2列なので、前章の方法で解ける。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">c_normal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">A</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="n">A</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;正規方程式の解 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">c_normal</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;A</span><span class="se">\\</span><span class="s">yとの差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">c_normal</span><span class="o">-</span><span class="n">c</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>正規方程式の解 = [1.0400000000000023, 1.989999999999999]
+A\yとの差 = 3.722145839155691e-15
+</pre></div>
+</div>
+</div>
+</div>
+<p>正規方程式は最小二乗法の仕組みを理解するのに役立つ。<span class="math notranslate nohighlight">\(A\)</span> の列が線形独立なら <span class="math notranslate nohighlight">\(A^TA\)</span> は正定値（0でない任意の <span class="math notranslate nohighlight">\(v\)</span> に対して <span class="math notranslate nohighlight">\(v^TA^TAv=\|Av\|_2^2&gt;0\)</span>）で、正則になるので、最小二乗解は一意である。ただし、実際の計算では <code class="docutils literal notranslate"><span class="pre">A'</span> <span class="pre">*</span> <span class="pre">A</span></code> をわざわざ作らず、<code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> またはQR分解を使うのが基本である。</p>
+<div class="tip admonition">
+<p class="admonition-title">なぜ正規方程式を第一選択にしないのか</p>
+<p><span class="math notranslate nohighlight">\(A\)</span> の列が線形独立なら、長方形行列の条件数を「最大の伸び率／最小の伸び率」と定義できる（Juliaの <code class="docutils literal notranslate"><span class="pre">cond(A)</span></code> で計算できる。理論は発展編の第12章で扱う）。このとき2ノルム条件数は <span class="math notranslate nohighlight">\(\kappa_2(A^TA)=\kappa_2(A)^2\)</span> となる。したがって <span class="math notranslate nohighlight">\(A^TA\)</span> を作ると、列がよく似た問題の感度を二乗して持ち込む。「式の導出には正規方程式、計算にはQR分解」と覚えておくとよい。</p>
+</div>
+</section>
+<section id="id5">
+<h2><span class="section-number">6.5. </span>QR分解で解く<a class="headerlink" href="#id5" title="Link to this heading">#</a></h2>
+<aside class="margin sidebar">
+<p class="sidebar-title"></p>
+<p><span class="math notranslate nohighlight">\(A\)</span>が実正方行列の場合は、直交行列<span class="math notranslate nohighlight">\(Q\)</span>と上三角行列<span class="math notranslate nohighlight">\(R\)</span>の積に、複素正方行列の場合は、ユニタリ行列<span class="math notranslate nohighlight">\(Q\)</span>と上三角行列<span class="math notranslate nohighlight">\(R\)</span>の積に分解できる。</p>
+</aside>
+<p><span class="math notranslate nohighlight">\(m\geq n\)</span> かつ <span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> の列が線形独立であるとする。<span class="math notranslate nohighlight">\(A\)</span> の列を、互いに直交する単位ベクトルへ整理したものを <span class="math notranslate nohighlight">\(Q\in\mathbb{R}^{m\times n}\)</span> とする。係数をまとめた上三角行列 <span class="math notranslate nohighlight">\(R\in\mathbb{R}^{n\times n}\)</span> を用いると</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+A=QR
+\end{align}
+\]</div>
+<p>と分解できる。これが<strong>QR分解</strong>である。</p>
+<div class="admonition-qr admonition">
+<p class="admonition-title">QR分解の定義</p>
+<p>より一般には、<span class="math notranslate nohighlight">\(m \ge n\)</span>の複素行列<span class="math notranslate nohighlight">\(m \times n\)</span>の任意の行列<span class="math notranslate nohighlight">\(A\)</span>に対して、<span class="math notranslate nohighlight">\(m \times m\)</span>のユニタリ行列<span class="math notranslate nohighlight">\(Q\)</span>と<span class="math notranslate nohighlight">\(m \times n\)</span>の上三角行列<span class="math notranslate nohighlight">\(R\)</span>が存在して、<span class="math notranslate nohighlight">\(A=QR\)</span>と分解できる。この場合の<span class="math notranslate nohighlight">\(R\)</span>は、上三角行列であるが、正方行列ではない。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+A_{m\times n}
+=
+\underbrace{Q}_{m\times m}
+\underbrace{R}_{m\times n}
+=
+\underbrace{\begin{bmatrix}Q_1 &amp; Q_2\end{bmatrix}}_{m\times m}
+\underbrace{\begin{bmatrix}R_1\\0\end{bmatrix}}_{m\times n}
+=
+\underbrace{Q_1}_{m\times n}
+\underbrace{R_1}_{n\times n},
+\qquad m\ge n
+\end{align}
+\end{split}\]</div>
+<p><span class="math notranslate nohighlight">\(m &lt; n \)</span>の場合は、<span class="math notranslate nohighlight">\(A^T\)</span>のQR分解を行うことで、同様に分解できる。</p>
+</div>
+<p><span class="math notranslate nohighlight">\(Q^TQ=I\)</span> なので、正規方程式に <span class="math notranslate nohighlight">\(A=QR\)</span> を代入すると <span class="math notranslate nohighlight">\(R^TRc=R^TQ^Ty\)</span> となる。<span class="math notranslate nohighlight">\(R\)</span> は正則なため、左から <span class="math notranslate nohighlight">\((R^T)^{-1}\)</span> を作用させて整理でき、最小二乗問題は</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+Rc=Q^Ty
+\end{align}
+\]</div>
+<p>という上三角行列の方程式に帰着する。最後は前章の後退代入で解ける。ここでは薄いQR分解を使うので、<span class="math notranslate nohighlight">\(Q^TQ=I_n\)</span> だが一般に <span class="math notranslate nohighlight">\(QQ^T \ne I_m\)</span> である。<span class="math notranslate nohighlight">\(Q\)</span> を正方な直交行列と取り違えないようにしよう。列が線形従属する場合の扱いは、発展編の第12章（SVD）で扱う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">F</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qr</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">(</span><span class="n">F</span><span class="o">.</span><span class="n">Q</span><span class="p">)[</span><span class="o">:</span><span class="p">,</span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="mi">2</span><span class="p">)]</span>
+<span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F</span><span class="o">.</span><span class="n">R</span>
+<span class="n">c_qr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="n">Q</span><span class="o">&#39;</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">y</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Q = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;R = </span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;AとQRの差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="o">-</span><span class="n">Q</span><span class="o">*</span><span class="n">R</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Q&#39;QとIの差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">Q</span><span class="o">&#39;</span><span class="n">Q</span><span class="o">-</span><span class="n">I</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;QRで求めた係数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">c_qr</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Q = 
+[-0.447 -0.632; -0.447 -0.316; -0.447 0.0; -0.447 0.316; -0.447 0.632]
+R = 
+[-2.236 -4.472; 0.0 3.162]
+AとQRの差 = 1.3847359079986438e-15
+Q&#39;QとIの差 = 4.772535618090538e-16
+QRで求めた係数 = [1.0399999999999991, 1.9900000000000004]
+</pre></div>
+</div>
+</div>
+</div>
+<p>Juliaでは <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> と書けば、長方形行列に対して適切な最小二乗解法が使われる。最初は <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> を使い、QR分解は「内部で何をしているか」を理解するために学ぶとよい。</p>
+<p>QR分解を構成する代表的な方法には、Gram--Schmidt直交化、Householder変換、Givens回転がある。通常は <code class="docutils literal notranslate"><span class="pre">qr(A)</span></code> を利用すればよいが、それぞれの構成法を見ると、直交変換が数値計算で果たす役割と実装上の使い分けが分かる。これらは章末の発展的な話題で扱う。</p>
+</section>
+<section id="id6">
+<h2><span class="section-number">6.6. </span>QR分解が威力を発揮する場面<a class="headerlink" href="#id6" title="Link to this heading">#</a></h2>
+<p>QR分解の利点が特に現れるのは、<span class="math notranslate nohighlight">\(A\)</span> の列がよく似ている最小二乗問題である。例えば2つの説明変数 <span class="math notranslate nohighlight">\(t\)</span> と <span class="math notranslate nohighlight">\(t+\varepsilon t^2\)</span> は、<span class="math notranslate nohighlight">\(\varepsilon\)</span> が小さいとほとんど同じ列になる。統計学や計量経済学では、説明変数どうしが強く相関するこの状況を<strong>多重共線性</strong>と呼ぶ。このとき <span class="math notranslate nohighlight">\(A^TA\)</span> を作る正規方程式では条件数が二乗され、丸め誤差の影響が大きくなる。</p>
+<p>次の例では真の係数を既知としてデータを作り、正規方程式とQR分解で係数を復元する。</p>
+<section id="id7">
+<h3><span class="section-number">6.6.1. </span>QR分解を手で読む：直線近似の場合<a class="headerlink" href="#id7" title="Link to this heading">#</a></h3>
+<p>上の出力の <span class="math notranslate nohighlight">\(Q,R\)</span> を読み解いてみよう。符号は計算方法によって反転することがあるので、ここでは絶対値に注目する。<span class="math notranslate nohighlight">\(t=(0,1,2,3,4)^T\)</span>、<span class="math notranslate nohighlight">\(\bar{t}=2\)</span> である。</p>
+<ul class="simple">
+<li><p><strong><span class="math notranslate nohighlight">\(Q\)</span> の第1列</strong>は、1を並べた列を長さ1にした <span class="math notranslate nohighlight">\(\frac{1}{\sqrt5}(1,1,1,1,1)^T\)</span>（<span class="math notranslate nohighlight">\(\approx0.447\)</span>）である。</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(Q\)</span> の第2列</strong>は、<span class="math notranslate nohighlight">\(t\)</span> から第1列の方向の成分、つまり平均 <span class="math notranslate nohighlight">\(\bar{t}\)</span> を引いた <span class="math notranslate nohighlight">\(t-\bar{t}=(-2,-1,0,1,2)^T\)</span> を、長さ <span class="math notranslate nohighlight">\(\sqrt{10}\)</span> で割ったもの（<span class="math notranslate nohighlight">\(\approx(-0.632,-0.316,0,0.316,0.632)^T\)</span>）である。</p></li>
+<li><p><strong><span class="math notranslate nohighlight">\(R\)</span></strong> は <span class="math notranslate nohighlight">\(\begin{bmatrix}\sqrt5&amp;\sqrt5\,\bar t\\0&amp;\sqrt{10}\end{bmatrix}\approx\begin{bmatrix}2.236&amp;4.472\\0&amp;3.162\end{bmatrix}\)</span> となる。</p></li>
+</ul>
+<p>つまり、直線近似のQR分解は「定数の列」と「平均からのずれ（中心化した <span class="math notranslate nohighlight">\(t\)</span>）」という直交する2方向を作る操作である。<span class="math notranslate nohighlight">\(Rc=Q^Ty\)</span> の第2行は</p>
+<div class="math notranslate nohighlight">
+\[
+\sqrt{10}\,c_1=\frac{1}{\sqrt{10}}\sum_i(t_i-\bar t)y_i
+\quad\Longrightarrow\quad
+c_1=\frac{\sum_i(t_i-\bar t)(y_i-\bar y)}{\sum_i(t_i-\bar t)^2}
+\]</div>
+<p>となる（<span class="math notranslate nohighlight">\(\sum_i(t_i-\bar t)=0\)</span> なので <span class="math notranslate nohighlight">\(y_i\)</span> を <span class="math notranslate nohighlight">\(y_i-\bar y\)</span> に置き換えてもよい）。これは統計学で学ぶ「傾き＝共分散／分散」の公式そのものである。第1行からは <span class="math notranslate nohighlight">\(c_0=\bar y-c_1\bar t\)</span> が得られる。本文の数値では <span class="math notranslate nohighlight">\(c_1=19.9/10=1.99\)</span>、<span class="math notranslate nohighlight">\(c_0=5.02-1.99\times2=1.04\)</span> となり、出力と一致する。</p>
+<p>このように、QR分解は「列を互いに直交する方向に整理し直してから係数を求める」手順である。一般の列の場合の作り方（Gram-Schmidt直交化など）は章末の発展的な話題で扱う。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">t_centered</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;平均を引いたt = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">t_centered</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Qの第2列×√10 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="n">sqrt</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">slope</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">t_centered</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="p">(</span><span class="n">y</span><span class="w"> </span><span class="o">.-</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">sum</span><span class="p">(</span><span class="n">t_centered</span><span class="o">.^</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;共分散／分散による傾き = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">slope</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;, 切片 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">slope</span><span class="o">*</span><span class="n">mean</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>平均を引いたt = [-2.0, -1.0, 0.0, 1.0, 2.0]
+Qの第2列×√10 = [-2.0, -1.0, 0.0, 1.0, 2.0]
+共分散／分散による傾き = 1.9899999999999998, 切片 = 1.040000000000001
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">ε</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1.0e-6</span>
+<span class="n">t_close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">range</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">;</span><span class="n">length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">A_close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">ones</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">t_close</span><span class="p">))</span><span class="w"> </span><span class="n">t_close</span><span class="w"> </span><span class="n">t_close</span><span class="w"> </span><span class="o">.+</span><span class="w"> </span><span class="n">ε</span><span class="o">.*</span><span class="n">t_close</span><span class="o">.^</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">c_true</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span><span class="mf">3.0</span><span class="p">]</span>
+<span class="n">y_close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A_close</span><span class="o">*</span><span class="n">c_true</span>
+
+<span class="n">c_normal_close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">A_close</span><span class="o">&#39;*</span><span class="n">A_close</span><span class="p">)</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="p">(</span><span class="n">A_close</span><span class="o">&#39;*</span><span class="n">y_close</span><span class="p">)</span>
+<span class="n">F_close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">qr</span><span class="p">(</span><span class="n">A_close</span><span class="p">)</span>
+<span class="n">c_qr_close</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">F_close</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">y_close</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;κ₂(A) = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">cond</span><span class="p">(</span><span class="n">A_close</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;正規方程式の係数誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">c_normal_close</span><span class="o">-</span><span class="n">c_true</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;QR分解の係数誤差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">c_qr_close</span><span class="o">-</span><span class="n">c_true</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;正規方程式の残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_close</span><span class="o">*</span><span class="n">c_normal_close</span><span class="o">-</span><span class="n">y_close</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;QR分解の残差 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_close</span><span class="o">*</span><span class="n">c_qr_close</span><span class="o">-</span><span class="n">y_close</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>κ₂(A) = 2.2800304577635236e7
+正規方程式の係数誤差 = 0.03128353844236706
+QR分解の係数誤差 = 2.645740349805996e-9
+正規方程式の残差 = 1.2127259195459606e-8
+QR分解の残差 = 2.937374022976103e-15
+</pre></div>
+</div>
+</div>
+</div>
+<p>出力では、条件数が大きく、正規方程式とQR分解で係数の誤差に大きな差が出る。丸めの影響を比較する例なので、末尾の桁や誤差の具体値は環境でも変わる。残差だけを見ると両者とも小さく見えるため、列がよく似た問題では計算法と条件数も確認する必要がある。</p>
+<p>QR分解は次のような場面でも再利用できる。</p>
+<ul class="simple">
+<li><p><strong>同じ説明変数で複数の観測量を近似する場合</strong>：<span class="math notranslate nohighlight">\(A\)</span> が同じで右辺 <span class="math notranslate nohighlight">\(y_1,y_2,\ldots\)</span> だけが変わるなら、<code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">=</span> <span class="pre">qr(A)</span></code> を一度計算し、<code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">\</span> <span class="pre">y1</span></code>, <code class="docutils literal notranslate"><span class="pre">F</span> <span class="pre">\</span> <span class="pre">y2</span></code>, ... と使い回せる。複数の右辺を列に並べた行列 <span class="math notranslate nohighlight">\(Y\)</span> なら <code class="docutils literal notranslate"><span class="pre">C</span> <span class="pre">=</span> <span class="pre">F</span> <span class="pre">\</span> <span class="pre">Y</span></code> と一度に解ける。</p></li>
+<li><p><strong>直交基底が欲しい場合</strong>：<span class="math notranslate nohighlight">\(Q\)</span> の列は直交規格化されているため、データを直交座標へ射影したり、部分空間上で低次元化したりするときに使える。</p></li>
+<li><p><strong>数値的に安定な変換を重ねたい場合</strong>：直交行列は2ノルムを変えないため、計算途中で誤差を不必要に増幅しにくい。</p></li>
+</ul>
+</section>
+</section>
+<section id="id8">
+<h2><span class="section-number">6.7. </span>2次式へ拡張する<a class="headerlink" href="#id8" title="Link to this heading">#</a></h2>
+<p>直線の代わりに</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+y\approx c_0+c_1t+c_2t^2
+\end{align}
+\]</div>
+<p>を使いたければ、設計行列に <span class="math notranslate nohighlight">\(t^2\)</span> の列を追加するだけでよい。モデルを複雑にすると本文のデータへの残差は小さくなりやすいが、未知データの予測まで必ず改善するとは限らない。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">A2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">ones</span><span class="p">(</span><span class="n">length</span><span class="p">(</span><span class="n">t</span><span class="p">))</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="n">t</span><span class="o">.^</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">c2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">A2</span><span class="w"> </span><span class="o">\</span><span class="w"> </span><span class="n">y</span>
+<span class="n">r2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">A2</span><span class="o">*</span><span class="n">c2</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;2次式の係数 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">round</span><span class="o">.</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span><span class="w"> </span><span class="n">digits</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;直線の残差ノルム = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;2次式の残差ノルム = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">r2</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>2次式の係数 = [1.083, 1.904, 0.021]
+直線の残差ノルム = 0.3271085446759226
+2次式の残差ノルム = 0.3171299868688372
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="clubsuit-qr">
+<h2><span class="section-number">6.8. </span><span class="math notranslate nohighlight">\(\clubsuit\)</span> 発展的な話題：QR分解の構成<a class="headerlink" href="#clubsuit-qr" title="Link to this heading">#</a></h2>
+<p>ここからは、QR分解を実際に構成する方法を扱う。最小二乗問題を解くだけなら <code class="docutils literal notranslate"><span class="pre">qr(A)</span></code> や <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> を使えばよいが、構成法を知ると、直交性がどのように作られ、丸め誤差や行列の疎性がアルゴリズムの選択にどう影響するかを理解できる。</p>
+<section id="gram-schmidt">
+<h3><span class="section-number">6.8.1. </span>Gram-Schmidt直交化<a class="headerlink" href="#gram-schmidt" title="Link to this heading">#</a></h3>
+<p><span class="math notranslate nohighlight">\(A\in\mathbb{R}^{m\times n}\)</span> の列を <span class="math notranslate nohighlight">\(a_1,a_2,\ldots,a_n\)</span> とし、これらが線形独立であるとする。Gram-Schmidt直交化では、<span class="math notranslate nohighlight">\(a_j\)</span> から、それ以前に得た直交規格化ベクトル <span class="math notranslate nohighlight">\(q_1,\ldots,q_{j-1}\)</span> 方向の成分を引く。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+r_{ij}&amp;=q_i^\mathsf{T}a_j\qquad (i&lt;j),\\
+v_j&amp;=a_j-\sum_{i=1}^{j-1}q_i r_{ij},\\
+r_{jj}&amp;=\|v_j\|_2,\\
+q_j&amp;=\frac{v_j}{r_{jj}}
+\end{align}
+\end{split}\]</div>
+<p><span class="math notranslate nohighlight">\(r_{jj}=0\)</span> なら <span class="math notranslate nohighlight">\(a_j\)</span> はそれ以前の列の線形結合であり、列は線形従属である。<span class="math notranslate nohighlight">\(r_{jj}\ne0\)</span> なら、<span class="math notranslate nohighlight">\(q_j\)</span> は以前のすべての <span class="math notranslate nohighlight">\(q_i\)</span> と直交し、長さが1になる。また、</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+a_j=\sum_{i=1}^j q_i r_{ij}
+\end{align}
+\]</div>
+<p>なので、すべての列をまとめると <span class="math notranslate nohighlight">\(A=QR\)</span> が得られる。ここで <span class="math notranslate nohighlight">\(Q=[q_1\ \cdots\ q_n]\)</span> は <span class="math notranslate nohighlight">\(Q^\mathsf{T}Q=I\)</span> を満たし、<span class="math notranslate nohighlight">\(R=(r_{ij})\)</span> は上三角行列である。</p>
+<p>上式をそのまま計算する方法を<strong>古典的Gram-Schmidt法</strong>という。有限精度では、ほぼ線形従属な列から大きさの近い射影をまとめて引くため、丸め誤差によって <span class="math notranslate nohighlight">\(Q\)</span> の直交性が失われることがある。</p>
+<p><strong>修正Gram-Schmidt法</strong>では、各 <span class="math notranslate nohighlight">\(q_i\)</span> 方向の成分を求めるたびに作業ベクトルを更新する。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+v_j^{(0)}&amp;=a_j,\\
+r_{ij}&amp;=q_i^\mathsf{T}v_j^{(i-1)},\\
+v_j^{(i)}&amp;=v_j^{(i-1)}-q_i r_{ij}
+\end{align}
+\end{split}\]</div>
+<p>厳密演算では両者は同じ結果になるが、修正版の方が一般に直交性を保ちやすい。それでも列の条件が非常に悪い場合には再直交化が必要になることがあり、密行列のQR分解には次のHouseholder変換が標準的に用いられる。直交化は、行列の固有値計算などにおいても重要な役割を果たす。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">modified_gram_schmidt</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">V</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">    </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zeros</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">n</span>
+<span class="w">        </span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">V</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">])</span>
+<span class="w">        </span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">eps</span><span class="p">(</span><span class="kt">Float64</span><span class="p">)</span><span class="o">*</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">error</span><span class="p">(</span><span class="s">&quot;列が数値的に線形従属です&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">V</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">j</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">:</span><span class="n">n</span>
+<span class="w">            </span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dot</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">],</span><span class="w"> </span><span class="n">V</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">])</span>
+<span class="w">            </span><span class="n">V</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">]</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">i</span><span class="p">]</span><span class="o">*</span><span class="n">R</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">]</span>
+<span class="w">        </span><span class="k">end</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">R</span>
+<span class="k">end</span>
+
+<span class="n">A_advanced</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">              </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">0.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="w">              </span><span class="mf">0.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">;</span>
+<span class="w">              </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="mf">1.0</span><span class="p">]</span>
+<span class="n">Q_mgs</span><span class="p">,</span><span class="w"> </span><span class="n">R_mgs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">modified_gram_schmidt</span><span class="p">(</span><span class="n">A_advanced</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;||A-QR|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_advanced</span><span class="o">-</span><span class="n">Q_mgs</span><span class="o">*</span><span class="n">R_mgs</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;||Q&#39;Q-I|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">Q_mgs</span><span class="o">&#39;</span><span class="n">Q_mgs</span><span class="o">-</span><span class="n">I</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>||A-QR|| = 3.634636298076482e-17
+||Q&#39;Q-I|| = 5.274070310554007e-16
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="householder">
+<h3><span class="section-number">6.8.2. </span>Householder変換<a class="headerlink" href="#householder" title="Link to this heading">#</a></h3>
+<p>Householder変換は、超平面に関する鏡映を表す直交変換である。長さ1のベクトル <span class="math notranslate nohighlight">\(u\)</span> に対して</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+H=I-2uu^\mathsf{T}
+\end{align}
+\]</div>
+<p>と定義する。<span class="math notranslate nohighlight">\(u^\mathsf{T}u=1\)</span> を使うと</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+H^\mathsf{T}&amp;=H,\\
+H^\mathsf{T}H&amp;=(I-2uu^\mathsf{T})^2=I
+\end{align}
+\end{split}\]</div>
+<p>となるので、<span class="math notranslate nohighlight">\(H\)</span> は対称な直交行列である。<span class="math notranslate nohighlight">\(u\)</span> 方向の成分は符号が反転し、それと直交する成分は変化しないため、幾何学的には鏡映である。</p>
+<p>0でないベクトル <span class="math notranslate nohighlight">\(x\)</span> の第1成分以外を一度に0にしたいとする。丸め誤差を抑えるため</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+\alpha&amp;=-\operatorname{sign}_{+}(x_1)\|x\|_2,\\
+v&amp;=x-\alpha e_1,\\
+u&amp;=\frac{v}{\|v\|_2}
+\end{align}
+\end{split}\]</div>
+<p>と選ぶ。ここで <span class="math notranslate nohighlight">\(\operatorname{sign}_{+}(0)=1\)</span> とする。このとき</p>
+<div class="math notranslate nohighlight">
+\[
+\begin{align}
+Hx=\alpha e_1
+\end{align}
+\]</div>
+<p>となる。<span class="math notranslate nohighlight">\(\alpha\)</span> の符号を <span class="math notranslate nohighlight">\(x_1\)</span> と反対にするのは、<span class="math notranslate nohighlight">\(v=x-\alpha e_1\)</span> の第1成分で近い数の差を避けるためである。</p>
+<p>この節では正方な <span class="math notranslate nohighlight">\(Q\)</span> と縦長な <span class="math notranslate nohighlight">\(R\)</span> を使う完全QR分解を構成する。本文の薄いQR分解は、必要な列・行だけを取り出したものである。</p>
+<p>QR分解では、まず第1列にHouseholder変換 <span class="math notranslate nohighlight">\(H_1\)</span> をかけて対角成分より下をすべて0にする。次に右下の小行列へ <span class="math notranslate nohighlight">\(H_2\)</span> を作用させ、同じ操作を繰り返す。</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+H_k\cdots H_2H_1A&amp;=R,\\
+Q&amp;=H_1H_2\cdots H_k,\\
+A&amp;=QR
+\end{align}
+\end{split}\]</div>
+<p>各 <span class="math notranslate nohighlight">\(H_i\)</span> は直交かつ対称なので、逆変換は同じ <span class="math notranslate nohighlight">\(H_i\)</span> である。Householder法は1回の変換で列の下側をまとめて消去でき、Gram--Schmidt法より丸め誤差に強い。このため、密行列に対するQR分解の標準的な方法である。実装では <span class="math notranslate nohighlight">\(H_i\)</span> 全体を保存せず、ベクトル <span class="math notranslate nohighlight">\(u_i\)</span> と係数だけを行列の下三角部分に格納する。</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">householder_qr</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">R</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">A</span><span class="p">)</span>
+<span class="w">    </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">(</span><span class="n">R</span><span class="p">)</span>
+<span class="w">    </span><span class="n">Q</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">Matrix</span><span class="p">{</span><span class="kt">Float64</span><span class="p">}(</span><span class="n">I</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">,</span><span class="w"> </span><span class="n">m</span><span class="p">)</span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">min</span><span class="p">(</span><span class="n">m</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span>
+<span class="w">        </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">copy</span><span class="p">(</span><span class="n">R</span><span class="p">[</span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">])</span>
+<span class="w">        </span><span class="n">iszero</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">))</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="k">continue</span>
+
+<span class="w">        </span><span class="n">sign_plus</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="o">-</span><span class="mf">1.0</span>
+<span class="w">        </span><span class="n">α</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="n">sign_plus</span><span class="o">*</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="w">        </span><span class="n">v</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span>
+<span class="w">        </span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="n">α</span>
+<span class="w">        </span><span class="n">u</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="o">/</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="w">        </span><span class="c"># R &lt;- H_k R, Q &lt;- Q H_k（H_kは対称）</span>
+<span class="w">        </span><span class="n">R</span><span class="p">[</span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">]</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="mi">2</span><span class="n">u</span><span class="o">*</span><span class="p">(</span><span class="n">u</span><span class="o">&#39;*</span><span class="n">R</span><span class="p">[</span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">])</span>
+<span class="w">        </span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">]</span><span class="w"> </span><span class="o">-=</span><span class="w"> </span><span class="mi">2</span><span class="p">(</span><span class="n">Q</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="o">:</span><span class="n">end</span><span class="p">]</span><span class="o">*</span><span class="n">u</span><span class="p">)</span><span class="o">*</span><span class="n">u</span><span class="o">&#39;</span>
+<span class="w">    </span><span class="k">end</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Q</span><span class="p">,</span><span class="w"> </span><span class="n">R</span>
+<span class="k">end</span>
+
+<span class="n">Q_h</span><span class="p">,</span><span class="w"> </span><span class="n">R_h</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">householder_qr</span><span class="p">(</span><span class="n">A_advanced</span><span class="p">)</span>
+
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;||A-QR|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">A_advanced</span><span class="o">-</span><span class="n">Q_h</span><span class="o">*</span><span class="n">R_h</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;||Q&#39;Q-I|| = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">Q_h</span><span class="o">&#39;</span><span class="n">Q_h</span><span class="o">-</span><span class="n">I</span><span class="p">))</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;Rの対角線より下のnorm = &quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">norm</span><span class="p">(</span><span class="n">tril</span><span class="p">(</span><span class="n">R_h</span><span class="p">[</span><span class="o">:</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="o">:</span><span class="n">size</span><span class="p">(</span><span class="n">A_advanced</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)],</span><span class="w"> </span><span class="o">-</span><span class="mi">1</span><span class="p">)))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>||A-QR|| = 3.880476486872571e-16
+||Q&#39;Q-I|| = 3.7467687820156277e-16
+Rの対角線より下のnorm = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+<section id="givens-2">
+<h3><span class="section-number">6.8.3. </span>Givens回転：2行だけを動かす<a class="headerlink" href="#givens-2" title="Link to this heading">#</a></h3>
+<p>成分 <span class="math notranslate nohighlight">\((a,b)^T\)</span> を <span class="math notranslate nohighlight">\((r,0)^T\)</span> へ回すことでも消去できる。<span class="math notranslate nohighlight">\(r=\sqrt{a^2+b^2}&gt;0\)</span>、<span class="math notranslate nohighlight">\(c=a/r\)</span>、<span class="math notranslate nohighlight">\(s=-b/r\)</span> とすれば</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+G=\begin{bmatrix}c&amp;-s\\s&amp;c\end{bmatrix},\qquad
+G^TG=I,\qquad G\begin{bmatrix}a\\b\end{bmatrix}=\begin{bmatrix}r\\0\end{bmatrix}.
+\end{split}\]</div>
+<p>例えば <span class="math notranslate nohighlight">\((a,b)=(3,4)\)</span> なら <span class="math notranslate nohighlight">\(r=5\)</span> である。この操作を行列の2行に適用して、狙った成分を0にする。行を追加した際のQR分解の更新などで使われる。実装では <code class="docutils literal notranslate"><span class="pre">hypot(a,b)</span></code> を使うと、単純な二乗和による不要なオーバーフローを避けやすい。<span class="math notranslate nohighlight">\(a=b=0\)</span> なら消去は不要である。</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>方法</p></th>
+<th class="head"><p>操作の見方</p></th>
+<th class="head"><p>主な用途</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Gram–Schmidt</p></td>
+<td><p>既存の方向の成分を引く</p></td>
+<td><p>直交基底を順に作る</p></td>
+</tr>
+<tr class="row-odd"><td><p>Householder</p></td>
+<td><p>鏡映で列の下側をまとめて消す</p></td>
+<td><p>密行列のQR分解</p></td>
+</tr>
+<tr class="row-even"><td><p>Givens</p></td>
+<td><p>2行を回して1成分を消す</p></td>
+<td><p>分解の更新、構造を利用する消去</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">a_g</span><span class="p">,</span><span class="w"> </span><span class="n">b_g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.0</span><span class="p">,</span><span class="w"> </span><span class="mf">4.0</span>
+<span class="n">r_g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hypot</span><span class="p">(</span><span class="n">a_g</span><span class="p">,</span><span class="w"> </span><span class="n">b_g</span><span class="p">)</span>
+<span class="n">c_g</span><span class="p">,</span><span class="w"> </span><span class="n">s_g</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a_g</span><span class="o">/</span><span class="n">r_g</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">b_g</span><span class="o">/</span><span class="n">r_g</span>
+<span class="n">G</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">c_g</span><span class="w"> </span><span class="o">-</span><span class="n">s_g</span><span class="p">;</span><span class="w"> </span><span class="n">s_g</span><span class="w"> </span><span class="n">c_g</span><span class="p">]</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;回転後 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">G</span><span class="o">*</span><span class="p">[</span><span class="n">a_g</span><span class="p">,</span><span class="n">b_g</span><span class="p">])</span>
+<span class="n">println</span><span class="p">(</span><span class="s">&quot;直交性の確認 = &quot;</span><span class="p">,</span><span class="w"> </span><span class="n">norm</span><span class="p">(</span><span class="n">G</span><span class="o">&#39;</span><span class="n">G</span><span class="o">-</span><span class="n">I</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>回転後 = [5.0, -4.440892098500626e-16]
+直交性の確認 = 0.0
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="id9">
+<h2><span class="section-number">6.9. </span>まとめ<a class="headerlink" href="#id9" title="Link to this heading">#</a></h2>
+<div class="tip admonition">
+<p class="admonition-title">本章のまとめ</p>
+<p>最小二乗法は、データをすべて通れない場合に残差の二乗和を最小にする。最適点での直交条件 <span class="math notranslate nohighlight">\(A^Tr=0\)</span> から正規方程式が得られ、QR分解を使えば第5章の三角方程式に帰着する。観測データの残差が0でないことは、直ちに計算の失敗を意味しない。</p>
+<p>計算では <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> またはQR分解を使い、残差の大きさと直交条件を確認する。モデルの項を増やせば当てはめ誤差は減っても、未知のデータへの予測が改善するとは限らない。</p>
+</div>
+<p>次の<a class="reference internal" href="Chap_NonlinearEquations.html"><span class="std std-doc">第7章</span></a>では、未知数が平方・三角関数などの中に入り、行列の方程式だけでは直接解けない問題を扱う。</p>
+</section>
+<section id="id10">
+<h2><span class="section-number">6.10. </span>演習<a class="headerlink" href="#id10" title="Link to this heading">#</a></h2>
+<p>本文の式・表・出力を使って説明してよい。</p>
+<div class="attention admonition">
+<p class="admonition-title">演習</p>
+<ol class="arabic simple">
+<li><p><strong>行列の読み方</strong>：直線 <span class="math notranslate nohighlight">\(y=c_0+c_1t\)</span> の設計行列で、<span class="math notranslate nohighlight">\(t=2\)</span> の観測に対応する行を書け。1を並べた列を削除すると、どのような直線しか表せなくなるか。</p></li>
+<li><p><strong>残差と最適性</strong>：本文の出力では残差は0でなく、<span class="math notranslate nohighlight">\(A^Tr\)</span> はほぼ0である。この二つが両立する理由を、観測点と近似直線の関係から説明せよ。</p></li>
+<li><p><strong>次数の選択</strong>：本文の直線と2次式の残差を比較せよ。「残差が小さい方が未知の観測にも必ずよい」と言えるか。既習の回帰の考え方も使い、確認したいことを一つ挙げよ。</p></li>
+<li><p><strong>QRと回帰の公式</strong>：データ <span class="math notranslate nohighlight">\(t=(1,2,3)^T\)</span>、<span class="math notranslate nohighlight">\(y=(2,3,7)^T\)</span> に直線を当てはめる。<span class="math notranslate nohighlight">\(t\)</span> の平均を引いたベクトルを作り、「共分散／分散」で傾きを手計算せよ。その値を <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">\</span> <span class="pre">y</span></code> の結果と比べ、<span class="math notranslate nohighlight">\(Q\)</span> の第2列が中心化した <span class="math notranslate nohighlight">\(t\)</span> に比例していることを確かめよ。</p></li>
+<li><p><strong>探究：1点の影響</strong>：本文の5点のデータのうち1点だけを大きくずらす（例えば <span class="math notranslate nohighlight">\(y_5=9.1\)</span> を <span class="math notranslate nohighlight">\(15\)</span> にする）と、傾き・切片・残差はどう変わるか。まず変化の向きと大きさを予想して書き、次に計算で確かめよ。さらに、ずらす点を端（<span class="math notranslate nohighlight">\(t=4\)</span>）から中央（<span class="math notranslate nohighlight">\(t=2\)</span>）に変えると影響の大きさが変わる理由を、残差の二乗和という基準から説明せよ。実際のデータ分析でこの性質がどのような問題になり得るかも一つ挙げよ。</p></li>
+</ol>
+</div>
+</section>
+<section id="id11">
+<h2><span class="section-number">6.11. </span>参考文献と関連する節<a class="headerlink" href="#id11" title="Link to this heading">#</a></h2>
+<ul class="simple">
+<li><p>Driscoll and Braun, <em>Fundamentals of Numerical Computation</em>, <a class="reference external" href="https://tobydriscoll.net/fnc-julia/leastsq/qr.html">The QR factorization</a>.</p></li>
+<li><p>本講義に入る前の復習：<a class="reference external" href="https://sotayoshida.github.io/AIML1/notebooks/Chapter_math_linearalgebra.html">AI・機械学習論1の線形代数</a>。</p></li>
+</ul>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.12"
+        },
+        kernelOptions: {
+            name: "julia-1.12",
+            path: "./notebooks"
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.12'</script>
+
+                </article>
+              
+
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="Chap_LUFactorization.html"
+       title="前のページ">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">前へ</p>
+        <p class="prev-next-title"><span class="section-number">5. </span>連立一次方程式： Gauss消去法とLU分解</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="Chap_NonlinearEquations.html"
+       title="次ページ">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">次へ</p>
+        <p class="prev-next-title"><span class="section-number">7. </span>非線形方程式</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> 目次
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">6.1. この章の目標</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id2">6.2. 直線をデータに当てはめる</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id3">6.3. 最小二乗解の幾何学</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id4">6.4. 正規方程式</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id5">6.5. QR分解で解く</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id6">6.6. QR分解が威力を発揮する場面</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#id7">6.6.1. QR分解を手で読む：直線近似の場合</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id8">6.7. 2次式へ拡張する</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#clubsuit-qr">6.8. <span class="math notranslate nohighlight">\(\clubsuit\)</span> 発展的な話題：QR分解の構成</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#gram-schmidt">6.8.1. Gram-Schmidt直交化</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#householder">6.8.2. Householder変換</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#givens-2">6.8.3. Givens回転：2行だけを動かす</a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id9">6.9. まとめ</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id10">6.10. 演習</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id11">6.11. 参考文献と関連する節</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+<div class="bd-footer-content__inner container">
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+  <div class="footer-item">
+    
+  </div>
+  
+</div>
+          </footer>
+        
+
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+  </footer>
+  </body>
+</html>
