@@ -1,0 +1,35 @@
+# Table of contents
+ 
+format: jb-book
+root: home
+
+parts:
+- caption: 準備
+  numbered: true
+  chapters:
+  - file: notebooks/Chap_WhyItMatters
+  - file: notebooks/Chap_linux_env
+  - file: notebooks/Chap_Julia_LinearAlgebra
+  - file: notebooks/Chap_NumericalAccuracyAndCost
+- caption: 基本アルゴリズム
+  numbered: true
+  chapters:
+  - file: notebooks/Chap_LUFactorization
+  - file: notebooks/Chap_QRLeastSquares
+  - file: notebooks/Chap_NonlinearEquations
+- caption: 近似と微分方程式
+  numbered: true
+  chapters:
+  - file: notebooks/Chap_InterpolationDifferentiationIntegration
+  - file: notebooks/Chap_InitialValueProblems
+  # - file: notebooks/Chap_DiffusionEquation
+- caption: 発展・応用
+  numbered: true
+  chapters:
+  - file: notebooks/Chap_IterativeLinearSystems
+  - file: notebooks/Chap_EigenvalueProblems
+  - file: notebooks/Chap_SVDLowRankApproximation
+  - file: notebooks/Chap_FourierAnalysis
+  - file: notebooks/Chap_DMD
+  - file: notebooks/Chap_MCMC
+  - file: notebooks/Chap_ParallelComputation
