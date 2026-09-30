@@ -16,22 +16,20 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -39,11 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
   
-  <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
@@ -71,7 +68,6 @@
     <link rel="prev" title="13. Fourier解析とFourier回帰" href="Chap_FourierAnalysis.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
-  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -79,16 +75,27 @@
 
   
   
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <dialog id="pst-search-dialog">
-    
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -96,6 +103,7 @@
   <input type="search"
          class="form-control"
          name="q"
+         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -103,11 +111,11 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+</form></div>
+  </div>
 
   <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
   
@@ -120,8 +128,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+      <div class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -151,17 +158,21 @@
     
     
     <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
-    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+    <script>document.write(`<img src="../_static/logo_na.jpeg" class="logo__image only-dark" alt="数値解析 - Home"/>`);</script>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">検索</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button></div>
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">検索</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
@@ -199,14 +210,9 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
   </div>
+  
+  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -303,16 +309,24 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
 
 
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-</button>
+  </button>
+`);
+</script>
 <button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
@@ -402,7 +416,8 @@ Y=[x_2\ x_3\ \cdots\ x_{m+1}]
 \]</div>
 <p>を作る。例えば4時刻なら、<span class="math notranslate nohighlight">\(X\)</span> の列は第1・2・3時刻、<span class="math notranslate nohighlight">\(Y\)</span> の列は第2・3・4時刻であり、同じ列番号が「現在と次」を組にする。</p>
 <figure class="align-default" id="fig-learning-dmd-pairs">
-<a class="reference internal image-reference" href="../_images/learning_dmd_pairs.svg"><img alt="4時刻のデータから、Xの列をx1,x2,x3、Yの列をx2,x3,x4とし、同じ列を現在と次の状態の組にする。" src="../_images/learning_dmd_pairs.svg" style="width: 95%;" /></a>
+<a class="reference internal image-reference" href="../_images/learning_dmd_pairs.svg"><img alt="4時刻のデータから、Xの列をx1,x2,x3、Yの列をx2,x3,x4とし、同じ列を現在と次の状態の組にする。" src="../_images/learning_dmd_pairs.svg" style="width: 95%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 14.1 </span><span class="caption-text">同じ列の上下が、入力と出力の一つの組である。<span class="math notranslate nohighlight">\(x_2\)</span> は第1列では「次」、第2列では「現在」として現れる。共通の <span class="math notranslate nohighlight">\(A\)</span> で <span class="math notranslate nohighlight">\(Ax_1\approx x_2\)</span>、<span class="math notranslate nohighlight">\(Ax_2\approx x_3\)</span>、<span class="math notranslate nohighlight">\(Ax_3\approx x_4\)</span> を同時に満たすように当てはめる。</span><a class="headerlink" href="#fig-learning-dmd-pairs" title="Link to this image">#</a></p>
 </figcaption>
@@ -561,7 +576,8 @@ DMD modelの1-step相対残差 = 1.2268530519639235e-15
 </details>
 </div>
 <figure class="align-default" id="fig-dmd-trajectory-spectrum">
-<a class="reference internal image-reference" href="../_images/dmd_trajectory_spectrum.svg"><img alt="減衰振動のsnapshot軌道と対応するDMD固有値" src="../_images/dmd_trajectory_spectrum.svg" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/dmd_trajectory_spectrum.svg"><img alt="減衰振動のsnapshot軌道と対応するDMD固有値" src="../_images/dmd_trajectory_spectrum.svg" style="width: 90%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 14.2 </span><span class="caption-text">状態空間の回転は複素共役な固有値の偏角に、1ステップごとの縮小は固有値の絶対値に対応する。単位円の内側にあるため、このモードは時間とともに減衰する。</span><a class="headerlink" href="#fig-dmd-trajectory-spectrum" title="Link to this image">#</a></p>
 </figcaption>
@@ -619,7 +635,8 @@ x_k\approx\Phi\Lambda^{k-1}b
 <p>2次元の減衰振動では固有値の意味を確認できたが、DMD modeがどのような<strong>空間パターン</strong>を表すかは見えにくい。そこで、円柱後流に生じるKármán（カルマン）渦列を考える。円柱の上下から渦が交互に放出され、後流に周期的な構造が現れる。</p>
 <p>以下はReynolds数100の数値simulationから得た渦度場である。赤と青は逆向きの回転を表し、時間とともに渦が下流へ運ばれる様子が分かる。</p>
 <figure class="align-default" id="fig-dmd-karman-vorticity">
-<a class="reference internal image-reference" href="../_images/dmd_data_vorticity.gif"><img alt="円柱後流に生じるカルマン渦列の渦度場" src="../_images/dmd_data_vorticity.gif" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/dmd_data_vorticity.gif"><img alt="円柱後流に生じるカルマン渦列の渦度場" src="../_images/dmd_data_vorticity.gif" style="width: 90%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 14.3 </span><span class="caption-text">円柱後流の渦度場。赤と青の渦が交互に放出される。</span><a class="headerlink" href="#fig-dmd-karman-vorticity" title="Link to this image">#</a></p>
 </figcaption>
@@ -724,7 +741,8 @@ q_k=\operatorname{vec}(q(\cdot,\cdot,t_k))\in\mathbb{R}^{89351}
 <h3><span class="section-number">14.9.2. </span>150枚の画像を15個のmodeで再構成する<a class="headerlink" href="#mode" title="Link to this heading">#</a></h3>
 <p>次のanimationは、流れ方向速度について、上から元data、rank-15 DMDによる再構成、両者の差を示す。</p>
 <figure class="align-default" id="fig-dmd-karman-reconstruction">
-<a class="reference internal image-reference" href="../_images/dmd_data_compare.gif"><img alt="円柱後流の元データ、DMD再構成、差分の比較" src="../_images/dmd_data_compare.gif" style="width: 420px;" /></a>
+<a class="reference internal image-reference" href="../_images/dmd_data_compare.gif"><img alt="円柱後流の元データ、DMD再構成、差分の比較" src="../_images/dmd_data_compare.gif" style="width: 420px;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 14.4 </span><span class="caption-text">円柱後流の速度場とrank-15 DMD再構成。下段は <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">-</span> <span class="pre">DMD</span></code> である。</span><a class="headerlink" href="#fig-dmd-karman-reconstruction" title="Link to this image">#</a></p>
 </figcaption>
@@ -796,7 +814,7 @@ q_k=\operatorname{vec}(q(\cdot,\cdot,t_k))\in\mathbb{R}^{89351}
 <div class="prev-next-area">
     <a class="left-prev"
        href="Chap_FourierAnalysis.html"
-       title="前のページ">
+       title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">前へ</p>
@@ -805,7 +823,7 @@ q_k=\operatorname{vec}(q(\cdot,\cdot,t_k))\in\mathbb{R}^{89351}
     </a>
     <a class="right-next"
        href="Chap_MCMC.html"
-       title="次ページ">
+       title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">次へ</p>
         <p class="prev-next-title"><span class="section-number">15. </span>マルコフ連鎖モンテカルロ法</p>
@@ -819,8 +837,7 @@ q_k=\operatorname{vec}(q(\cdot,\cdot,t_k))\in\mathbb{R}^{89351}
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -882,8 +899,8 @@ q_k=\operatorname{vec}(q(\cdot,\cdot,t_k))\in\mathbb{R}^{89351}
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>

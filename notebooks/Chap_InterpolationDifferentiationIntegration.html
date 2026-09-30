@@ -16,22 +16,20 @@
     document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
     document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
   </script>
-  <!--
-    this give us a css class that will be invisible only if js is disabled
-  -->
-  <noscript>
-    <style>
-      .pst-js-only { display: none !important; }
-
-    </style>
-  </noscript>
   
   <!-- Loaded before other Sphinx assets -->
-  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
-<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+  <link href="../_static/styles/theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.2/css/all.min.css?digest=dfe6caa3a7d634c4db9b" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.2/webfonts/fa-regular-400.woff2" />
 
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=a3416100" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/sphinx-book-theme.css?v=eba8b062" />
     <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css?v=13237357" />
     <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.4510f1fc1dee50b3e5859aac5469c37c29e427902b24a333a5f9fcb2f0b3ac41.css" />
@@ -39,11 +37,10 @@
     <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
     <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=8c577342" />
   
-  <!-- So that users can add custom icons -->
-  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
   <!-- Pre-loaded scripts that we'll load fully later -->
-  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
-<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b" />
+  <script src="../_static/vendor/fontawesome/6.5.2/js/all.min.js?digest=dfe6caa3a7d634c4db9b"></script>
 
     <script src="../_static/documentation_options.js?v=1cf7f4d9"></script>
     <script src="../_static/doctools.js?v=9a2dae69"></script>
@@ -71,7 +68,6 @@
     <link rel="prev" title="7. 非線形方程式" href="Chap_NonlinearEquations.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="ja"/>
-  <meta name="docsearch:version" content="" />
   </head>
   
   
@@ -79,16 +75,27 @@
 
   
   
-  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">本文へスキップ</a></div>
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
   
   <div id="pst-scroll-pixel-helper"></div>
   
   <button type="button" class="btn rounded-pill" id="pst-back-to-top">
-    <i class="fa-solid fa-arrow-up"></i>トップに戻る</button>
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
 
   
-  <dialog id="pst-search-dialog">
-    
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-primary-sidebar-checkbox"/>
+  <label class="overlay overlay-primary" for="pst-primary-sidebar-checkbox"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          id="pst-secondary-sidebar-checkbox"/>
+  <label class="overlay overlay-secondary" for="pst-secondary-sidebar-checkbox"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
 <form class="bd-search d-flex align-items-center"
       action="../search.html"
       method="get">
@@ -96,6 +103,7 @@
   <input type="search"
          class="form-control"
          name="q"
+         id="search-input"
          placeholder="Search..."
          aria-label="Search..."
          autocomplete="off"
@@ -103,11 +111,11 @@
          autocapitalize="off"
          spellcheck="false"/>
   <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
-</form>
-  </dialog>
+</form></div>
+  </div>
 
   <div class="pst-async-banner-revealer d-none">
-  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="バージョン警告"></aside>
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
 </div>
 
   
@@ -120,8 +128,7 @@
       
       
       
-      <dialog id="pst-primary-sidebar-modal"></dialog>
-      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+      <div class="bd-sidebar-primary bd-sidebar">
         
 
   
@@ -151,17 +158,21 @@
     
     
     <img src="../_static/logo_na.jpeg" class="logo__image only-light" alt="数値解析 - Home"/>
-    <img src="../_static/logo_na.jpeg" class="logo__image only-dark pst-js-only" alt="数値解析 - Home"/>
+    <script>document.write(`<img src="../_static/logo_na.jpeg" class="logo__image only-dark" alt="数値解析 - Home"/>`);</script>
   
   
 </a></div>
         <div class="sidebar-primary-item">
 
-<button class="btn search-button-field search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
- <i class="fa-solid fa-magnifying-glass"></i>
- <span class="search-button__default-text">検索</span>
- <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
-</button></div>
+ <script>
+ document.write(`
+   <button class="btn search-button-field search-button__button" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">検索</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script></div>
         <div class="sidebar-primary-item"><nav class="bd-links bd-docs-nav" aria-label="Main">
     <div class="bd-toc-item navbar-nav active">
         <p aria-level="2" class="caption" role="heading"><span class="caption-text">準備</span></p>
@@ -199,14 +210,9 @@
   
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
-      <div class="sidebar-primary-item">
-<div id="ethical-ad-placement"
-      class="flat"
-      data-ea-publisher="readthedocs"
-      data-ea-type="readthedocs-sidebar"
-      data-ea-manual="true">
-</div></div>
   </div>
+  
+  <div id="rtd-footer-container"></div>
 
 
       </div>
@@ -303,16 +309,24 @@
 
 
 
-<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
-  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="ライト"></i>
-  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="ダーク"></i>
-  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
-</button>
+<script>
+document.write(`
+  <button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="theme-switch fa-solid fa-sun fa-lg" data-mode="light"></i>
+    <i class="theme-switch fa-solid fa-moon fa-lg" data-mode="dark"></i>
+    <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"></i>
+  </button>
+`);
+</script>
 
 
-<button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
+<script>
+document.write(`
+  <button class="btn btn-sm pst-navbar-icon search-button search-button__button" title="検索" aria-label="検索" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
-</button>
+  </button>
+`);
+</script>
 <button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <span class="fa-solid fa-list"></span>
 </button>
@@ -430,7 +444,8 @@ p(x)=\frac{x_{i+1}-x}{x_{i+1}-x_i}y_i
 <p>例えば3点 <span class="math notranslate nohighlight">\((0,1),(1,2),(2,5)\)</span> を考える。まず隣同士を直線で結ぶと、<span class="math notranslate nohighlight">\([0,1]\)</span> では <span class="math notranslate nohighlight">\(p(x)=1+x\)</span>、<span class="math notranslate nohighlight">\([1,2]\)</span> では <span class="math notranslate nohighlight">\(p(x)=3x-1\)</span> となる。<span class="math notranslate nohighlight">\(x=0.5\)</span> では両端に1/2ずつ重みを付けて1.5を得る。つなぎ目 <span class="math notranslate nohighlight">\(x=1\)</span> では左右とも2なので関数は連続だが、傾きは1から3へ変わる。</p>
 <p>同じ3点を一本の放物線 <span class="math notranslate nohighlight">\(q(x)=x^2+1\)</span> で結ぶこともできる。これが<strong>2次補間</strong>であり、<span class="math notranslate nohighlight">\(x=0.5\)</span> では1.25となる。点を通るという条件だけでなく、間をどの形でつなぐかも指定している。次の図で、節点では一致しても、その間では近似値が異なることを確かめよう。</p>
 <figure class="align-default" id="fig-interpolation-linear-quadratic">
-<a class="reference internal image-reference" href="../_images/interpolation_linear_quadratic.svg"><img alt="同じ3点を折れ線と放物線で結んだ比較。xが0.5のとき区分線形補間は1.5、2次補間は1.25。" src="../_images/interpolation_linear_quadratic.svg" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="../_images/interpolation_linear_quadratic.svg"><img alt="同じ3点を折れ線と放物線で結んだ比較。xが0.5のとき区分線形補間は1.5、2次補間は1.25。" src="../_images/interpolation_linear_quadratic.svg" style="width: 100%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.1 </span><span class="caption-text">左は隣り合う点を直線でつないだ区分線形補間、右は3点を通る2次補間。同じデータでも点の間の値は異なる。右の破線は比較のために重ねた区分線形補間である。</span><a class="headerlink" href="#fig-interpolation-linear-quadratic" title="Link to this image">#</a></p>
 </figcaption>
@@ -511,7 +526,8 @@ p_2(x)=1\ell_0(x)+2\ell_1(x)+5\ell_2(x)=x^2+1.
 \]</div>
 <p>例えば <span class="math notranslate nohighlight">\(x=0.5\)</span> では <span class="math notranslate nohighlight">\((\ell_0,\ell_1,\ell_2)=(3/8,3/4,-1/8)\)</span> なので、<span class="math notranslate nohighlight">\(p_2(0.5)=3/8+2\times3/4-5/8=1.25\)</span> となる。線形補間と違い、2次以上では重みが負になることもある。</p>
 <figure class="align-default" id="fig-interpolation-lagrange-basis">
-<a class="reference internal image-reference" href="../_images/interpolation_lagrange_basis.svg"><img alt="3個のLagrange基底は担当する節点で1、他の節点で0となる。各基底にデータ値を掛けて足すと2次補間多項式になる。" src="../_images/interpolation_lagrange_basis.svg" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="../_images/interpolation_lagrange_basis.svg"><img alt="3個のLagrange基底は担当する節点で1、他の節点で0となる。各基底にデータ値を掛けて足すと2次補間多項式になる。" src="../_images/interpolation_lagrange_basis.svg" style="width: 100%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.2 </span><span class="caption-text">左は各点を担当する <span class="math notranslate nohighlight">\(\ell_0,\ell_1,\ell_2\)</span>。右は高さを掛けた <span class="math notranslate nohighlight">\(y_i\ell_i\)</span> と、その和 <span class="math notranslate nohighlight">\(p_2\)</span> である。各節点では一つの項だけが残り、指定された値を再現する。</span><a class="headerlink" href="#fig-interpolation-lagrange-basis" title="Link to this image">#</a></p>
 </figcaption>
@@ -577,7 +593,8 @@ p_h(x)=\sum_{i=0}^{n}y_i\phi_i(x)
 \]</div>
 <p>と書ける。小区間 <span class="math notranslate nohighlight">\([x_i,x_{i+1}]\)</span> の内部では <span class="math notranslate nohighlight">\(\phi_i,\phi_{i+1}\)</span> だけが0でなく、先ほどの線形補間の二つの重みと一致する。各部品が連続なので、その和も連続になる。</p>
 <figure class="align-default" id="fig-approximation-local-basis">
-<a class="reference internal image-reference" href="../_images/approximation_local_basis.svg"><img alt="帽子型の局所基底と、その高さをsin関数の節点値に合わせて足した区分線形近似。" src="../_images/approximation_local_basis.svg" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="../_images/approximation_local_basis.svg"><img alt="帽子型の局所基底と、その高さをsin関数の節点値に合わせて足した区分線形近似。" src="../_images/approximation_local_basis.svg" style="width: 100%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.3 </span><span class="caption-text">左の帽子型関数を、右ではデータ値 <span class="math notranslate nohighlight">\(y_i=\sin x_i\)</span> 倍して重ねる。色付きの各成分を足した赤い折れ線は、節点では黒い <span class="math notranslate nohighlight">\(\sin x\)</span> と一致し、その間を近似する。この基底では、一つのデータを変えた影響は隣接区間に限られる。</span><a class="headerlink" href="#fig-approximation-local-basis" title="Link to this image">#</a></p>
 </figcaption>
@@ -784,7 +801,8 @@ P_3(x)=\frac{5x^3-3x}{2}.
 </div>
 </div>
 <figure class="align-default" id="fig-orthogonal-polynomial-approximation">
-<a class="reference internal image-reference" href="../_images/orthogonal_polynomial_approximation.svg"><img alt="Legendre多項式P0からP3の形と、それらの重ね合わせによるexp関数の近似。次数0、1、2、4の近似を比較。" src="../_images/orthogonal_polynomial_approximation.svg" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="../_images/orthogonal_polynomial_approximation.svg"><img alt="Legendre多項式P0からP3の形と、それらの重ね合わせによるexp関数の近似。次数0、1、2、4の近似を比較。" src="../_images/orthogonal_polynomial_approximation.svg" style="width: 100%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.4 </span><span class="caption-text">左はLegendre基底の形、右は <span class="math notranslate nohighlight">\(f(x)=e^x\)</span> の近似 <span class="math notranslate nohighlight">\(p_N=\sum_{k=0}^{N}a_kP_k\)</span> である。<span class="math notranslate nohighlight">\(N=0\)</span> では定数だけ、<span class="math notranslate nohighlight">\(N=1\)</span> で傾き、<span class="math notranslate nohighlight">\(N=2\)</span> で曲がりを加える。<span class="math notranslate nohighlight">\(N=4\)</span> の曲線はこの表示では真の関数とほぼ重なる。係数の積分は細かい格子上の複合台形則で評価した。</span><a class="headerlink" href="#fig-orthogonal-polynomial-approximation" title="Link to this image">#</a></p>
 </figcaption>
@@ -978,7 +996,8 @@ h=1.0e-15: 誤差=0.16829803556636147
 </div>
 </div>
 <figure class="align-default" id="fig-differentiation-step-size">
-<a class="reference internal image-reference" href="../_images/differentiation_step_size.svg"><img alt="前進差分と中心差分の刻み幅に対する微分誤差" src="../_images/differentiation_step_size.svg" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/differentiation_step_size.svg"><img alt="前進差分と中心差分の刻み幅に対する微分誤差" src="../_images/differentiation_step_size.svg" style="width: 90%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.5 </span><span class="caption-text">右側では刻みを小さくすると打切り誤差が減るが、左側では近い数の差による丸め誤差が支配する。したがって、刻み幅は小さければ小さいほどよいわけではない。</span><a class="headerlink" href="#fig-differentiation-step-size" title="Link to this image">#</a></p>
 </figcaption>
@@ -1004,7 +1023,8 @@ T_n=h\left[\frac{f(a)+f(b)}{2}+\sum_{i=1}^{n-1}f(a+ih)\right],
 \]</div>
 <p>を得る。<span class="math notranslate nohighlight">\(f\)</span> が十分滑らかなら大域的な誤差は <span class="math notranslate nohighlight">\(O(h^2)\)</span> である。各内部点が左右の台形に半分ずつ現れるため、まとめると重みが1になる。</p>
 <figure class="align-default" id="fig-learning-trapezoids">
-<a class="reference internal image-reference" href="../_images/learning_trapezoids.svg"><img alt="2個の台形で曲線下の面積を近似する。中央の関数値は左右の台形の式にそれぞれ半分ずつ現れる。" src="../_images/learning_trapezoids.svg" style="width: 85%;" /></a>
+<a class="reference internal image-reference" href="../_images/learning_trapezoids.svg"><img alt="2個の台形で曲線下の面積を近似する。中央の関数値は左右の台形の式にそれぞれ半分ずつ現れる。" src="../_images/learning_trapezoids.svg" style="width: 85%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.6 </span><span class="caption-text">黒い曲線を、隣の節点を結ぶ青い破線で置き換え、その下の色付き面積を足す。<span class="math notranslate nohighlight">\(h=1\)</span>、<span class="math notranslate nohighlight">\(f_i=f(x_i)\)</span> の例では、中央の高さ <span class="math notranslate nohighlight">\(f_1\)</span> が左右から <span class="math notranslate nohighlight">\(h/2\)</span> ずつ寄与し、合計の係数は <span class="math notranslate nohighlight">\(h\)</span> になる。端点の高さは1回しか現れず、係数は <span class="math notranslate nohighlight">\(h/2\)</span> のままである。</span><a class="headerlink" href="#fig-learning-trapezoids" title="Link to this image">#</a></p>
 </figcaption>
@@ -1274,7 +1294,8 @@ x_i=\cos\frac{i\pi}{n},\qquad i=0,\ldots,n
 </div>
 </div>
 <figure class="align-default" id="fig-interpolation-node-placement">
-<a class="reference internal image-reference" href="../_images/interpolation_node_placement.svg"><img alt="Runge関数に対する等間隔点とChebyshev点の多項式補間" src="../_images/interpolation_node_placement.svg" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/interpolation_node_placement.svg"><img alt="Runge関数に対する等間隔点とChebyshev点の多項式補間" src="../_images/interpolation_node_placement.svg" style="width: 90%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.7 </span><span class="caption-text">多項式の次数が同じでも、補間点の配置によって端点付近の振動は大きく変わる。高次補間では次数だけでなく点配置が重要である。</span><a class="headerlink" href="#fig-interpolation-node-placement" title="Link to this image">#</a></p>
 </figcaption>
@@ -1441,7 +1462,8 @@ exp(x), n=3: 誤差 = 6.54586075912178e-5
 </div>
 </div>
 <figure class="align-default" id="fig-gauss-legendre-nodes">
-<a class="reference internal image-reference" href="../_images/gauss_legendre_nodes.svg"><img alt="3点Gauss--Legendre積分の節点とLegendre多項式P3" src="../_images/gauss_legendre_nodes.svg" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="../_images/gauss_legendre_nodes.svg"><img alt="3点Gauss--Legendre積分の節点とLegendre多項式P3" src="../_images/gauss_legendre_nodes.svg" style="width: 90%;" />
+</a>
 <figcaption>
 <p><span class="caption-number">図 8.8 </span><span class="caption-text">赤点は <span class="math notranslate nohighlight">\(P_3\)</span> の零点であり、3点Gauss--Legendre積分の節点になる。点の大きさと下の数値は重みを表し、中央に近い節点ほど大きな重みを持つ。</span><a class="headerlink" href="#fig-gauss-legendre-nodes" title="Link to this image">#</a></p>
 </figcaption>
@@ -1512,7 +1534,7 @@ exp(x), n=3: 誤差 = 6.54586075912178e-5
 <div class="prev-next-area">
     <a class="left-prev"
        href="Chap_NonlinearEquations.html"
-       title="前のページ">
+       title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">前へ</p>
@@ -1521,7 +1543,7 @@ exp(x), n=3: 誤差 = 6.54586075912178e-5
     </a>
     <a class="right-next"
        href="Chap_InitialValueProblems.html"
-       title="次ページ">
+       title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">次へ</p>
         <p class="prev-next-title"><span class="section-number">9. </span>常微分方程式の初期値問題</p>
@@ -1535,8 +1557,7 @@ exp(x), n=3: 誤差 = 6.54586075912178e-5
             
             
               
-                <dialog id="pst-secondary-sidebar-modal"></dialog>
-                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
 
 
   <div class="sidebar-secondary-item">
@@ -1609,8 +1630,8 @@ exp(x), n=3: 誤差 = 6.54586075912178e-5
   </div>
   
   <!-- Scripts loaded after <body> so the DOM is not blocked -->
-  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
-<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+  <script src="../_static/scripts/bootstrap.js?digest=dfe6caa3a7d634c4db9b"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=dfe6caa3a7d634c4db9b"></script>
 
   <footer class="bd-footer">
   </footer>
