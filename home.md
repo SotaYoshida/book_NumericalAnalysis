@@ -10,7 +10,7 @@
 
 ```{image} pic/home.png
 :alt: 数値計算の例
-:width: 80%
+:width: 100%
 :align: center
 ```
 
